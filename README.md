@@ -2,14 +2,6 @@
 
 GoDeploy is a command-line tool for bootstrapping and configuring Single Page Application (SPA) deployments using Docker and Nginx. It simplifies the process of setting up a multi-SPA server where multiple SPAs can be hosted under a single domain with different paths.
 
-## Features
-
-- **Local Development**: Quickly serve your SPAs locally for testing
-- **Production Deployment**: Generate all necessary files for production deployment
-- **Multi-SPA Support**: Host multiple SPAs under a single domain with different paths
-- **Automatic Configuration**: Automatically configure Nginx for assets, locales, and routing
-- **Docker Integration**: Generate Dockerfile for easy deployment
-
 ## Installation
 
 ```bash
@@ -23,6 +15,34 @@ git clone https://github.com/audetic/godeploy.git
 cd godeploy
 go build -o godeploy ./cmd/godeploy
 ```
+
+## Quick Start
+
+Here's a quick reference of common commands and their purposes:
+
+```bash
+# Create a new deployment configuration
+godeploy -config spa-config.json deploy
+
+# Start local development server on port 8082
+godeploy serve
+
+# Generate deployment files to a custom directory
+godeploy -output custom-deploy deploy
+
+# Generate deployment files with a custom config
+godeploy -config custom-config.json deploy
+
+# Start local server with custom config
+godeploy -config custom-config.json serve
+```
+
+| Command                   | Description                                                                   |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `godeploy deploy`         | Generates deployment files (Nginx configs, Dockerfile) in `deploy/` directory |
+| `godeploy serve`          | Starts a local Docker container for testing on port 8082                      |
+| `godeploy -config <file>` | Uses a custom configuration file instead of `spa-config.json`                 |
+| `godeploy -output <dir>`  | Outputs deployment files to a custom directory instead of `deploy/`           |
 
 ## Usage
 
@@ -104,6 +124,14 @@ Commands:
 
 For command-specific help, run: godeploy <command> -h
 ```
+
+## Features
+
+- **Local Development**: Quickly serve your SPAs locally for testing
+- **Production Deployment**: Generate all necessary files for production deployment
+- **Multi-SPA Support**: Host multiple SPAs under a single domain with different paths
+- **Automatic Configuration**: Automatically configure Nginx for assets, locales, and routing
+- **Docker Integration**: Generate Dockerfile for easy deployment
 
 ## How It Works
 
