@@ -1,11 +1,11 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/alecthomas/kong"
 	"github.com/audetic/godeploy/pkg/config"
 	"github.com/audetic/godeploy/pkg/docker"
 	"github.com/audetic/godeploy/pkg/nginx"
@@ -16,73 +16,81 @@ const (
 	defaultOutputDir  = "deploy"
 )
 
-func main() {
-	// Define command-line flags
-	configPath := flag.String("config", defaultConfigPath, "Path to the SPA configuration file")
-	outputDir := flag.String("output", defaultOutputDir, "Output directory for deployment files")
+// CLI represents the command-line interface structure
+var CLI struct {
+	// Global flags
+	Config string `help:"Path to the SPA configuration file" default:"spa-config.json"`
 
-	// Define custom usage function
-	flag.Usage = func() {
-		printUsage()
-	}
+	// Commands
+	Serve  ServeCmd  `cmd:"" help:"Start a local server for testing"`
+	Deploy DeployCmd `cmd:"" help:"Generate deployment files"`
+}
 
-	// Define subcommands
-	serveCmd := flag.NewFlagSet("serve", flag.ExitOnError)
+// ServeCmd represents the serve command
+type ServeCmd struct {
+	Output string `help:"Output directory for deployment files" default:"deploy"`
+}
 
-	deployCmd := flag.NewFlagSet("deploy", flag.ExitOnError)
-	deployOutput := deployCmd.String("output", defaultOutputDir, "Output directory for deployment files")
+// DeployCmd represents the deploy command
+type DeployCmd struct {
+	Output string `help:"Output directory for deployment files" default:"deploy"`
+}
 
-	// Parse the main flags
-	flag.Parse()
-
-	// Check if a subcommand is provided
-	if len(flag.Args()) < 1 {
-		printUsage()
-		os.Exit(1)
-	}
-
+// Run executes the serve command
+func (s *ServeCmd) Run() error {
 	// Load the SPA configuration
-	spaConfig, err := config.LoadConfig(*configPath)
+	spaConfig, err := config.LoadConfig(CLI.Config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading configuration: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("error loading configuration: %w", err)
 	}
 
-	// Process the subcommand
-	switch flag.Args()[0] {
-	case "serve":
-		// Parse the serve subcommand flags
-		serveCmd.Parse(flag.Args()[1:])
+	// Generate deployment files
+	if err := generateDeploymentFiles(spaConfig, s.Output); err != nil {
+		return fmt.Errorf("error generating deployment files: %w", err)
+	}
 
-		// Generate deployment files
-		if err := generateDeploymentFiles(spaConfig, *outputDir); err != nil {
-			fmt.Fprintf(os.Stderr, "Error generating deployment files: %v\n", err)
-			os.Exit(1)
-		}
+	// Run the server locally
+	fmt.Println("Starting server with Docker...")
+	if err := docker.RunLocalDocker(s.Output); err != nil {
+		return fmt.Errorf("error running Docker: %w", err)
+	}
 
-		// Run the server locally
-		fmt.Println("Starting server with Docker...")
-		if err := docker.RunLocalDocker(*outputDir); err != nil {
-			fmt.Fprintf(os.Stderr, "Error running Docker: %v\n", err)
-			os.Exit(1)
-		}
+	return nil
+}
 
-	case "deploy":
-		// Parse the deploy subcommand flags
-		deployCmd.Parse(flag.Args()[1:])
+// Run executes the deploy command
+func (d *DeployCmd) Run() error {
+	// Load the SPA configuration
+	spaConfig, err := config.LoadConfig(CLI.Config)
+	if err != nil {
+		return fmt.Errorf("error loading configuration: %w", err)
+	}
 
-		// Generate deployment files
-		if err := generateDeploymentFiles(spaConfig, *deployOutput); err != nil {
-			fmt.Fprintf(os.Stderr, "Error generating deployment files: %v\n", err)
-			os.Exit(1)
-		}
+	// Generate deployment files
+	if err := generateDeploymentFiles(spaConfig, d.Output); err != nil {
+		return fmt.Errorf("error generating deployment files: %w", err)
+	}
 
-		fmt.Printf("Deployment files generated in %s\n", *deployOutput)
-		fmt.Println("You can now deploy these files to your cloud provider.")
+	fmt.Printf("Deployment files generated in %s\n", d.Output)
+	fmt.Println("You can now deploy these files to your cloud provider.")
 
-	default:
-		fmt.Fprintf(os.Stderr, "Unknown subcommand: %s\n", flag.Args()[0])
-		printUsage()
+	return nil
+}
+
+func main() {
+	ctx := kong.Parse(&CLI,
+		kong.Name("godeploy"),
+		kong.Description("A CLI tool for bootstrapping and configuring SPA deployments using Docker and Nginx"),
+		kong.UsageOnError(),
+		kong.ConfigureHelp(kong.HelpOptions{
+			Compact: true,
+			Summary: true,
+		}),
+	)
+
+	err := ctx.Run()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -124,18 +132,4 @@ func generateDeploymentFiles(spaConfig *config.SpaConfig, outputDir string) erro
 	}
 
 	return nil
-}
-
-// printUsage prints the usage information
-func printUsage() {
-	fmt.Println("Usage: godeploy [options] <command>")
-	fmt.Println()
-	fmt.Println("Options:")
-	flag.PrintDefaults()
-	fmt.Println()
-	fmt.Println("Commands:")
-	fmt.Println("  serve    Start a local server for testing")
-	fmt.Println("  deploy   Generate deployment files")
-	fmt.Println()
-	fmt.Println("For command-specific help, run: godeploy <command> -h")
 }

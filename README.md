@@ -22,27 +22,27 @@ Here's a quick reference of common commands and their purposes:
 
 ```bash
 # Create a new deployment configuration
-godeploy -config spa-config.json deploy
+godeploy deploy
 
 # Start local development server on port 8082
 godeploy serve
 
 # Generate deployment files to a custom directory
-godeploy -output custom-deploy deploy
+godeploy deploy --output custom-deploy
 
 # Generate deployment files with a custom config
-godeploy -config custom-config.json deploy
+godeploy --config custom-config.json deploy
 
 # Start local server with custom config
-godeploy -config custom-config.json serve
+godeploy --config custom-config.json serve
 ```
 
-| Command                   | Description                                                                   |
-| ------------------------- | ----------------------------------------------------------------------------- |
-| `godeploy deploy`         | Generates deployment files (Nginx configs, Dockerfile) in `deploy/` directory |
-| `godeploy serve`          | Starts a local Docker container for testing on port 8082                      |
-| `godeploy -config <file>` | Uses a custom configuration file instead of `spa-config.json`                 |
-| `godeploy -output <dir>`  | Outputs deployment files to a custom directory instead of `deploy/`           |
+| Command                          | Description                                                                   |
+| -------------------------------- | ----------------------------------------------------------------------------- |
+| `godeploy deploy`                | Generates deployment files (Nginx configs, Dockerfile) in `deploy/` directory |
+| `godeploy serve`                 | Starts a local Docker container for testing on port 8082                      |
+| `godeploy --config <file>`       | Uses a custom configuration file instead of `spa-config.json`                 |
+| `godeploy deploy --output <dir>` | Outputs deployment files to a custom directory instead of `deploy/`           |
 
 ## Usage
 
@@ -110,19 +110,19 @@ You can then deploy these files to your cloud provider of choice.
 ### Options
 
 ```
-Usage: godeploy [options] <command>
+Usage: godeploy <command> [flags]
 
-Options:
-  -config string
-        Path to the SPA configuration file (default "spa-config.json")
-  -output string
-        Output directory for deployment files (default "deploy")
+A CLI tool for bootstrapping and configuring SPA deployments using Docker and Nginx
+
+Flags:
+  -h, --help                        Show context-sensitive help.
+      --config="spa-config.json"    Path to the SPA configuration file
 
 Commands:
-  serve    Start a local server for testing
-  deploy   Generate deployment files
+  serve     Start a local server for testing
+  deploy    Generate deployment files
 
-For command-specific help, run: godeploy <command> -h
+Run "godeploy <command> --help" for more information on a command.
 ```
 
 ## Features
