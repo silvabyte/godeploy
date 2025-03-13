@@ -21,6 +21,9 @@ go build -o godeploy ./cmd/godeploy
 Here's a quick reference of common commands and their purposes:
 
 ```bash
+# Initialize a new configuration file
+godeploy init
+
 # Create a new deployment configuration
 godeploy deploy
 
@@ -39,6 +42,8 @@ godeploy --config custom-config.json serve
 
 | Command                          | Description                                                                   |
 | -------------------------------- | ----------------------------------------------------------------------------- |
+| `godeploy init`                  | Creates a default spa-config.json file in the current directory               |
+| `godeploy init --force`          | Creates or overwrites the spa-config.json file                                |
 | `godeploy deploy`                | Generates deployment files (Nginx configs, Dockerfile) in `deploy/` directory |
 | `godeploy serve`                 | Starts a local Docker container for testing on port 8082                      |
 | `godeploy --config <file>`       | Uses a custom configuration file instead of `spa-config.json`                 |
@@ -70,7 +75,27 @@ Create a `spa-config.json` file to define your SPAs:
 }
 ```
 
+You can generate this file automatically using the `init` command:
+
+```bash
+godeploy init
+```
+
 ### Commands
+
+#### Initialize Configuration
+
+To create a new configuration file:
+
+```bash
+godeploy init
+```
+
+This will create a default `spa-config.json` file in the current directory. If the file already exists, you can use the `--force` flag to overwrite it:
+
+```bash
+godeploy init --force
+```
 
 #### Serve Locally
 
@@ -121,6 +146,7 @@ Flags:
 Commands:
   serve     Start a local server for testing
   deploy    Generate deployment files
+  init      Initialize a new spa-config.json file
 
 Run "godeploy <command> --help" for more information on a command.
 ```

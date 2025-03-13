@@ -19,6 +19,7 @@ var CLI struct {
 	// Commands
 	Serve  ServeCmd  `cmd:"" help:"Start a local server for testing"`
 	Deploy DeployCmd `cmd:"" help:"Generate deployment files"`
+	Init   InitCmd   `cmd:"" help:"Initialize a new spa-config.json file"`
 }
 
 // ServeCmd represents the serve command
@@ -30,6 +31,25 @@ type ServeCmd struct {
 type DeployCmd struct {
 	Output string `help:"Output directory for deployment files" default:"deploy"`
 }
+
+// InitCmd represents the init command
+type InitCmd struct {
+	Force bool `help:"Overwrite existing config file if it exists" short:"f"`
+}
+
+// defaultConfig is the default configuration template
+const defaultConfig = `{
+  "default_app": "yourAppName",
+  "apps": [
+    {
+      "name": "yourAppName",
+      "source_dir": "dist",
+      "description": "Your application description",
+      "enabled": true
+    }
+  ]
+}
+`
 
 // Run executes the serve command
 func (s *ServeCmd) Run() error {
@@ -69,6 +89,25 @@ func (d *DeployCmd) Run() error {
 	fmt.Printf("Deployment files generated in %s\n", d.Output)
 	fmt.Println("You can now deploy these files to your cloud provider.")
 
+	return nil
+}
+
+// Run executes the init command
+func (i *InitCmd) Run() error {
+	configPath := CLI.Config
+
+	// Check if the file already exists
+	if _, err := os.Stat(configPath); err == nil && !i.Force {
+		return fmt.Errorf("config file %s already exists. Use --force to overwrite", configPath)
+	}
+
+	// Create the config file
+	if err := os.WriteFile(configPath, []byte(defaultConfig), 0644); err != nil {
+		return fmt.Errorf("failed to create config file: %w", err)
+	}
+
+	fmt.Printf("Created config file: %s\n", configPath)
+	fmt.Println("You can now edit this file to configure your SPAs.")
 	return nil
 }
 
