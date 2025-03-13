@@ -1,0 +1,11 @@
+{
+    "default_app": "auth",
+    "apps": [
+        {
+            "name": "auth",
+            "source_dir": "example-spa/dist",
+            "description": "Authentication application",
+            "enabled": true
+        }
+    ]
+}

@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/audetic/godeploy/pkg/config"
@@ -76,6 +77,28 @@ func RunLocalDocker(outputDir string) error {
 		return fmt.Errorf("Docker is not installed or not in PATH: %w", err)
 	}
 
+	// Container name
+	containerName := "audetic-spa-server"
+
+	// Check if the container is already running and stop/remove it
+	fmt.Println("Checking for existing container...")
+	checkCmd := exec.Command("docker", "ps", "-a", "--filter", fmt.Sprintf("name=%s", containerName), "--format", "{{.ID}}")
+	output, err := checkCmd.Output()
+	if err == nil && len(output) > 0 {
+		containerId := strings.TrimSpace(string(output))
+		if containerId != "" {
+			fmt.Printf("Found existing container %s, stopping and removing it...\n", containerName)
+			// Stop the container if it's running
+			stopCmd := exec.Command("docker", "stop", containerId)
+			stopCmd.Run() // Ignore errors, as the container might not be running
+
+			// Remove the container
+			if err := runCommand("docker", "rm", containerId); err != nil {
+				return fmt.Errorf("failed to remove existing container: %w", err)
+			}
+		}
+	}
+
 	// Build the Docker image
 	fmt.Println("Building Docker image...")
 	if err := runCommand("docker", "build", "-t", "audetic-spa-server", outputDir); err != nil {
@@ -85,7 +108,7 @@ func RunLocalDocker(outputDir string) error {
 	// Run the Docker container
 	fmt.Println("Running Docker container on http://localhost:8082")
 	fmt.Println("Press Ctrl+C to stop the server")
-	cmd := exec.Command("docker", "run", "--rm", "-p", "8082:80", "--name", "audetic-spa-server", "audetic-spa-server")
+	cmd := exec.Command("docker", "run", "--rm", "-p", "8082:80", "--name", containerName, "audetic-spa-server")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()

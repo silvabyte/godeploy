@@ -40,10 +40,22 @@ http {
 
 	defaultConfTemplate = `server {
     listen       80;
+    server_name  localhost;
+
+    # Set port for redirects when running locally
+    set $port "";
+    if ($http_host ~ "^[^:]+:(\d+)$") {
+        set $port ":$1";
+    }
 
     # Root redirect to default app
     location = / {
-        return 301 /{{.DefaultApp}}/;
+        return 301 $scheme://$host$port/{{.DefaultApp}}/;
+    }
+
+    # Handle root favicon.ico - redirect to default app's favicon
+    location = /favicon.ico {
+        return 301 $scheme://$host$port/{{.DefaultApp}}/favicon.ico;
     }
 
     # Include app-specific configurations
