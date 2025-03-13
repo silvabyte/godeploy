@@ -1,0 +1,23 @@
+{
+    "default_app": "auth",
+    "apps": [
+        {
+            "name": "auth",
+            "source_dir": "dist",
+            "description": "Authentication application",
+            "enabled": true
+        },
+        {
+            "name": "dashboard",
+            "source_dir": "dashboard-dist",
+            "description": "User dashboard application",
+            "enabled": false
+        },
+        {
+            "name": "admin",
+            "source_dir": "admin-dist",
+            "description": "Admin panel application",
+            "enabled": false
+        }
+    ]
+}
