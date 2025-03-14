@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.2] - 2025-03-14
+
+* chore: clean up emoji use
+* chore: add more perf readme juju
+* docs: add upcoming `godeploy deploy` feature to README with alpha sign-up link
+* chore: add more kool-aid
+* chore: release v0.1.1
+
 ## [0.1.1] - 2025-03-14
 
 * chore: update Go version to 1.22 and modify build command in CI workflow
