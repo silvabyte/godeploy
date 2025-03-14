@@ -233,3 +233,28 @@ Or push to your container registry and deploy to your cloud provider.
 ## 📝 License
 
 MIT
+
+--- More notes ---
+
+## ✅ **Reality Check: Nginx vs Full-Stack Frameworks for Serving SPAs**
+
+### ⚡ **TL;DR: Nginx is orders of magnitude faster at serving static files than any full-stack SSR framework — because that's what it's built for.**
+
+| Task                                        | Nginx (Static Files)                        | Next.js / Nuxt.js / Remix (SSR/Edge/Static Hybrid)       |
+| ------------------------------------------- | ------------------------------------------- | -------------------------------------------------------- |
+| **Raw static file serving (HTML, CSS, JS)** | 🔥 ~50,000+ req/sec (depending on hardware) | ❌ Slower: adds V8 runtime, middleware, routing overhead |
+| **First byte latency (static assets)**      | ⚡ 1-5ms                                    | 🐢 30-70ms typical for dynamic/SSR content               |
+| **Concurrent connections (commodity VPS)**  | 10,000+ sustained                           | Limited, often <500 (due to Node.js single-thread & V8)  |
+| **Memory footprint (idle/static serving)**  | 🚀 ~5-10MB                                  | 🐘 100-400MB+ for typical Node.js SSR servers            |
+| **Response time variability**               | ✅ Predictable & consistent                 | ❌ Can vary under load, cold starts, edge locations      |
+| **CDN optimization compatibility**          | ✅ Plug-and-play, cache forever             | ❌ SSR adds complexity in CDN caching, stales fast       |
+
+---
+
+### ✅ **Sources / Performance Context:**
+
+1. **Nginx Static Serving Benchmarks**: 40,000 to 100,000 requests/sec on modern instances ([source](https://www.nginx.com/blog/testing-the-performance-of-nginx-and-nginx-plus-web-servers/)).
+2. **Next.js Edge + SSR**: Typical latency 30-100ms for dynamic SSR pages, can increase under load ([source](https://vercel.com/docs/concepts/functions/edge-functions/edge-performance)).
+3. **Remix SSR**: Similar latency and overhead to Next.js — full SSR adds substantial routing and logic layer between client and assets ([Remix architecture docs](https://remix.run/docs/en/main/guides/data-loading)).
+4. **Node.js server limits**: Well-known event-loop saturation issues — usually requires horizontal scaling much faster than Nginx
+5. **CDN + Static combo**: Nginx plays perfectly with CDNs (Cloudflare, Fastly) for cache-control + stale-while-revalidate patterns — hard to do properly with SSR apps that require fresh data.
