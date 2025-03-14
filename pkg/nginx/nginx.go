@@ -101,7 +101,7 @@ location ~* ^/{{.AppName}}/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]css(?:[.]map)?)$
     add_header Cache-Control "no-cache";
 }
 location ~* ^/locales/(.+)$ {
-    return 301 /{{.AppName}}/locales/$1;
+    return 301 $scheme://$host$port/{{.AppName}}/locales/$1;
 }
 `
 )
