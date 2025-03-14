@@ -1,7 +1,3 @@
-Here's a **clean, well-structured "Advanced Configuration" doc** that matches the improved style and devx we applied to your Quickstart. It's optimized for readability and fast comprehension by developers:
-
----
-
 # ⚙️ Advanced Configuration — GoDeploy
 
 Take your **Single Page Application (SPA) deployments** to the next level with **multi-SPA support, advanced command options, and custom output directories**.
@@ -189,7 +185,3 @@ godeploy deploy --output custom-output
 
 Need more control over Nginx?  
 ➡️ After running `godeploy deploy`, **edit the generated `nginx.conf`** before building your Docker image.
-
----
-
-Want me to package this up as a ready-to-drop `docs/advanced-configuration.md` file?
