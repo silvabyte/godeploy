@@ -1,7 +1,3 @@
-Here's a **cleaned up and improved version** of your **GoDeploy Quickstart**, focusing on **clearer flow, better formatting, and stronger developer experience (DevX)** — without adding unnecessary verbosity:
-
----
-
 # 🚀 GoDeploy — Simple SPA Deployment with Docker + Nginx
 
 [![Release: Automated with xrelease](https://img.shields.io/badge/Release-Automated%20with%20xrelease-blueviolet?logo=github&logoColor=white)](https://github.com/matsilva/xrelease)
@@ -147,6 +143,3 @@ For **multi-SPA**, **custom Nginx config**, and **advanced workflows**, check ou
 
 MIT
 
----
-
-Let me know if you want a **Markdown file** version ready to drop in `README.md`.
