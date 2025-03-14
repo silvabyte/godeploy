@@ -30,6 +30,12 @@ godeploy deploy
 # Start local development server on port 8082
 godeploy serve
 
+# Start local development server on a custom port
+godeploy serve --port 3000
+
+# Start local development server with a custom Docker image name
+godeploy serve --image-name my-custom-spa-server
+
 # Generate deployment files to a custom directory
 godeploy deploy --output custom-deploy
 
@@ -40,14 +46,16 @@ godeploy --config custom-config.json deploy
 godeploy --config custom-config.json serve
 ```
 
-| Command                          | Description                                                                   |
-| -------------------------------- | ----------------------------------------------------------------------------- |
-| `godeploy init`                  | Creates a default spa-config.json file in the current directory               |
-| `godeploy init --force`          | Creates or overwrites the spa-config.json file                                |
-| `godeploy deploy`                | Generates deployment files (Nginx configs, Dockerfile) in `deploy/` directory |
-| `godeploy serve`                 | Starts a local Docker container for testing on port 8082                      |
-| `godeploy --config <file>`       | Uses a custom configuration file instead of `spa-config.json`                 |
-| `godeploy deploy --output <dir>` | Outputs deployment files to a custom directory instead of `deploy/`           |
+| Command                              | Description                                                                   |
+| ------------------------------------ | ----------------------------------------------------------------------------- |
+| `godeploy init`                      | Creates a default spa-config.json file in the current directory               |
+| `godeploy init --force`              | Creates or overwrites the spa-config.json file                                |
+| `godeploy deploy`                    | Generates deployment files (Nginx configs, Dockerfile) in `deploy/` directory |
+| `godeploy serve`                     | Starts a local Docker container for testing on port 8082                      |
+| `godeploy serve --port <port>`       | Starts a local Docker container on the specified port                         |
+| `godeploy serve --image-name <name>` | Uses a custom Docker image name instead of the default                        |
+| `godeploy --config <file>`           | Uses a custom configuration file instead of `spa-config.json`                 |
+| `godeploy deploy --output <dir>`     | Outputs deployment files to a custom directory instead of `deploy/`           |
 
 ## Usage
 
@@ -116,6 +124,18 @@ You can access your SPAs at:
 - Default app: http://localhost:8082/
 - Specific app: http://localhost:8082/[app-name]/
 
+To use a different port:
+
+```bash
+godeploy serve --port 3000
+```
+
+To use a custom Docker image name:
+
+```bash
+godeploy serve --image-name my-custom-spa-server
+```
+
 #### Generate Deployment Files
 
 To generate files for production deployment:
@@ -145,8 +165,13 @@ Flags:
 
 Commands:
   serve     Start a local server for testing
+    --output="deploy"               Output directory for deployment files
+    --port=8082                     Port to run the server on
+    --image-name="godeploy-spa-server"  Docker image name
   deploy    Generate deployment files
+    --output="deploy"               Output directory for deployment files
   init      Initialize a new spa-config.json file
+    -f, --force                     Overwrite existing config file if it exists
 
 Run "godeploy <command> --help" for more information on a command.
 ```
@@ -158,6 +183,7 @@ Run "godeploy <command> --help" for more information on a command.
 - **Multi-SPA Support**: Host multiple SPAs under a single domain with different paths
 - **Automatic Configuration**: Automatically configure Nginx for assets, locales, and routing
 - **Docker Integration**: Generate Dockerfile for easy deployment
+- **Customizable**: Configure port and Docker image name to avoid conflicts
 
 ## How It Works
 

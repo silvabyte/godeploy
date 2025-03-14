@@ -24,7 +24,9 @@ var CLI struct {
 
 // ServeCmd represents the serve command
 type ServeCmd struct {
-	Output string `help:"Output directory for deployment files" default:"deploy"`
+	Output    string `help:"Output directory for deployment files" default:"deploy"`
+	Port      int    `help:"Port to run the server on" default:"8082"`
+	ImageName string `help:"Docker image name" default:"godeploy-spa-server"`
 }
 
 // DeployCmd represents the deploy command
@@ -66,7 +68,7 @@ func (s *ServeCmd) Run() error {
 
 	// Run the server locally
 	fmt.Println("Starting server with Docker...")
-	if err := docker.RunLocalDocker(s.Output); err != nil {
+	if err := docker.RunLocalDocker(s.Output, s.Port, s.ImageName); err != nil {
 		return fmt.Errorf("error running Docker: %w", err)
 	}
 

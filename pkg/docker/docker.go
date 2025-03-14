@@ -71,14 +71,19 @@ func GenerateDockerfile(spaConfig *config.SpaConfig, outputDir string) error {
 }
 
 // RunLocalDocker runs the SPA server locally using Docker
-func RunLocalDocker(outputDir string) error {
+func RunLocalDocker(outputDir string, port int, imageName string) error {
 	// Check if Docker is installed
 	if err := runCommand("docker", "--version"); err != nil {
 		return fmt.Errorf("Docker is not installed or not in PATH: %w", err)
 	}
 
-	// Container name
-	containerName := "audetic-spa-server"
+	// If image name is not provided, use default
+	if imageName == "" {
+		imageName = "godeploy-spa-server"
+	}
+
+	// Container name - derive from image name
+	containerName := imageName
 
 	// Check if the container is already running and stop/remove it
 	fmt.Println("Checking for existing container...")
@@ -101,14 +106,14 @@ func RunLocalDocker(outputDir string) error {
 
 	// Build the Docker image
 	fmt.Println("Building Docker image...")
-	if err := runCommand("docker", "build", "-t", "audetic-spa-server", outputDir); err != nil {
+	if err := runCommand("docker", "build", "-t", imageName, outputDir); err != nil {
 		return fmt.Errorf("failed to build Docker image: %w", err)
 	}
 
 	// Run the Docker container
-	fmt.Println("Running Docker container on http://localhost:8082")
+	fmt.Printf("Running Docker container on http://localhost:%d\n", port)
 	fmt.Println("Press Ctrl+C to stop the server")
-	cmd := exec.Command("docker", "run", "--rm", "-p", "8082:80", "--name", containerName, "audetic-spa-server")
+	cmd := exec.Command("docker", "run", "--rm", "-p", fmt.Sprintf("%d:80", port), "--name", containerName, imageName)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
