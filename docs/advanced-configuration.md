@@ -1,12 +1,12 @@
 # ⚙️ Advanced Configuration — GoDeploy
 
-Take your **Single Page Application (SPA) deployments** to the next level with **multi-SPA support, advanced command options, and custom output directories**.
+Level up your SPA containerization with **multi-app support**, **custom Docker output**, and **fine-tuned CLI options** — all without extra DevOps overhead.
 
 ---
 
 ## 🚀 Multi-SPA Configuration
 
-GoDeploy can deploy **multiple SPAs** under a single domain — each on its own route.
+Host **multiple SPAs under one domain**, each on its own route — great for dashboards, admin panels, or microsites.
 
 ### Example `spa-config.json`
 
@@ -30,118 +30,126 @@ GoDeploy can deploy **multiple SPAs** under a single domain — each on its own
 }
 ```
 
-### Resulting Routes
+### Automatic Routes
 
-| App Name    | Route            |
-| ----------- | ---------------- |
-| `auth`      | `/` and `/auth/` |
-| `dashboard` | `/dashboard/`    |
+| App Name    | URL Paths     |
+| ----------- | ------------- |
+| `auth`      | `/`, `/auth/` |
+| `dashboard` | `/dashboard/` |
 
-> ✅ **Note**: The `default_app` is served on `/` and `/auth/`.
+> ✅ **Note**: `default_app` is served on `/` and its name-based path.
 
 ---
 
-## 🛠️ Command Line Options
+## 🛠️ CLI Options
 
 ### 🌍 Global Option
 
-| Option                       | Description                                         |
-| ---------------------------- | --------------------------------------------------- |
-| `--config="spa-config.json"` | Use custom config file (default: `spa-config.json`) |
+| Option                       | Description                                           |
+| ---------------------------- | ----------------------------------------------------- |
+| `--config="spa-config.json"` | Use a custom config file (default: `spa-config.json`) |
 
 ---
 
 ### 🧪 Serve Command
 
-Run and test SPAs locally in Docker.
+Run and preview SPAs **locally in Docker**.
 
 ```bash
 godeploy serve [options]
 ```
 
-| Option                        | Description                                |
-| ----------------------------- | ------------------------------------------ |
-| `--port=8082`                 | Set custom port (default: `8082`)          |
-| `--image-name="custom-image"` | Use custom Docker image name               |
-| `--output="deploy"`           | Set output folder for deployment artifacts |
+| Option                        | Description                                     |
+| ----------------------------- | ----------------------------------------------- |
+| `--port=8082`                 | Set custom port (default: `8082`)               |
+| `--image-name="custom-image"` | Use custom Docker image name                    |
+| `--output="deploy"`           | Set output folder for generated container files |
 
 ---
 
-### 🚀 Deploy Command
+### 📦 Package Command
 
-Generate Nginx configs, Dockerfile, and SPA assets for deployment.
+Package everything for production — Docker, Nginx, assets.
 
 ```bash
-godeploy deploy [options]
+godeploy package [options]
 ```
 
-| Option              | Description                                   |
-| ------------------- | --------------------------------------------- |
-| `--output="deploy"` | Set custom output folder (default: `deploy/`) |
+| Option              | Description                           |
+| ------------------- | ------------------------------------- |
+| `--output="deploy"` | Output directory (default: `deploy/`) |
 
 ---
 
 ### ⚙️ Init Command
 
-Create `spa-config.json` interactively.
+Scaffold a default config quickly.
 
 ```bash
 godeploy init [options]
 ```
 
-| Option        | Description                    |
-| ------------- | ------------------------------ |
-| `-f, --force` | Overwrite existing config file |
+| Option        | Description                          |
+| ------------- | ------------------------------------ |
+| `-f, --force` | Overwrite existing `spa-config.json` |
 
 ---
 
-## ✅ Full Command Reference
+## ✅ Complete CLI Reference
 
 | Command                              | Description                                       |
 | ------------------------------------ | ------------------------------------------------- |
-| `godeploy init`                      | Create default `spa-config.json`                  |
-| `godeploy init --force`              | Overwrite existing `spa-config.json`              |
-| `godeploy deploy`                    | Generate deployable Docker/Nginx setup            |
-| `godeploy deploy --output <dir>`     | Output deployment files to custom directory       |
+| `godeploy init`                      | Create a default `spa-config.json`                |
+| `godeploy init --force`              | Overwrite existing config                         |
+| `godeploy package`                   | Generate containerized Docker + Nginx setup       |
+| `godeploy package --output <dir>`    | Output to custom directory                        |
 | `godeploy serve`                     | Serve SPAs locally in Docker (default port: 8082) |
 | `godeploy serve --port <port>`       | Serve on custom port                              |
 | `godeploy serve --image-name <name>` | Use custom Docker image name                      |
-| `godeploy --config <file>`           | Use custom config file                            |
+| `godeploy --config <file>`           | Use a custom config file                          |
 
 ---
 
-## 🔍 Technical Overview
+## 🔍 How It Works
 
 ### 1. **Config-Driven, Zero-Code Setup**
 
-- Define SPAs, source directories, and defaults in `spa-config.json`.
-- Multi-app aware, route-based serving (e.g., `/auth/`, `/dashboard/`).
+- Define each SPA and source directory in `spa-config.json`.
+- Supports **multi-app routing** out of the box.
+
+---
 
 ### 2. **Automatic Asset Handling**
 
-- Processes hashed assets (e.g., `index-CgbRfOA8.js`) for cache-busting.
-- Injects correct Nginx cache headers and routes.
+- Detects and serves **hashed assets** (e.g., `app.234sd.js`) with proper cache-busting.
+- Injects **optimized cache headers** for performance.
+
+---
 
 ### 3. **Path-Based Routing**
 
-- Default app served on `/`.
-- Other apps mapped to `/[app-name]/`.
+- Default app on `/`, others on `/[app-name]/`.
+- Fully supports **HTML5 history mode** for clean URLs.
+
+---
 
 ### 4. **Localization Support**
 
-- Locale files auto-served under `/[app-name]/locales/`.
-- Fallback to default locales if needed.
+- Serves locale files under `/[app-name]/locales/`.
+- Auto-redirects `/locales/` requests to the correct app's locales.
 
 ---
 
 ## 🧵 Nginx Configuration
 
-Generated **Nginx config** handles:
+Auto-generated **Nginx config** does all the heavy lifting:
 
-- SPA routing and fallback (HTML5 history mode support).
-- Static asset caching (immutable hashed filenames).
+- SPA routing with fallback for client-side navigation.
+- Static asset caching (hashed filenames + cache headers).
 - Localization file serving.
 - Redirect `/` to the default app.
+
+> Want to tweak it? Just edit `deploy/nginx.conf` after running `godeploy package`.
 
 ---
 
@@ -149,25 +157,27 @@ Generated **Nginx config** handles:
 
 Generated `Dockerfile` includes:
 
-- **Base Image**: `nginx:1.13-alpine`
-- **Tools**: Minimal (bash, curl, jq) for runtime flexibility.
-- **Assets**: All SPA files and Nginx config copied in.
-- **Ports**: Exposes port `80`.
-- **Entrypoint**: Runs optimized Nginx config.
+| Layer          | Detail                                     |
+| -------------- | ------------------------------------------ |
+| **Base Image** | `nginx:1.13-alpine` (lightweight and fast) |
+| **Tools**      | Minimal (bash, curl, jq) for flexibility   |
+| **Assets**     | Copies Nginx config + SPA files            |
+| **Ports**      | Exposes port `80`                          |
+| **Entrypoint** | Starts optimized Nginx server              |
 
 ---
 
-## ⚡ Example: Custom Deployment Directory
+## ⚡ Example: Custom Output Directory
 
 ```bash
-godeploy deploy --output custom-output
+godeploy package --output custom-output
 ```
 
-➡️ Deployment files (Dockerfile, Nginx config, SPA assets) will be in `custom-output/`.
+➡️ Container files will be created in `custom-output/`.
 
 ---
 
-## 🔑 Summary
+## 🔑 Feature Recap
 
 | Feature               | Supported          |
 | --------------------- | ------------------ |
@@ -183,5 +193,9 @@ godeploy deploy --output custom-output
 
 ## 💡 Pro Tip
 
-Need more control over Nginx?  
-➡️ After running `godeploy deploy`, **edit the generated `nginx.conf`** before building your Docker image.
+Need more control over Nginx?
+➡️ After running `godeploy package`, **edit the generated `nginx.conf`** before building your Docker image.
+
+```
+
+```

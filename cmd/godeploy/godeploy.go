@@ -17,21 +17,21 @@ var CLI struct {
 	Config string `help:"Path to the SPA configuration file" default:"spa-config.json"`
 
 	// Commands
-	Serve  ServeCmd  `cmd:"" help:"Start a local server for testing"`
-	Deploy DeployCmd `cmd:"" help:"Generate deployment files"`
-	Init   InitCmd   `cmd:"" help:"Initialize a new spa-config.json file"`
+	Serve   ServeCmd   `cmd:"" help:"Start a local server for testing"`
+	Package PackageCmd `cmd:"" help:"Generate container files for deployment"`
+	Init    InitCmd    `cmd:"" help:"Initialize a new spa-config.json file"`
 }
 
 // ServeCmd represents the serve command
 type ServeCmd struct {
-	Output    string `help:"Output directory for deployment files" default:"deploy"`
+	Output    string `help:"Output directory for container files" default:"deploy"`
 	Port      int    `help:"Port to run the server on" default:"8082"`
 	ImageName string `help:"Docker image name" default:"godeploy-spa-server"`
 }
 
-// DeployCmd represents the deploy command
-type DeployCmd struct {
-	Output string `help:"Output directory for deployment files" default:"deploy"`
+// PackageCmd represents the package command
+type PackageCmd struct {
+	Output string `help:"Output directory for container files" default:"deploy"`
 }
 
 // InitCmd represents the init command
@@ -61,9 +61,9 @@ func (s *ServeCmd) Run() error {
 		return fmt.Errorf("error loading configuration: %w", err)
 	}
 
-	// Generate deployment files
-	if err := generateDeploymentFiles(spaConfig, s.Output); err != nil {
-		return fmt.Errorf("error generating deployment files: %w", err)
+	// Generate container files
+	if err := generateContainerFiles(spaConfig, s.Output); err != nil {
+		return fmt.Errorf("error generating container files: %w", err)
 	}
 
 	// Run the server locally
@@ -75,21 +75,21 @@ func (s *ServeCmd) Run() error {
 	return nil
 }
 
-// Run executes the deploy command
-func (d *DeployCmd) Run() error {
+// Run executes the package command
+func (d *PackageCmd) Run() error {
 	// Load the SPA configuration
 	spaConfig, err := config.LoadConfig(CLI.Config)
 	if err != nil {
 		return fmt.Errorf("error loading configuration: %w", err)
 	}
 
-	// Generate deployment files
-	if err := generateDeploymentFiles(spaConfig, d.Output); err != nil {
-		return fmt.Errorf("error generating deployment files: %w", err)
+	// Generate container files
+	if err := generateContainerFiles(spaConfig, d.Output); err != nil {
+		return fmt.Errorf("error generating container files: %w", err)
 	}
 
-	fmt.Printf("Deployment files generated in %s\n", d.Output)
-	fmt.Println("You can now deploy these files to your cloud provider.")
+	fmt.Printf("Container files generated in %s\n", d.Output)
+	fmt.Println("You can now build and deploy this container to your cloud provider.")
 
 	return nil
 }
@@ -128,8 +128,8 @@ func RunCLI() error {
 	return ctx.Run()
 }
 
-// generateDeploymentFiles generates all the files needed for deployment
-func generateDeploymentFiles(spaConfig *config.SpaConfig, outputDir string) error {
+// generateContainerFiles generates all the files needed for containerization
+func generateContainerFiles(spaConfig *config.SpaConfig, outputDir string) error {
 	// Create the output directory
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
