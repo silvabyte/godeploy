@@ -1,0 +1,55 @@
+# Go Release Workflow
+name: Release
+
+# Manual trigger
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required for creating releases and tags
+      pull-requests: write # Required if you want to create PRs
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Important for correct version calculation
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          check-latest: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      # xrelease will:
+      # 1. Update version in package.json (source of truth)
+      # 2. Update go.mod version based on major version
+      # 3. Generate/update CHANGELOG.md
+      # 4. Commit these changes with message "chore(release): x.y.z"
+      # 5. Create and push git tag vx.y.z
+      # 6. Create GitHub release from the changelog
+      - name: Create Release
+        run: npx xrelease create --bump ${{ inputs.version_bump }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

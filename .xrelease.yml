@@ -1,0 +1,48 @@
+version: 1
+release:
+  # Branch configuration
+  branch: main
+
+  # Version bump type
+  defaultBump: patch
+
+  # Version file updates - Configures how version numbers are updated in different files
+  version:
+    files:
+      # go.mod - Updates the module declaration while preserving the full import path
+      # Example: "module github.com/user/project" -> "module github.com/user/project"
+      - path: 'go.mod'
+        pattern: "^module\\s+([^\\s]+)" # Captures the full module path after "module "
+        template: 'module ${1}' # Keeps the original module path unchanged
+
+      # package.json - Updates the version field with the new version
+      # Example: "version": "1.0.0" -> "version": "1.1.0"
+      - path: 'package.json'
+        pattern: '"version":\\s*"([^"]+)"' # Matches the version field value
+        template: '"version": "${version}"' # Replaces with new version from release
+
+  # Changelog configuration
+  changelog:
+    enabled: true
+    template: conventional
+
+  # Pre-release checks
+  checks:
+    - type: build
+      command: 'go build'
+
+  # Release actions actions
+  actions:
+    - type: git-tag
+    - type: commit-push
+    - type: github-release
+      # Release assets configuration - Specify files to upload with the release
+      # Supports glob patterns to match build artifacts
+      # assets:
+      #   - 'dist/*-Darwin_arm64.tar.gz' # macOS ARM64 binaries
+      #   - 'dist/*-Windows_amd64.zip' # Windows x64 binaries (exe and dlls)
+    # run any custom commands here, which will run after the release is created
+    # - type: custom
+    #   name: 'go-mod-tidy'
+    #   command: |
+    #     go mod tidy
