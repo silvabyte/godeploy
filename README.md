@@ -20,7 +20,7 @@ Package **any SPA** into a **production-ready Docker + Nginx container** in **mi
 
 ## ✨ Features
 
-### ✅ 1. Simplified SPA Containerization
+### 1. Simplified SPA Containerization
 
 No more fiddling with Dockerfiles or Nginx configs. Go from built assets to container-ready in seconds.
 
@@ -36,7 +36,7 @@ godeploy package
 
 ---
 
-### ✅ 2. Zero Infrastructure Headaches
+### 2. Zero Infrastructure Headaches
 
 Test and containerize without writing any server config or understanding container orchestration.
 
@@ -48,7 +48,7 @@ godeploy serve
 
 ---
 
-### ✅ 3. Blazing Fast, No Overhead — Powered by Nginx
+### 3. Blazing Fast, No Overhead — Powered by Nginx
 
 Why force a full-stack framework to serve a static app when **Nginx is made for this**?
 
@@ -64,7 +64,7 @@ GoDeploy serves your SPA with **raw Nginx performance**, optimized for static de
 
 ---
 
-### ✅ 4. Use Any Frontend Stack
+### 4. Use Any Frontend Stack
 
 React, Vue, Angular, Svelte — if it builds to static files, it works. No full-stack lock-in, **just containerize your frontend.**
 
@@ -75,7 +75,7 @@ godeploy init
 
 ---
 
-### ✅ 5. Multi-SPA Support, Easy Routing
+### 5. Multi-SPA Support, Easy Routing
 
 Host **multiple SPAs under one domain**, each on its own route, configured via `spa-config.json`.
 
@@ -93,7 +93,7 @@ Host **multiple SPAs under one domain**, each on its own route, configured via `
 
 ---
 
-### ✅ 6. Quick to Learn, Fast to Ship
+### 6. Quick to Learn, Fast to Ship
 
 Forget complex docs. GoDeploy is a **3-command workflow**:
 
@@ -217,7 +217,7 @@ Or push to your container registry and deploy to your cloud provider.
 
 ---
 
-## ✅ Requirements
+## Requirements
 
 - Go 1.16+
 - Docker (for `serve` + `package`)
@@ -236,7 +236,7 @@ MIT
 
 --- More notes ---
 
-## ✅ **Reality Check: Nginx vs Full-Stack Frameworks for Serving SPAs**
+## 🧐 **Reality Check: Nginx vs Full-Stack Frameworks for Serving SPAs**
 
 ### ⚡ **TL;DR: Nginx is orders of magnitude faster at serving static files than any full-stack SSR framework — because that's what it's built for.**
 
@@ -251,7 +251,7 @@ MIT
 
 ---
 
-### ✅ **Sources / Performance Context:**
+### **Sources / Performance Context:**
 
 1. **Nginx Static Serving Benchmarks**: 40,000 to 100,000 requests/sec on modern instances ([source](https://www.nginx.com/blog/testing-the-performance-of-nginx-and-nginx-plus-web-servers/)).
 2. **Next.js Edge + SSR**: Typical latency 30-100ms for dynamic SSR pages, can increase under load ([source](https://vercel.com/docs/concepts/functions/edge-functions/edge-performance)).
