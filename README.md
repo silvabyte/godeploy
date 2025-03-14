@@ -105,6 +105,31 @@ godeploy package  # Containerize for production
 
 ---
 
+## 🚧 **Coming Soon: `godeploy deploy` — Instant SPA Hosting (Join Alpha)**
+
+> Imagine running this:
+
+```bash
+godeploy deploy
+```
+
+➡️ And getting this:
+
+```
+🎉 Your app is live at: https://my-app.godeploy.app
+```
+
+- No AWS. No Cloudflare. No pipelines.
+- **Just run the command and your app is online — optimized, secured, and served from a global CDN.**
+
+💥 **Be first in line** for **alpha access**:  
+👉 [**Sign up here**](https://godeploy.app/alpha) (coming soon)
+
+**⭐ Star this repo** to support the project and follow updates!  
+[https://github.com/matsilva/godeploy](https://github.com/matsilva/godeploy)
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Install GoDeploy
@@ -178,25 +203,17 @@ Or push to your container registry and deploy to your cloud provider.
 
 ## 🔧 Full CLI Reference
 
-| Command                              | Description                                         |
-| ------------------------------------ | --------------------------------------------------- |
-| `godeploy init`                      | Create default `spa-config.json`                    |
-| `godeploy init --force`              | Overwrite existing config                           |
-| `godeploy serve`                     | Serve SPA locally via Docker (port 8082)            |
-| `godeploy serve --port <port>`       | Use custom port                                     |
-| `godeploy serve --image-name <name>` | Use custom Docker image name                        |
-| `godeploy package`                   | Generate containerized Docker + Nginx setup         |
-| `godeploy package --output <dir>`    | Output to custom directory (default: `deploy/`)     |
-| `godeploy --config <file>`           | Use custom config file (default: `spa-config.json`) |
-
----
-
-## 📈 Advanced Features
-
-- **Multi-SPA on one domain** — [See Advanced Config](docs/advanced-configuration.md)
-- **Localization auto-routing** for `/locales/`
-- **Hashed asset handling** for immutable caching
-- **Custom output directories** for flexible pipelines
+| Command                              | Description                                             |
+| ------------------------------------ | ------------------------------------------------------- |
+| `godeploy init`                      | Create default `spa-config.json`                        |
+| `godeploy init --force`              | Overwrite existing config                               |
+| `godeploy serve`                     | Serve SPA locally via Docker (port 8082)                |
+| `godeploy serve --port <port>`       | Use custom port                                         |
+| `godeploy serve --image-name <name>` | Use custom Docker image name                            |
+| `godeploy package`                   | Generate containerized Docker + Nginx setup             |
+| `godeploy package --output <dir>`    | Output to custom directory (default: `deploy/`)         |
+| `godeploy --config <file>`           | Use custom config file (default: `spa-config.json`)     |
+| 🚧 `godeploy deploy`                 | **Coming soon** — One-command SaaS deploy (join alpha!) |
 
 ---
 
@@ -204,31 +221,6 @@ Or push to your container registry and deploy to your cloud provider.
 
 - Go 1.16+
 - Docker (for `serve` + `package`)
-
----
-
-## ✅ **Reality Check: Nginx vs Full-Stack Frameworks for Serving SPAs**
-
-### ⚡ **TL;DR: Nginx is orders of magnitude faster at serving static files than any full-stack SSR framework — because that's what it's built for.**
-
-| Task                                        | Nginx (Static Files)                        | Next.js / Nuxt.js / Remix (SSR/Edge/Static Hybrid)       |
-| ------------------------------------------- | ------------------------------------------- | -------------------------------------------------------- |
-| **Raw static file serving (HTML, CSS, JS)** | 🔥 ~50,000+ req/sec (depending on hardware) | ❌ Slower: adds V8 runtime, middleware, routing overhead |
-| **First byte latency (static assets)**      | ⚡ 1-5ms                                    | 🐢 30-70ms typical for dynamic/SSR content               |
-| **Concurrent connections (commodity VPS)**  | 10,000+ sustained                           | Limited, often <500 (due to Node.js single-thread & V8)  |
-| **Memory footprint (idle/static serving)**  | 🚀 ~5-10MB                                  | 🐘 100-400MB+ for typical Node.js SSR servers            |
-| **Response time variability**               | ✅ Predictable & consistent                 | ❌ Can vary under load, cold starts, edge locations      |
-| **CDN optimization compatibility**          | ✅ Plug-and-play, cache forever             | ❌ SSR adds complexity in CDN caching, stales fast       |
-
----
-
-### ✅ **Sources / Performance Context:**
-
-1. **Nginx Static Serving Benchmarks**: 40,000 to 100,000 requests/sec on modern instances ([source](https://www.nginx.com/blog/testing-the-performance-of-nginx-and-nginx-plus-web-servers/)).
-2. **Next.js Edge + SSR**: Typical latency 30-100ms for dynamic SSR pages, can increase under load ([source](https://vercel.com/docs/concepts/functions/edge-functions/edge-performance)).
-3. **Remix SSR**: Similar latency and overhead to Next.js — full SSR adds substantial routing and logic layer between client and assets ([Remix architecture docs](https://remix.run/docs/en/main/guides/data-loading)).
-4. **Node.js server limits**: Well-known event-loop saturation issues — usually requires horizontal scaling much faster than Nginx ([source](https://www.nearform.com/blog/node-js-scalability-challenges/)).
-5. **CDN + Static combo**: Nginx plays perfectly with CDNs (Cloudflare, Fastly) for cache-control + stale-while-revalidate patterns — hard to do properly with SSR apps that require fresh data.
 
 ---
 
