@@ -14,7 +14,9 @@
     "docker:build": "docker build -t godeploy-api .",
     "docker:run": "docker run -p 38444:38444 godeploy-api",
     "docker:stop": "docker stop godeploy-api",
-    "docker:remove": "docker rm godeploy-api"
+    "docker:remove": "docker rm godeploy-api",
+    "docker:start": "npm run docker:build && npm run docker:run",
+    "docker:logs": "docker logs -f godeploy-api"
   },
   "author": "mat silva",
   "license": "ISC",

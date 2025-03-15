@@ -54,7 +54,7 @@ export default async function (fastify: FastifyInstance) {
     ) => {
       try {
         const { email } = request.body;
-        const redirectUrl = 'http://localhost:38389';
+        const redirectUrl = 'http://localhost:38389'; // cli will be listening on this port
 
         // Use Supabase OTP to send a magic link
         const { data, error } = await fastify.supabase.auth.signInWithOtp({
@@ -130,6 +130,7 @@ export default async function (fastify: FastifyInstance) {
   // Endpoint to verify a token (useful for CLI to check if token is valid)
   fastify.get('/api/auth/verify', {
     schema: {
+      security: [{ bearerAuth: [] }],
       response: {
         200: {
           type: 'object',

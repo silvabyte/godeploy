@@ -1,6 +1,11 @@
 
 FROM docker.io/node:lts-alpine
 
+ENV APP_URL=https://api.godeploy.app    
+ENV PORT=38444
+
+
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
@@ -10,10 +15,7 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
-COPY apps/godeploy-api/dist godeploy-api/
-RUN chown -R godeploy-api:godeploy-api .
-
 # Expose the port
-EXPOSE 3000
+EXPOSE 38444
 
-CMD [ "tsx", "godeploy-api" ]
+CMD [ "node_modules/.bin/tsx", "src/main.ts" ]
