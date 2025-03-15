@@ -1,19 +1,19 @@
 
 FROM docker.io/node:lts-alpine
 
-ENV HOST=0.0.0.0
-ENV PORT=3000
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-WORKDIR /app
+# Install dependencies
+RUN npm install
 
-RUN addgroup --system godeploy-api && \
-          adduser --system -G godeploy-api godeploy-api
+# Copy the rest of the application
+COPY . .
 
 COPY apps/godeploy-api/dist godeploy-api/
 RUN chown -R godeploy-api:godeploy-api .
 
-# You can remove this install step if you build with `--bundle` option.
-# The bundled output will include external dependencies.
-RUN npm install
+# Expose the port
+EXPOSE 3000
 
 CMD [ "tsx", "godeploy-api" ]

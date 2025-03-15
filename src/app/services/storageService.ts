@@ -10,12 +10,12 @@ import * as crypto from 'crypto';
 import AdmZip from 'adm-zip';
 
 // DigitalOcean Spaces configuration
-const spacesEndpoint = 'nyc3.digitaloceanspaces.com'; // Change to your region
-const bucketName = 'godeploy-spa-assets'; // Your bucket name
+const spacesEndpoint = process.env.DIGITAL_OCEAN_SPACES_ENDPOINT || '';
+const bucketName = process.env.DIGITAL_OCEAN_SPACES_BUCKET || '';
 
 // Create S3 client for DigitalOcean Spaces
 const s3Client = new S3Client({
-  endpoint: `https://${spacesEndpoint}`,
+  endpoint: spacesEndpoint,
   region: 'us-east-1', // DigitalOcean uses this region for API compatibility
   credentials: {
     accessKeyId: process.env.DIGITAL_OCEAN_SPACES_KEY || '',
@@ -94,7 +94,7 @@ export class StorageService {
 
       // Upload all files with appropriate cache headers
       const baseKey = `spa-projects/${tenantId}/${projectId}`;
-      const cdnUrl = `https://${projectName}.godeploy.app`;
+      const cdnUrl = `https://${projectName}.spa.godeploy.app`;
 
       // Process all files recursively
       await this.uploadDirectory(tempDir, baseKey);

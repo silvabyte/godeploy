@@ -1,9 +1,10 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { DbService } from '../../services/dbService';
+import { DbService } from '../services/dbService';
 
 // Define the schema for the projects endpoint
 const projectsSchema = {
   schema: {
+    security: [{ bearerAuth: [] }],
     response: {
       200: {
         type: 'array',
@@ -53,7 +54,7 @@ export default async function (fastify: FastifyInstance) {
         // Transform the response to include the URL
         const projectsWithUrl = projects.map((project) => ({
           ...project,
-          url: `https://${project.subdomain}.godeploy.app`,
+          url: `https://${project.subdomain}.spa.godeploy.app`,
         }));
 
         return reply.code(200).send(projectsWithUrl);

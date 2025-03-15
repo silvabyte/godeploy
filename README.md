@@ -93,7 +93,7 @@ DIGITAL_OCEAN_SPACES_KEY=your_spaces_access_key
 DIGITAL_OCEAN_SPACES_SECRET=your_spaces_secret_key
 ```
 
-### Installation
+### Quick Start
 
 ```bash
 # Install dependencies
@@ -102,11 +102,8 @@ npm install
 # Start development server
 npm run dev
 
-# Build for production
-npm run build
-
-# Start production server
-npm start
+# Or use the start script
+./scripts/start.sh
 ```
 
 ### Database Migrations
@@ -122,6 +119,42 @@ npm run db:migrate:up
 npm run db:migrate:push
 ```
 
+## Database Setup
+
+```bash
+# Run the migrations
+./scripts/run-migrations.sh
+
+# Or run the migrations manually
+npm run db:migrate:push
+
+# Initialize test data
+supabase db query < scripts/init-test-data.sql
+```
+
+## Testing the API
+
+For testing purposes, the API includes public endpoints that don't require authentication:
+
+- `GET /health` - Health check endpoint
+- `GET /api/projects-public` - List all projects for the test tenant
+- `POST /api/deploy-public?project=<project-name>` - Deploy a SPA to the test tenant
+
+### Example: Deploy a SPA
+
+```bash
+curl -X POST \
+  -F "archive=@/path/to/spa.zip" \
+  -F "spa_config=@/path/to/spa-config.json" \
+  "http://localhost:3000/api/deploy-public?project=my-app"
+```
+
+### Example: List Projects
+
+```bash
+curl "http://localhost:3000/api/projects-public"
+```
+
 ## Documentation
 
 API documentation is available at `/documentation` when the server is running.
@@ -129,3 +162,14 @@ API documentation is available at `/documentation` when the server is running.
 ## License
 
 ISC
+
+## Running with Docker
+
+```bash
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Or build and run the Docker image directly
+docker build -t godeploy-api .
+docker run -p 3000:3000 --env-file .env godeploy-api
+```

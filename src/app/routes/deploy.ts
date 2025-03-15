@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { StorageService } from '../../services/storageService';
-import { DbService } from '../../services/dbService';
-import { FileUtils } from '../../utils/fileUtils';
+import { StorageService } from '../services/storageService';
+import { DbService } from '../services/dbService';
+import { FileUtils } from '../utils/fileUtils';
 import { v4 as uuidv4 } from 'uuid';
 import fastifyMultipart from '@fastify/multipart';
 
@@ -13,6 +13,7 @@ interface DeployQuerystring {
 // Define the schema for the deploy endpoint
 const deploySchema = {
   schema: {
+    security: [{ bearerAuth: [] }],
     querystring: {
       type: 'object',
       properties: {
@@ -49,7 +50,7 @@ export default async function (fastify: FastifyInstance) {
   // Register multipart support
   await fastify.register(fastifyMultipart, {
     limits: {
-      fileSize: 50 * 1024 * 1024, // 50MB limit
+      fileSize: 100 * 1024 * 1024, // 100mb limit
     },
   });
 
@@ -137,7 +138,7 @@ export default async function (fastify: FastifyInstance) {
           tenant_id,
           project_id: project.id,
           user_id,
-          url: `https://${project.subdomain}.godeploy.app`,
+          url: `https://${project.subdomain}.spa.godeploy.app`,
           status: 'pending',
         });
 
