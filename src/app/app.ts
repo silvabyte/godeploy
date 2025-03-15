@@ -11,6 +11,8 @@ const __dirname = dirname(__filename);
 export interface AppOptions {}
 
 export async function app(fastify: FastifyInstance, opts: AppOptions) {
+  // Register Supabase Auth middleware
+
   // Place here your custom code!
 
   // Do not touch the following lines
