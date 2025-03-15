@@ -112,9 +112,26 @@ export default async function (fastify: FastifyInstance) {
       request: FastifyRequest<MagicLinkRequest>,
       reply: FastifyReply
     ) => {
-      //TODO: add check if token is valid
       try {
         const { redirect_to, token } = request.query;
+
+        // Check if the token contains a hash with access_token
+        // This happens when Supabase redirects with the authentication data in the URL fragment
+        if (request.raw.url) {
+          const urlString = request.raw.url;
+          const hashMatch = urlString.match(/#access_token=([^&]+)/);
+
+          if (hashMatch && hashMatch[1]) {
+            const accessToken = hashMatch[1];
+            const redirectUrl = new URL(redirect_to);
+
+            // Add the extracted access token to the redirect URL
+            redirectUrl.searchParams.set('token', accessToken);
+            return reply.redirect(redirectUrl.toString());
+          }
+        }
+
+        // Fallback to the original behavior if no access_token is found
         const redirectUrl = new URL(redirect_to);
         redirectUrl.searchParams.set('token', token);
         return reply.redirect(redirectUrl.toString());
