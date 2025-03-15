@@ -2,7 +2,7 @@
 FROM docker.io/node:lts-alpine
 
 ENV APP_URL=https://api.godeploy.app    
-ENV PORT=38444
+ENV PORT=80
 
 
 
@@ -16,6 +16,6 @@ RUN npm install
 COPY . .
 
 # Expose the port
-EXPOSE 38444
+EXPOSE 80
 
 CMD [ "node_modules/.bin/tsx", "src/main.ts" ]
