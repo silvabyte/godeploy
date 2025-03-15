@@ -98,18 +98,39 @@ func (s *ServeCmd) Run() error {
 	)
 	authCancel := authSpinner.Start(ctx)
 
-	// Check if authenticated
-	isAuth, err := auth.IsAuthenticated()
+	// Check if we have a token locally
+	token, err := auth.GetAuthToken()
 	if err != nil {
 		authCancel()
 		authSpinner.Fail("Failed to check authentication")
 		return fmt.Errorf("error checking authentication: %w", err)
 	}
-	if !isAuth {
+
+	// If there's no token, the user is not authenticated
+	if token == "" {
 		authCancel()
 		authSpinner.Fail("Not authenticated")
 		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
 	}
+
+	// We have a token, now verify it with the API
+	apiClient := api.NewClient()
+	verifyResp, err := apiClient.VerifyToken(token)
+
+	// Handle API connection errors
+	if err != nil {
+		authCancel()
+		authSpinner.Fail("Failed to verify token")
+		return fmt.Errorf("error verifying authentication: %w", err)
+	}
+
+	// Check if the token is valid
+	if !verifyResp.Valid {
+		authCancel()
+		authSpinner.Fail("Invalid authentication")
+		return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login --email=your@email.com' to authenticate")
+	}
+
 	authCancel()
 	authSpinner.Stop("Authentication verified")
 
@@ -177,18 +198,39 @@ func (d *PackageCmd) Run() error {
 	)
 	authCancel := authSpinner.Start(ctx)
 
-	// Check if authenticated
-	isAuth, err := auth.IsAuthenticated()
+	// Check if we have a token locally
+	token, err := auth.GetAuthToken()
 	if err != nil {
 		authCancel()
 		authSpinner.Fail("Failed to check authentication")
 		return fmt.Errorf("error checking authentication: %w", err)
 	}
-	if !isAuth {
+
+	// If there's no token, the user is not authenticated
+	if token == "" {
 		authCancel()
 		authSpinner.Fail("Not authenticated")
 		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
 	}
+
+	// We have a token, now verify it with the API
+	apiClient := api.NewClient()
+	verifyResp, err := apiClient.VerifyToken(token)
+
+	// Handle API connection errors
+	if err != nil {
+		authCancel()
+		authSpinner.Fail("Failed to verify token")
+		return fmt.Errorf("error verifying authentication: %w", err)
+	}
+
+	// Check if the token is valid
+	if !verifyResp.Valid {
+		authCancel()
+		authSpinner.Fail("Invalid authentication")
+		return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login --email=your@email.com' to authenticate")
+	}
+
 	authCancel()
 	authSpinner.Stop("Authentication verified")
 
@@ -428,22 +470,54 @@ func (s *StatusCmd) Run() error {
 	)
 	statusCancel := statusSpinner.Start(ctx)
 
-	// Check if authenticated
-	isAuth, err := auth.IsAuthenticated()
+	// Check if we have a token locally
+	token, err := auth.GetAuthToken()
 	if err != nil {
 		statusCancel()
 		statusSpinner.Fail("Failed to check status")
 		return fmt.Errorf("error checking authentication: %w", err)
 	}
 
+	// If there's no token, the user is not authenticated
+	if token == "" {
+		statusCancel()
+		statusSpinner.Stop("Status checked")
+		fmt.Println("❌ You are not authenticated with GoDeploy.")
+		fmt.Println("Run 'godeploy auth login --email=your@email.com' to authenticate.")
+		return nil
+	}
+
+	// We have a token, now verify it with the API
+	apiClient := api.NewClient()
+	verifyResp, err := apiClient.VerifyToken(token)
+
+	// Handle API connection errors
+	if err != nil {
+		statusCancel()
+		statusSpinner.Fail("Failed to verify token")
+		fmt.Println("⚠️ Could not verify authentication status with the server.")
+		fmt.Println("Error:", err)
+		fmt.Println("Your local token may still be valid.")
+		return nil
+	}
+
 	statusCancel()
 	statusSpinner.Stop("Status checked")
 
-	if isAuth {
+	// Check if the token is valid
+	if verifyResp.Valid {
 		fmt.Println("✅ You are authenticated with GoDeploy.")
+		if verifyResp.User.Email != "" {
+			fmt.Printf("Logged in as: %s\n", verifyResp.User.Email)
+		}
 	} else {
-		fmt.Println("❌ You are not authenticated with GoDeploy.")
+		fmt.Println("❌ Your authentication token is invalid or expired.")
 		fmt.Println("Run 'godeploy auth login --email=your@email.com' to authenticate.")
+
+		// Clear the invalid token
+		if err := auth.ClearAuthToken(); err != nil {
+			fmt.Println("⚠️ Warning: Failed to clear invalid token:", err)
+		}
 	}
 
 	return nil
@@ -454,14 +528,48 @@ func (d *DeployCmd) Run() error {
 	// Create a context
 	ctx := context.Background()
 
-	// Check if authenticated
-	isAuth, err := auth.IsAuthenticated()
+	// Create a spinner for checking authentication
+	authSpinner := pin.New("Checking authentication status...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	authCancel := authSpinner.Start(ctx)
+
+	// Check if we have a token locally
+	token, err := auth.GetAuthToken()
 	if err != nil {
+		authCancel()
+		authSpinner.Fail("Failed to check authentication")
 		return fmt.Errorf("error checking authentication: %w", err)
 	}
-	if !isAuth {
+
+	// If there's no token, the user is not authenticated
+	if token == "" {
+		authCancel()
+		authSpinner.Fail("Not authenticated")
 		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
 	}
+
+	// We have a token, now verify it with the API
+	apiClient := api.NewClient()
+	verifyResp, err := apiClient.VerifyToken(token)
+
+	// Handle API connection errors
+	if err != nil {
+		authCancel()
+		authSpinner.Fail("Failed to verify token")
+		return fmt.Errorf("error verifying authentication: %w", err)
+	}
+
+	// Check if the token is valid
+	if !verifyResp.Valid {
+		authCancel()
+		authSpinner.Fail("Invalid authentication")
+		return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login --email=your@email.com' to authenticate")
+	}
+
+	authCancel()
+	authSpinner.Stop("Authentication verified")
 
 	// Create a spinner for the deploy command
 	deploySpinner := pin.New("Checking deployment status...",

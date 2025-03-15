@@ -253,7 +253,7 @@ These errors are presented to the user with clear, actionable messages both in t
 
 - `godeploy auth login --email <email>` - Authenticate with the GoDeploy service
 - `godeploy auth logout` - Log out from the GoDeploy service
-- `godeploy auth status` - Check your authentication status
+- `godeploy auth status` - Check your authentication status with the backend API
 
 ### Security
 
@@ -261,6 +261,8 @@ These errors are presented to the user with clear, actionable messages both in t
 - Tokens are used to authenticate API requests to the GoDeploy service
 - The authentication flow uses a temporary local server that automatically shuts down after authentication
 - Support for both hash parameters and query parameters ensures compatibility with various security implementations
+- All commands verify token validity with the backend API before proceeding
+- Expired or invalid tokens are automatically detected and the user is prompted to re-authenticate
 
 ### Terminal Experience
 

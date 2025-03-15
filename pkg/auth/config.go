@@ -112,7 +112,16 @@ func IsAuthenticated() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return config.AuthToken != "", nil
+
+	// If there's no token, the user is not authenticated
+	if config.AuthToken == "" {
+		return false, nil
+	}
+
+	// We have a token, but we need to verify it with the API
+	// This will be implemented in the StatusCmd.Run() method
+	// to avoid circular dependencies between auth and api packages
+	return true, nil
 }
 
 // GetAuthToken returns the authentication token
