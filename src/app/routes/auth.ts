@@ -128,20 +128,29 @@ export default async function (fastify: FastifyInstance) {
         // This happens when Supabase redirects with the authentication data in the URL fragment
         if (request.raw.url) {
           const urlString = request.raw.url;
-          const hashMatch = urlString.match(/#access_token=([^&]+)/);
+          // Extract all hash parameters
+          const hashMatch = urlString.match(/#(.+)$/);
           request.measure.add('hash_match', {
             hash_match: !!hashMatch,
             url_string: urlString,
           });
 
           if (hashMatch && hashMatch[1]) {
-            const accessToken = hashMatch[1];
-            const redirectUrl = new URL(redirect_to);
+            const hashParams = new URLSearchParams(hashMatch[1]);
+            const accessToken = hashParams.get('access_token');
 
-            // Add the extracted access token to the redirect URL
-            redirectUrl.searchParams.set('access_token', accessToken);
-            request.measure.success();
-            return reply.redirect(redirectUrl.toString());
+            if (accessToken) {
+              // Get all hash parameters to convert to query parameters
+              const redirectUrl = new URL(redirect_to);
+
+              // Convert all hash parameters to query parameters
+              for (const [key, value] of hashParams.entries()) {
+                redirectUrl.searchParams.set(key, value);
+              }
+
+              request.measure.success();
+              return reply.redirect(redirectUrl.toString());
+            }
           }
         }
         request.measure.add('no_hash_match');
