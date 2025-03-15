@@ -34,7 +34,9 @@ export class ActionTelemetry {
   }
 
   start(operation: string, metadata: unknown) {
-    const flattenedData = flatten(metadata);
+    const flattenedData = flatten(metadata, {
+      delimiter: '_',
+    });
     this.startEntry = {
       operation,
       start: new Date(),
@@ -43,7 +45,9 @@ export class ActionTelemetry {
     return this;
   }
   add(action: string, data: unknown) {
-    const flattenedData = flatten(data);
+    const flattenedData = flatten(data, {
+      delimiter: '_',
+    });
     this.actions.push({
       label: action,
       data: flattenedData,
@@ -52,7 +56,9 @@ export class ActionTelemetry {
   }
 
   success(data: unknown) {
-    const flattenedData = flatten(data);
+    const flattenedData = flatten(data, {
+      delimiter: '_',
+    });
     this.endEntry = {
       end: new Date(),
       data: flattenedData,
@@ -62,7 +68,9 @@ export class ActionTelemetry {
   }
 
   failure(error: unknown, data: unknown) {
-    const flattenedData = flatten(data);
+    const flattenedData = flatten(data, {
+      delimiter: '_',
+    });
     this.endEntry = {
       end: new Date(),
       data: flattenedData,

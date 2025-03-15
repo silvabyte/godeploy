@@ -162,8 +162,9 @@ await server.register(swagger, {
       url: 'https://godeploy.app',
       description: 'Find more info here',
     },
-    host: `${host}:${port}`,
-    schemes: ['http', 'https'],
+    host: process.env.APP_URL,
+    schemes:
+      process.env.NODE_ENV === 'production' ? ['https'] : ['http', 'https'],
     consumes: ['application/json', 'multipart/form-data'],
     produces: ['application/json'],
     securityDefinitions: {
