@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/alecthomas/kong"
+	"github.com/audetic/godeploy/pkg/api"
+	"github.com/audetic/godeploy/pkg/auth"
 	"github.com/audetic/godeploy/pkg/config"
 	"github.com/audetic/godeploy/pkg/docker"
 	"github.com/audetic/godeploy/pkg/nginx"
@@ -20,6 +24,10 @@ var CLI struct {
 	Serve   ServeCmd   `cmd:"" help:"Start a local server for testing"`
 	Package PackageCmd `cmd:"" help:"Generate container files for deployment"`
 	Init    InitCmd    `cmd:"" help:"Initialize a new spa-config.json file"`
+	Auth    AuthCmd    `cmd:"" help:"Authenticate with the GoDeploy service"`
+	Logout  LogoutCmd  `cmd:"" help:"Log out from the GoDeploy service"`
+	Status  StatusCmd  `cmd:"" help:"Check authentication status"`
+	Deploy  DeployCmd  `cmd:"" help:"Deploy your SPA to the GoDeploy service (Coming Soon)"`
 }
 
 // ServeCmd represents the serve command
@@ -37,6 +45,24 @@ type PackageCmd struct {
 // InitCmd represents the init command
 type InitCmd struct {
 	Force bool `help:"Overwrite existing config file if it exists" short:"f"`
+}
+
+// AuthCmd represents the auth command
+type AuthCmd struct {
+	Email string `help:"Email address to authenticate with" required:""`
+}
+
+// LogoutCmd represents the logout command
+type LogoutCmd struct {
+}
+
+// StatusCmd represents the status command
+type StatusCmd struct {
+}
+
+// DeployCmd represents the deploy command
+type DeployCmd struct {
+	Output string `help:"Output directory for container files" default:"deploy"`
 }
 
 // defaultConfig is the default configuration template
@@ -110,6 +136,138 @@ func (i *InitCmd) Run() error {
 
 	fmt.Printf("Created config file: %s\n", configPath)
 	fmt.Println("You can now edit this file to configure your SPAs.")
+	return nil
+}
+
+// Run executes the auth command
+func (a *AuthCmd) Run() error {
+	// Check if already authenticated
+	isAuth, err := auth.IsAuthenticated()
+	if err != nil {
+		return fmt.Errorf("error checking authentication: %w", err)
+	}
+	if isAuth {
+		fmt.Println("You are already authenticated. To log out, run 'godeploy logout'.")
+		return nil
+	}
+
+	// Create a context with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	// Start the local server
+	fmt.Println("Starting local authentication server...")
+	fmt.Printf("Waiting for authentication at http://localhost:%d/callback\n", auth.DefaultPort)
+
+	// Start the local server in a goroutine
+	serverDone := make(chan struct{})
+	var token string
+	var serverErr error
+
+	go func() {
+		token, serverErr = auth.StartLocalServer(ctx)
+		close(serverDone)
+	}()
+
+	// Initialize the authentication flow
+	redirectURI := auth.GetRedirectURI()
+	apiClient := api.NewClient()
+
+	fmt.Printf("Sending authentication request for %s...\n", a.Email)
+	authResp, err := apiClient.InitAuth(a.Email, redirectURI)
+	if err != nil {
+		cancel() // Cancel the server context
+		<-serverDone
+		return fmt.Errorf("failed to initialize authentication: %w", err)
+	}
+
+	fmt.Println(authResp.Message)
+	fmt.Println("Waiting for you to complete authentication...")
+	fmt.Println("Check your email for a login link and click it to authenticate.")
+
+	// Wait for the server to complete
+	<-serverDone
+	if serverErr != nil {
+		return fmt.Errorf("authentication failed: %w", serverErr)
+	}
+
+	// Save the token
+	if err := auth.SetAuthToken(token); err != nil {
+		return fmt.Errorf("failed to save authentication token: %w", err)
+	}
+
+	fmt.Println("✅ Authentication successful! You are now logged in.")
+	return nil
+}
+
+// Run executes the logout command
+func (l *LogoutCmd) Run() error {
+	// Check if authenticated
+	isAuth, err := auth.IsAuthenticated()
+	if err != nil {
+		return fmt.Errorf("error checking authentication: %w", err)
+	}
+	if !isAuth {
+		fmt.Println("You are not currently authenticated.")
+		return nil
+	}
+
+	// Clear the token
+	if err := auth.ClearAuthToken(); err != nil {
+		return fmt.Errorf("failed to clear authentication token: %w", err)
+	}
+
+	fmt.Println("✅ You have been successfully logged out.")
+	return nil
+}
+
+// Run executes the status command
+func (s *StatusCmd) Run() error {
+	// Check if authenticated
+	isAuth, err := auth.IsAuthenticated()
+	if err != nil {
+		return fmt.Errorf("error checking authentication: %w", err)
+	}
+
+	if isAuth {
+		token, err := auth.GetAuthToken()
+		if err != nil {
+			return fmt.Errorf("error getting authentication token: %w", err)
+		}
+
+		// Only show the first 10 characters of the token for security
+		tokenPreview := ""
+		if len(token) > 10 {
+			tokenPreview = token[:10] + "..."
+		} else {
+			tokenPreview = token
+		}
+
+		fmt.Println("✅ You are authenticated with GoDeploy.")
+		fmt.Printf("Token: %s\n", tokenPreview)
+	} else {
+		fmt.Println("❌ You are not authenticated with GoDeploy.")
+		fmt.Println("Run 'godeploy auth --email=your@email.com' to authenticate.")
+	}
+
+	return nil
+}
+
+// Run executes the deploy command
+func (d *DeployCmd) Run() error {
+	// Check if authenticated
+	isAuth, err := auth.IsAuthenticated()
+	if err != nil {
+		return fmt.Errorf("error checking authentication: %w", err)
+	}
+	if !isAuth {
+		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth --email=your@email.com' to authenticate")
+	}
+
+	fmt.Println("🚧 The deploy command is coming soon!")
+	fmt.Println("This feature is currently in development and will be available in a future release.")
+	fmt.Println("Stay tuned for updates!")
+
 	return nil
 }
 

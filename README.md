@@ -203,17 +203,45 @@ Or push to your container registry and deploy to your cloud provider.
 
 ## 🔧 Full CLI Reference
 
-| Command                              | Description                                             |
-| ------------------------------------ | ------------------------------------------------------- |
-| `godeploy init`                      | Create default `spa-config.json`                        |
-| `godeploy init --force`              | Overwrite existing config                               |
-| `godeploy serve`                     | Serve SPA locally via Docker (port 8082)                |
-| `godeploy serve --port <port>`       | Use custom port                                         |
-| `godeploy serve --image-name <name>` | Use custom Docker image name                            |
-| `godeploy package`                   | Generate containerized Docker + Nginx setup             |
-| `godeploy package --output <dir>`    | Output to custom directory (default: `deploy/`)         |
-| `godeploy --config <file>`           | Use custom config file (default: `spa-config.json`)     |
-| 🚧 `godeploy deploy`                 | **Coming soon** — One-command SaaS deploy (join alpha!) |
+| Command                           | Description                                             |
+| --------------------------------- | ------------------------------------------------------- |
+| `godeploy init`                   | Create default `spa-config.json`                        |
+| `godeploy init --force`           | Overwrite existing config                               |
+| `godeploy serve`                  | Serve SPA locally via Docker (port 8082)                |
+| `godeploy serve --port <port>`    | Use custom port                                         |
+| `godeploy serve --image-name <n>` | Use custom Docker image name                            |
+| `godeploy package`                | Generate containerized Docker + Nginx setup             |
+| `godeploy package --output <dir>` | Output to custom directory (default: `deploy/`)         |
+| `godeploy --config <file>`        | Use custom config file (default: `spa-config.json`)     |
+| `godeploy auth --email <email>`   | Authenticate with the GoDeploy service                  |
+| `godeploy logout`                 | Log out from the GoDeploy service                       |
+| `godeploy status`                 | Check authentication status                             |
+| 🚧 `godeploy deploy`              | **Coming soon** — One-command SaaS deploy (join alpha!) |
+
+---
+
+## 🔐 Authentication
+
+GoDeploy uses a secure authentication flow to protect your deployments and enable the upcoming `deploy` command.
+
+### Authentication Flow
+
+1. Run `godeploy auth --email your@email.com`
+2. GoDeploy sends a magic link to your email
+3. Click the link in your email to authenticate
+4. The CLI automatically captures the token and stores it securely
+
+### Commands
+
+- `godeploy auth --email <email>` - Authenticate with the GoDeploy service
+- `godeploy logout` - Log out from the GoDeploy service
+- `godeploy status` - Check your authentication status
+
+### Security
+
+- Authentication tokens are stored securely in `~/.config/godeploy/config.json` (or OS equivalent)
+- Tokens are used to authenticate API requests to the GoDeploy service
+- The authentication flow uses a temporary local server that automatically shuts down after authentication
 
 ---
 
