@@ -1,7 +1,23 @@
 import type { FastifyInstance } from 'fastify';
+import fs from 'fs';
 
 export default async function (fastify: FastifyInstance) {
-  fastify.get('/', async function () {
-    return { message: 'go deploy api' };
-  });
+  //load version from package.json
+  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8')) as {
+    version: string;
+  };
+  const version = packageJson.version;
+
+  fastify.get(
+    '/',
+    {
+      config: {
+        auth: false,
+      },
+    },
+    async function () {
+      //add api metadata
+      return { version, api: 'godeploy-api', status: 'ok' };
+    }
+  );
 }

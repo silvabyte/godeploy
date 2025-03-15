@@ -7,23 +7,6 @@ const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_API_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Extend FastifyRequest to include user property
-declare module 'fastify' {
-  interface FastifyInstance {
-    supabase: SupabaseClient;
-  }
-  interface FastifyRequest {
-    user: {
-      user_id: string;
-      tenant_id: string;
-    };
-  }
-
-  interface FastifyContextConfig {
-    auth?: boolean;
-  }
-}
-
 export default fp(async (fastify) => {
   fastify.decorate('supabase', supabase);
 

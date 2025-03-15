@@ -112,6 +112,7 @@ export default async function (fastify: FastifyInstance) {
       request: FastifyRequest<MagicLinkRequest>,
       reply: FastifyReply
     ) => {
+      //TODO: add check if token is valid
       try {
         const { redirect_to, token } = request.query;
         const redirectUrl = new URL(redirect_to);
