@@ -191,6 +191,19 @@ export default async function (fastify: FastifyInstance) {
           return reply.code(400).send({ error: 'Project name is required' });
         }
 
+        // this needs to remove all dashes from the end of the name
+        let nameMutated = name;
+        while (nameMutated.endsWith('-')) {
+          nameMutated = nameMutated.slice(0, -1);
+        }
+        // needs to be a string with atleast 3 characters
+        if (nameMutated.length < 3) {
+          logRequest(request, 'Project creation failed: name is too short');
+          return reply.code(400).send({
+            error: 'Project name is too short. Min 3 characters',
+          });
+        }
+
         // Generate subdomain from name
         const subdomain = slugify(name, {
           lower: true,
