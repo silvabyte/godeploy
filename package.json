@@ -16,6 +16,8 @@
     "@fastify/autoload": "~6.0.3",
     "@fastify/sensible": "~6.0.2",
     "@fastify/swagger": "^9.4.2",
+    "@supabase/supabase-js": "^2.49.1",
+    "dotenv": "^16.4.7",
     "fastify": "~5.2.1",
     "fastify-plugin": "~5.0.1",
     "tsx": "^4.19.3"
