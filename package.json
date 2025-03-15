@@ -1,0 +1,28 @@
+{
+  "name": "godeploy-api",
+  "version": "1.0.0",
+  "main": "src/main.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo 'test'",
+    "start": "tsx src/main.ts",
+    "dev": "tsx watch src/main.ts"
+  },
+  "author": "mat silva",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@fastify/autoload": "~6.0.3",
+    "@fastify/sensible": "~6.0.2",
+    "@fastify/swagger": "^9.4.2",
+    "fastify": "~5.2.1",
+    "fastify-plugin": "~5.0.1",
+    "tsx": "^4.19.3"
+  },
+  "devDependencies": {
+    "@types/node": "~18.16.9",
+    "prettier": "^2.6.2",
+    "tslib": "^2.3.0",
+    "typescript": "~5.7.2"
+  }
+}
