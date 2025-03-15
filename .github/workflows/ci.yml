@@ -45,8 +45,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      # - name: Build
+      #   run: npm run build
 
       # - name: Deploy to DigitalOcean
       #   uses: digitalocean/app_action@v1.1.5

@@ -52,12 +52,16 @@ export default async function (fastify: FastifyInstance) {
       request: FastifyRequest<AuthInitRequest>,
       reply: FastifyReply
     ) => {
+      request.measure.start('auth_init', {
+        email: request.body.email,
+      });
       try {
         const { email } = request.body;
-        const redirectUrl = 'http://localhost:38389'; // cli will be listening on this port
+        const redirectUrl = 'http://localhost:38389/callback'; // cli will be listening on this port
 
+        request.measure.add('supabase_auth_signinwithotp');
         // Use Supabase OTP to send a magic link
-        const { data, error } = await fastify.supabase.auth.signInWithOtp({
+        const { error } = await fastify.supabase.auth.signInWithOtp({
           email,
           options: {
             emailRedirectTo: `${
@@ -67,12 +71,15 @@ export default async function (fastify: FastifyInstance) {
         });
 
         if (error) {
+          request.measure.failure(error);
           fastify.log.error(error);
           return reply.code(400).send({
             success: false,
             error: error.message,
           });
         }
+
+        request.measure.success();
 
         // Log the action in development mode
         fastify.log.info(
@@ -84,6 +91,7 @@ export default async function (fastify: FastifyInstance) {
           message: 'Check your email for the login link.',
         });
       } catch (error) {
+        request.measure.failure(error);
         fastify.log.error(error);
         return reply.code(500).send({
           success: false,
@@ -98,7 +106,7 @@ export default async function (fastify: FastifyInstance) {
     schema: {
       querystring: {
         type: 'object',
-        required: ['redirect_to', 'token'],
+        required: ['redirect_to'],
         properties: {
           redirect_to: { type: 'string' },
           token: { type: 'string' },
@@ -112,6 +120,7 @@ export default async function (fastify: FastifyInstance) {
       request: FastifyRequest<MagicLinkRequest>,
       reply: FastifyReply
     ) => {
+      request.measure.start('magic_link');
       try {
         const { redirect_to, token } = request.query;
 
@@ -120,23 +129,40 @@ export default async function (fastify: FastifyInstance) {
         if (request.raw.url) {
           const urlString = request.raw.url;
           const hashMatch = urlString.match(/#access_token=([^&]+)/);
+          request.measure.add('hash_match', {
+            hash_match: !!hashMatch,
+            url_string: urlString,
+          });
 
           if (hashMatch && hashMatch[1]) {
             const accessToken = hashMatch[1];
             const redirectUrl = new URL(redirect_to);
 
             // Add the extracted access token to the redirect URL
-            redirectUrl.searchParams.set('token', accessToken);
+            redirectUrl.searchParams.set('access_token', accessToken);
+            request.measure.success();
             return reply.redirect(redirectUrl.toString());
           }
         }
+        request.measure.add('no_hash_match');
 
         // Fallback to the original behavior if no access_token is found
-        const redirectUrl = new URL(redirect_to);
-        redirectUrl.searchParams.set('token', token);
-        return reply.redirect(redirectUrl.toString());
+        // Only proceed with token from query if it exists
+        if (token) {
+          const redirectUrl = new URL(redirect_to);
+          redirectUrl.searchParams.set('access_token', token);
+          request.measure.success();
+          return reply.redirect(redirectUrl.toString());
+        } else {
+          // If no token is found in hash or query, log the issue
+          fastify.log.warn('No token found in hash or query parameters');
+          const redirectUrl = new URL(redirect_to);
+          request.measure.success();
+          return reply.redirect(redirectUrl.toString());
+        }
       } catch (error) {
         fastify.log.error(error);
+        request.measure.failure(error);
         return reply.code(500).send({
           success: false,
           error: 'Internal server error',
@@ -174,16 +200,20 @@ export default async function (fastify: FastifyInstance) {
       },
     },
     handler: async (request: FastifyRequest, reply: FastifyReply) => {
+      request.measure.start('auth_verify');
       try {
+        request.measure.add('get_token_from_auth_header');
         const token = request.headers.authorization?.split(' ')[1];
 
         if (!token) {
+          request.measure.failure('Unauthorized: Missing token');
           return reply.code(401).send({
             valid: false,
             error: 'Unauthorized: Missing token',
           });
         }
 
+        request.measure.add('get_user_auth_from_supabase');
         // Verify the token and get user data
         const {
           data: { user },
@@ -191,12 +221,18 @@ export default async function (fastify: FastifyInstance) {
         } = await fastify.supabase.auth.getUser(token);
 
         if (error || !user) {
+          if (error) {
+            request.measure.failure(error);
+          } else {
+            request.measure.failure('Unauthorized: Invalid token');
+          }
           return reply.code(401).send({
             valid: false,
             error: 'Unauthorized: Invalid token',
           });
         }
 
+        request.measure.add('get_user_tenant_id_from_supabase');
         // Get the tenant_id for this user from our users table
         const { data: userData, error: userError } = await fastify.supabase
           .from('users')
@@ -205,11 +241,14 @@ export default async function (fastify: FastifyInstance) {
           .single();
 
         if (userError || !userData) {
+          request.measure.failure(userError ?? 'Unauthorized: User not found');
           return reply.code(401).send({
             valid: false,
             error: 'Unauthorized: User not found',
           });
         }
+
+        request.measure.success();
 
         return reply.code(200).send({
           valid: true,
@@ -220,6 +259,7 @@ export default async function (fastify: FastifyInstance) {
           },
         });
       } catch (error) {
+        request.measure.failure(error);
         fastify.log.error(error);
         return reply.code(401).send({
           valid: false,

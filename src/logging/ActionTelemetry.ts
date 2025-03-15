@@ -33,7 +33,8 @@ export class ActionTelemetry {
     return new ActionTelemetry(this.telemetry);
   }
 
-  start(operation: string, metadata: unknown) {
+  start(operation: string, metadata?: unknown) {
+    metadata ??= {};
     const flattenedData = flatten(metadata, {
       delimiter: '_',
     });
@@ -44,7 +45,8 @@ export class ActionTelemetry {
     };
     return this;
   }
-  add(action: string, data: unknown) {
+  add(action: string, data?: unknown) {
+    data ??= {};
     const flattenedData = flatten(data, {
       delimiter: '_',
     });
@@ -55,7 +57,8 @@ export class ActionTelemetry {
     return this;
   }
 
-  success(data: unknown) {
+  success(data?: unknown) {
+    data ??= {};
     const flattenedData = flatten(data, {
       delimiter: '_',
     });
@@ -67,7 +70,8 @@ export class ActionTelemetry {
     return this.process().send();
   }
 
-  failure(error: unknown, data: unknown) {
+  failure(error: unknown, data?: unknown) {
+    data ??= {};
     const flattenedData = flatten(data, {
       delimiter: '_',
     });
@@ -81,7 +85,6 @@ export class ActionTelemetry {
   }
 
   process() {
-    const telemetry = this.telemetry;
     if (!this.startEntry || !this.endEntry) {
       console.warn('No telemetry data to process');
       return this;
