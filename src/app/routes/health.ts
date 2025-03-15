@@ -17,7 +17,7 @@ export default async function (fastify: FastifyInstance) {
     config: {
       auth: false, // Skip auth for health check
     },
-    handler: async (request, reply) => {
+    handler: async () => {
       return {
         status: 'ok',
         timestamp: new Date().toISOString(),
