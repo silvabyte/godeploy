@@ -33,9 +33,17 @@ echo -e "${GREEN}Server is running! Starting tests...${NC}"
 echo -e "${BLUE}Testing health endpoint...${NC}"
 curl -s http://localhost:3000/health | jq
 
-# Test the projects endpoint with auth token
+# Test the projects endpoint
 echo -e "${BLUE}Testing projects endpoint...${NC}"
 curl -s -H "Authorization: Bearer $GODEPLOY_ACCESS_TOKEN" http://localhost:3000/api/projects | jq
+
+# Test creating a new project
+echo -e "${BLUE}Testing project creation...${NC}"
+curl -s -X POST \
+  -H "Authorization: Bearer $GODEPLOY_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"test-project-'$(date +%s)'", "description":"Test project created via API"}' \
+  http://localhost:3000/api/projects | jq
 
 # Create a test SPA archive
 echo -e "${BLUE}Creating test SPA archive...${NC}"
@@ -43,12 +51,19 @@ mkdir -p test-spa
 echo "<html><body><h1>Hello GoDeploy!</h1></body></html>" > test-spa/index.html
 zip -r test-spa.zip test-spa
 
-# Test the deploy endpoint with auth token
+# Test the deploy endpoint
 echo -e "${BLUE}Testing deploy endpoint...${NC}"
 curl -s -X POST \
   -H "Authorization: Bearer $GODEPLOY_ACCESS_TOKEN" \
   -F "archive=@test-spa.zip" \
   "http://localhost:3000/api/deploy?project=test-app" | jq
+
+# Test deploy to non-existent project
+echo -e "${BLUE}Testing deploy to non-existent project...${NC}"
+curl -s -X POST \
+  -H "Authorization: Bearer $GODEPLOY_ACCESS_TOKEN" \
+  -F "archive=@test-spa.zip" \
+  "http://localhost:3000/api/deploy?project=non-existent-project" | jq
 
 # Clean up
 echo -e "${BLUE}Cleaning up test files...${NC}"

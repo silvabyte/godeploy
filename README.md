@@ -27,6 +27,61 @@ All API endpoints require authentication via Supabase JWT token in the `Authoriz
 Authorization: Bearer <token>
 ```
 
+#### CLI Authentication Flow
+
+The API supports a magic link authentication flow for CLI clients using Supabase OTP:
+
+1. **Initialize Authentication**
+
+```
+POST /api/auth/init
+```
+
+Initiates the authentication flow by sending a magic link to the user's email using Supabase OTP.
+
+**Request:**
+
+```json
+{
+  "email": "user@example.com",
+  "redirect_uri": "http://localhost:38389/callback"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Check your email for the login link."
+}
+```
+
+2. **Magic Link Flow**
+
+When the user clicks the magic link in their email, Supabase will handle the authentication and redirect to the CLI's callback URL with an access token.
+
+3. **Verify Token**
+
+```
+GET /api/auth/verify
+```
+
+Verifies if a token is valid and returns the user information.
+
+**Response:**
+
+```json
+{
+  "valid": true,
+  "user": {
+    "id": "user-id",
+    "email": "user@example.com",
+    "tenant_id": "tenant-id"
+  }
+}
+```
+
 ### Projects Endpoint
 
 ```

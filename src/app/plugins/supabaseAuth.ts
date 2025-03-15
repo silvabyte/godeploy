@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import fp from 'fastify-plugin';
 
 // Create Supabase client
@@ -9,6 +9,9 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Extend FastifyRequest to include user property
 declare module 'fastify' {
+  interface FastifyInstance {
+    supabase: SupabaseClient;
+  }
   interface FastifyRequest {
     user: {
       user_id: string;

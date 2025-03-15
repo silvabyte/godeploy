@@ -6,11 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - '${PORT}:${PORT}'
     environment:
       - NODE_ENV=development
       - HOST=0.0.0.0
-      - PORT=3000
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_API_KEY=${SUPABASE_API_KEY}
       - DIGITAL_OCEAN_TOKEN=${DIGITAL_OCEAN_TOKEN}
@@ -19,6 +18,8 @@ services:
       - TEST_USER_ID=${TEST_USER_ID}
       - TEST_TENANT_ID=${TEST_TENANT_ID}
       - GODEPLOY_ACCESS_TOKEN=${GODEPLOY_ACCESS_TOKEN}
+      - APP_URL=${APP_URL}
+      - PORT=${PORT}
     volumes:
       - ./src:/app/src
       - ./package.json:/app/package.json
