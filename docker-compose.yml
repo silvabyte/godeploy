@@ -16,6 +16,9 @@ services:
       - DIGITAL_OCEAN_TOKEN=${DIGITAL_OCEAN_TOKEN}
       - DIGITAL_OCEAN_SPACES_KEY=${DIGITAL_OCEAN_SPACES_KEY}
       - DIGITAL_OCEAN_SPACES_SECRET=${DIGITAL_OCEAN_SPACES_SECRET}
+      - TEST_USER_ID=${TEST_USER_ID}
+      - TEST_TENANT_ID=${TEST_TENANT_ID}
+      - GODEPLOY_ACCESS_TOKEN=${GODEPLOY_ACCESS_TOKEN}
     volumes:
       - ./src:/app/src
       - ./package.json:/app/package.json

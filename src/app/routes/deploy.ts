@@ -35,6 +35,13 @@ const deploySchema = {
           error: { type: 'string' },
         },
       },
+      404: {
+        type: 'object',
+        properties: {
+          error: { type: 'string' },
+          message: { type: 'string' },
+        },
+      },
       500: {
         type: 'object',
         properties: {
@@ -120,16 +127,17 @@ export default async function (fastify: FastifyInstance) {
             .send({ error: 'Invalid SPA archive structure' });
         }
 
-        // Check if project exists or create a new one
-        let project = await dbService.getProjectByName(projectName, tenant_id);
+        // Check if project exists
+        const project = await dbService.getProjectByName(
+          projectName,
+          tenant_id
+        );
 
         if (!project) {
-          // Create a new project
-          project = await dbService.createProject({
-            tenant_id,
-            owner_id: user_id,
-            name: projectName,
-            subdomain: projectName.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+          // Return 404 error if project doesn't exist
+          return reply.code(404).send({
+            error: `Project '${projectName}' not found`,
+            message: `Please initialize a new project first with: godeploy project create --name ${projectName}`,
           });
         }
 

@@ -7,6 +7,7 @@ export interface Project {
   owner_id: string;
   name: string;
   subdomain: string;
+  description?: string;
   created_at: string;
   updated_at: string;
 }
@@ -56,6 +57,28 @@ export class DbService {
         return null;
       }
       throw new Error(`Failed to get project: ${error.message}`);
+    }
+
+    return data as Project;
+  }
+
+  /**
+   * Get a project by subdomain
+   * @param subdomain Project subdomain
+   */
+  async getProjectBySubdomain(subdomain: string): Promise<Project | null> {
+    const { data, error } = await this.supabase
+      .from('projects')
+      .select('*')
+      .eq('subdomain', subdomain)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // PGRST116 is the error code for "no rows returned"
+        return null;
+      }
+      throw new Error(`Failed to get project by subdomain: ${error.message}`);
     }
 
     return data as Project;

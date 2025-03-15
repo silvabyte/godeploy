@@ -27,29 +27,6 @@ All API endpoints require authentication via Supabase JWT token in the `Authoriz
 Authorization: Bearer <token>
 ```
 
-### Deploy Endpoint
-
-```
-POST /api/deploy?project=<project-name>
-```
-
-Uploads a static SPA to DigitalOcean Spaces and returns a CDN URL.
-
-**Request:**
-
-- Multipart form data with:
-  - `archive`: Zipped SPA build directory
-  - `spa_config`: Configuration file (optional)
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "url": "https://my-app.godeploy.app"
-}
-```
-
 ### Projects Endpoint
 
 ```
@@ -73,6 +50,62 @@ Returns a list of all projects for the authenticated tenant.
 ]
 ```
 
+### Create Project Endpoint
+
+```
+POST /api/projects
+```
+
+Creates a new project for the authenticated tenant.
+
+**Request:**
+
+```json
+{
+  "name": "my-app",
+  "description": "My awesome SPA application"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "uuid",
+  "name": "my-app",
+  "subdomain": "my-app",
+  "description": "My awesome SPA application",
+  "url": "https://my-app.godeploy.app",
+  "created_at": "2023-01-01T00:00:00Z",
+  "updated_at": "2023-01-01T00:00:00Z"
+}
+```
+
+### Deploy Endpoint
+
+```
+POST /api/deploy?project=<project-name>
+```
+
+Uploads a static SPA to DigitalOcean Spaces and returns a CDN URL.
+
+**Note:** The project must exist before deploying. If the project doesn't exist, you'll need to create it first using the Create Project endpoint.
+
+**Request:**
+
+- Multipart form data with:
+  - `archive`: Zipped SPA build directory
+  - `spa_config`: Configuration file (optional)
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "url": "https://my-app.godeploy.app"
+}
+```
+
 ## Development
 
 ### Prerequisites
@@ -91,7 +124,10 @@ SUPABASE_URL=your_supabase_url
 SUPABASE_API_KEY=your_supabase_api_key
 DIGITAL_OCEAN_SPACES_KEY=your_spaces_access_key
 DIGITAL_OCEAN_SPACES_SECRET=your_spaces_secret_key
+GODEPLOY_ACCESS_TOKEN="your_supabase_jwt_token"
 ```
+
+The `GODEPLOY_ACCESS_TOKEN` is a long-lived JWT token from Supabase that can be used for testing the API with a real authenticated user.
 
 ### Quick Start
 
@@ -101,10 +137,24 @@ npm install
 
 # Start development server
 npm run dev
-
-# Or use the start script
-./scripts/start.sh
 ```
+
+### Testing the API
+
+```bash
+# Test the API with the test script
+./scripts/test-api.sh
+```
+
+The test script will:
+
+1. Check if the server is running
+2. Test the health endpoint
+3. Test the projects endpoint with auth token
+4. Test creating a new project
+5. Test the deploy endpoint with auth token
+6. Test deploying to a non-existent project
+7. Clean up test files
 
 ### Database Migrations
 
@@ -123,36 +173,37 @@ npm run db:migrate:push
 
 ```bash
 # Run the migrations
-./scripts/run-migrations.sh
-
-# Or run the migrations manually
 npm run db:migrate:push
 
 # Initialize test data
 supabase db query < scripts/init-test-data.sql
 ```
 
-## Testing the API
+### Example: Create a Project
 
-For testing purposes, the API includes public endpoints that don't require authentication:
-
-- `GET /health` - Health check endpoint
-- `GET /api/projects-public` - List all projects for the test tenant
-- `POST /api/deploy-public?project=<project-name>` - Deploy a SPA to the test tenant
+```bash
+curl -X POST \
+  -H "Authorization: Bearer $GODEPLOY_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"my-app", "description":"My awesome SPA application"}' \
+  "http://localhost:3000/api/projects"
+```
 
 ### Example: Deploy a SPA
 
 ```bash
 curl -X POST \
+  -H "Authorization: Bearer $GODEPLOY_ACCESS_TOKEN" \
   -F "archive=@/path/to/spa.zip" \
   -F "spa_config=@/path/to/spa-config.json" \
-  "http://localhost:3000/api/deploy-public?project=my-app"
+  "http://localhost:3000/api/deploy?project=my-app"
 ```
 
 ### Example: List Projects
 
 ```bash
-curl "http://localhost:3000/api/projects-public"
+curl -H "Authorization: Bearer $GODEPLOY_ACCESS_TOKEN" \
+  "http://localhost:3000/api/projects"
 ```
 
 ## Documentation

@@ -5,6 +5,9 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import cors from '@fastify/cors';
 
+// Set NODE_ENV to development if not already set
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
@@ -70,5 +73,6 @@ server.listen({ port, host }, (err) => {
   } else {
     console.log(`[ ready ] http://${host}:${port}`);
     console.log(`[ docs  ] http://${host}:${port}/documentation`);
+    console.log(`[ mode  ] ${process.env.NODE_ENV}`);
   }
 });
