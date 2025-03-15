@@ -7,7 +7,10 @@
     "test": "echo 'test'",
     "start": "tsx src/main.ts",
     "dev": "tsx watch src/main.ts",
-    "format": "npx -y prettier . --write"
+    "format": "npx -y prettier . --write",
+    "db:migrate:new": "supabase migration new",
+    "db:migrate:up": "supabase migration up",
+    "db:migrate:push": "supabase db push"
   },
   "author": "mat silva",
   "license": "ISC",
