@@ -15,7 +15,7 @@ const bucketName = process.env.DIGITAL_OCEAN_SPACES_BUCKET || '';
 
 // Create S3 client for DigitalOcean Spaces
 const s3Client = new S3Client({
-  endpoint: spacesEndpoint,
+  endpoint: `https://${spacesEndpoint}`,
   region: 'us-east-1', // DigitalOcean uses this region for API compatibility
   credentials: {
     accessKeyId: process.env.DIGITAL_OCEAN_SPACES_KEY || '',
