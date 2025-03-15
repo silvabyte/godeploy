@@ -2,12 +2,12 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { createReadStream, ReadStream } from 'fs';
 import { join } from 'path';
-import { pipeline } from 'stream/promises';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
 import * as crypto from 'crypto';
 import AdmZip from 'adm-zip';
+import { constructCdnUrl } from '../utils/urlUtils';
 
 // DigitalOcean Spaces configuration
 const spacesEndpoint = process.env.DIGITAL_OCEAN_SPACES_ENDPOINT || '';
@@ -94,7 +94,7 @@ export class StorageService {
 
       // Upload all files with appropriate cache headers
       const baseKey = `spa-projects/${tenantId}/${projectId}`;
-      const cdnUrl = `https://${projectName}.spa.godeploy.app`;
+      const cdnUrl = constructCdnUrl(projectName, tenantId);
 
       // Process all files recursively
       await this.uploadDirectory(tempDir, baseKey);

@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { DbService } from '../services/dbService';
 import slugify from 'slugify';
+import { constructCdnUrl } from '../utils/urlUtils';
 
 // Define the request interface with proper typing
 interface CreateProjectBody {
@@ -136,7 +137,7 @@ export default async function (fastify: FastifyInstance) {
         // Add URL to each project
         const projectsWithUrl = projects.map((project) => ({
           ...project,
-          url: `https://${project.subdomain}.spa.godeploy.app`,
+          url: constructCdnUrl(project.subdomain, tenant_id),
         }));
 
         logRequest(request, 'Successfully processed projects request');
@@ -226,6 +227,12 @@ export default async function (fastify: FastifyInstance) {
           description,
         });
 
+        // Add URL to the project
+        const projectWithUrl = {
+          ...project,
+          url: constructCdnUrl(project.subdomain, tenant_id),
+        };
+
         // Return the created project
         logRequest(
           request,
@@ -234,10 +241,7 @@ export default async function (fastify: FastifyInstance) {
             8
           )}...`
         );
-        return reply.code(201).send({
-          ...project,
-          url: `https://${project.subdomain}.spa.godeploy.app`,
-        });
+        return reply.code(201).send(projectWithUrl);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Unknown error';

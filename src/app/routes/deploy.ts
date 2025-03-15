@@ -4,6 +4,7 @@ import { DbService } from '../services/dbService';
 import { FileUtils } from '../utils/fileUtils';
 import { v4 as uuidv4 } from 'uuid';
 import fastifyMultipart from '@fastify/multipart';
+import { constructCdnUrl } from '../utils/urlUtils';
 
 // Define the request interface with proper typing
 interface DeployQuerystring {
@@ -249,7 +250,7 @@ export default async function (fastify: FastifyInstance) {
           tenant_id,
           project_id: project.id,
           user_id,
-          url: `https://${project.subdomain}.spa.godeploy.app`,
+          url: constructCdnUrl(project.subdomain, tenant_id),
           status: 'pending',
         });
 
