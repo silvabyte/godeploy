@@ -213,9 +213,9 @@ Or push to your container registry and deploy to your cloud provider.
 | `godeploy package`                | Generate containerized Docker + Nginx setup             |
 | `godeploy package --output <dir>` | Output to custom directory (default: `deploy/`)         |
 | `godeploy --config <file>`        | Use custom config file (default: `spa-config.json`)     |
-| `godeploy auth --email <email>`   | Authenticate with the GoDeploy service                  |
-| `godeploy logout`                 | Log out from the GoDeploy service                       |
-| `godeploy status`                 | Check authentication status                             |
+| `godeploy auth login --email <e>` | Authenticate with the GoDeploy service                  |
+| `godeploy auth logout`            | Log out from the GoDeploy service                       |
+| `godeploy auth status`            | Check authentication status                             |
 | 🚧 `godeploy deploy`              | **Coming soon** — One-command SaaS deploy (join alpha!) |
 
 ---
@@ -226,16 +226,16 @@ GoDeploy uses a secure authentication flow to protect your deployments and enabl
 
 ### Authentication Flow
 
-1. Run `godeploy auth --email your@email.com`
+1. Run `godeploy auth login --email your@email.com`
 2. GoDeploy sends a magic link to your email
 3. Click the link in your email to authenticate
 4. The CLI automatically captures the token and stores it securely
 
 ### Commands
 
-- `godeploy auth --email <email>` - Authenticate with the GoDeploy service
-- `godeploy logout` - Log out from the GoDeploy service
-- `godeploy status` - Check your authentication status
+- `godeploy auth login --email <email>` - Authenticate with the GoDeploy service
+- `godeploy auth logout` - Log out from the GoDeploy service
+- `godeploy auth status` - Check your authentication status
 
 ### Security
 

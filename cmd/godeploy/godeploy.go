@@ -24,9 +24,7 @@ var CLI struct {
 	Serve   ServeCmd   `cmd:"" help:"Start a local server for testing"`
 	Package PackageCmd `cmd:"" help:"Generate container files for deployment"`
 	Init    InitCmd    `cmd:"" help:"Initialize a new spa-config.json file"`
-	Auth    AuthCmd    `cmd:"" help:"Authenticate with the GoDeploy service"`
-	Logout  LogoutCmd  `cmd:"" help:"Log out from the GoDeploy service"`
-	Status  StatusCmd  `cmd:"" help:"Check authentication status"`
+	Auth    AuthCmd    `cmd:"" help:"Authentication commands"`
 	Deploy  DeployCmd  `cmd:"" help:"Deploy your SPA to the GoDeploy service (Coming Soon)"`
 }
 
@@ -49,6 +47,13 @@ type InitCmd struct {
 
 // AuthCmd represents the auth command
 type AuthCmd struct {
+	Login  LoginCmd  `cmd:"" help:"Authenticate with the GoDeploy service" default:"1"`
+	Status StatusCmd `cmd:"" help:"Check authentication status"`
+	Logout LogoutCmd `cmd:"" help:"Log out from the GoDeploy service"`
+}
+
+// LoginCmd represents the auth login command
+type LoginCmd struct {
 	Email string `help:"Email address to authenticate with" required:""`
 }
 
@@ -81,6 +86,15 @@ const defaultConfig = `{
 
 // Run executes the serve command
 func (s *ServeCmd) Run() error {
+	// Check if authenticated
+	isAuth, err := auth.IsAuthenticated()
+	if err != nil {
+		return fmt.Errorf("error checking authentication: %w", err)
+	}
+	if !isAuth {
+		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
+	}
+
 	// Load the SPA configuration
 	spaConfig, err := config.LoadConfig(CLI.Config)
 	if err != nil {
@@ -103,6 +117,15 @@ func (s *ServeCmd) Run() error {
 
 // Run executes the package command
 func (d *PackageCmd) Run() error {
+	// Check if authenticated
+	isAuth, err := auth.IsAuthenticated()
+	if err != nil {
+		return fmt.Errorf("error checking authentication: %w", err)
+	}
+	if !isAuth {
+		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
+	}
+
 	// Load the SPA configuration
 	spaConfig, err := config.LoadConfig(CLI.Config)
 	if err != nil {
@@ -139,15 +162,15 @@ func (i *InitCmd) Run() error {
 	return nil
 }
 
-// Run executes the auth command
-func (a *AuthCmd) Run() error {
+// Run executes the login command
+func (l *LoginCmd) Run() error {
 	// Check if already authenticated
 	isAuth, err := auth.IsAuthenticated()
 	if err != nil {
 		return fmt.Errorf("error checking authentication: %w", err)
 	}
 	if isAuth {
-		fmt.Println("You are already authenticated. To log out, run 'godeploy logout'.")
+		fmt.Println("You are already authenticated. To log out, run 'godeploy auth logout'.")
 		return nil
 	}
 
@@ -173,8 +196,8 @@ func (a *AuthCmd) Run() error {
 	redirectURI := auth.GetRedirectURI()
 	apiClient := api.NewClient()
 
-	fmt.Printf("Sending authentication request for %s...\n", a.Email)
-	authResp, err := apiClient.InitAuth(a.Email, redirectURI)
+	fmt.Printf("Sending authentication request for %s...\n", l.Email)
+	authResp, err := apiClient.InitAuth(l.Email, redirectURI)
 	if err != nil {
 		cancel() // Cancel the server context
 		<-serverDone
@@ -247,7 +270,7 @@ func (s *StatusCmd) Run() error {
 		fmt.Printf("Token: %s\n", tokenPreview)
 	} else {
 		fmt.Println("❌ You are not authenticated with GoDeploy.")
-		fmt.Println("Run 'godeploy auth --email=your@email.com' to authenticate.")
+		fmt.Println("Run 'godeploy auth login --email=your@email.com' to authenticate.")
 	}
 
 	return nil
@@ -261,7 +284,7 @@ func (d *DeployCmd) Run() error {
 		return fmt.Errorf("error checking authentication: %w", err)
 	}
 	if !isAuth {
-		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth --email=your@email.com' to authenticate")
+		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
 	}
 
 	fmt.Println("🚧 The deploy command is coming soon!")
