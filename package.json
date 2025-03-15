@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo 'test'",
     "start": "tsx src/main.ts",
-    "dev": "tsx watch src/main.ts"
+    "dev": "tsx watch src/main.ts",
+    "format": "npx -y prettier . --write"
   },
   "author": "mat silva",
   "license": "ISC",
@@ -20,9 +21,17 @@
     "tsx": "^4.19.3"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
     "@types/node": "~18.16.9",
+    "husky": "^9.1.7",
     "prettier": "^2.6.2",
     "tslib": "^2.3.0",
     "typescript": "~5.7.2"
+  },
+  "lint-staged": {
+    "**/*": [
+      "prettier --write --ignore-unknown"
+    ]
   }
 }
