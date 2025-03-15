@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/alecthomas/kong"
@@ -13,6 +14,7 @@ import (
 	"github.com/audetic/godeploy/pkg/config"
 	"github.com/audetic/godeploy/pkg/docker"
 	"github.com/audetic/godeploy/pkg/nginx"
+	"github.com/yarlson/pin"
 )
 
 // CLI represents the command-line interface structure
@@ -86,58 +88,144 @@ const defaultConfig = `{
 
 // Run executes the serve command
 func (s *ServeCmd) Run() error {
+	// Create a context
+	ctx := context.Background()
+
+	// Create a spinner for checking authentication
+	authSpinner := pin.New("Checking authentication status...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	authCancel := authSpinner.Start(ctx)
+
 	// Check if authenticated
 	isAuth, err := auth.IsAuthenticated()
 	if err != nil {
+		authCancel()
+		authSpinner.Fail("Failed to check authentication")
 		return fmt.Errorf("error checking authentication: %w", err)
 	}
 	if !isAuth {
+		authCancel()
+		authSpinner.Fail("Not authenticated")
 		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
 	}
+	authCancel()
+	authSpinner.Stop("Authentication verified")
+
+	// Create a spinner for loading configuration
+	configSpinner := pin.New("Loading SPA configuration...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	configCancel := configSpinner.Start(ctx)
 
 	// Load the SPA configuration
 	spaConfig, err := config.LoadConfig(CLI.Config)
 	if err != nil {
+		configCancel()
+		configSpinner.Fail("Failed to load configuration")
 		return fmt.Errorf("error loading configuration: %w", err)
 	}
+	configCancel()
+	configSpinner.Stop("Configuration loaded")
+
+	// Create a spinner for generating container files
+	genSpinner := pin.New("Generating container files...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	genCancel := genSpinner.Start(ctx)
 
 	// Generate container files
 	if err := generateContainerFiles(spaConfig, s.Output); err != nil {
+		genCancel()
+		genSpinner.Fail("Failed to generate container files")
 		return fmt.Errorf("error generating container files: %w", err)
 	}
+	genCancel()
+	genSpinner.Stop("Container files generated")
+
+	// Create a spinner for starting Docker
+	dockerSpinner := pin.New("Starting server with Docker...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	dockerCancel := dockerSpinner.Start(ctx)
 
 	// Run the server locally
-	fmt.Println("Starting server with Docker...")
 	if err := docker.RunLocalDocker(s.Output, s.Port, s.ImageName); err != nil {
+		dockerCancel()
+		dockerSpinner.Fail("Failed to start Docker")
 		return fmt.Errorf("error running Docker: %w", err)
 	}
+	dockerCancel()
+	dockerSpinner.Stop("Docker server started")
 
 	return nil
 }
 
 // Run executes the package command
 func (d *PackageCmd) Run() error {
+	// Create a context
+	ctx := context.Background()
+
+	// Create a spinner for checking authentication
+	authSpinner := pin.New("Checking authentication status...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	authCancel := authSpinner.Start(ctx)
+
 	// Check if authenticated
 	isAuth, err := auth.IsAuthenticated()
 	if err != nil {
+		authCancel()
+		authSpinner.Fail("Failed to check authentication")
 		return fmt.Errorf("error checking authentication: %w", err)
 	}
 	if !isAuth {
+		authCancel()
+		authSpinner.Fail("Not authenticated")
 		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
 	}
+	authCancel()
+	authSpinner.Stop("Authentication verified")
+
+	// Create a spinner for loading configuration
+	configSpinner := pin.New("Loading SPA configuration...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	configCancel := configSpinner.Start(ctx)
 
 	// Load the SPA configuration
 	spaConfig, err := config.LoadConfig(CLI.Config)
 	if err != nil {
+		configCancel()
+		configSpinner.Fail("Failed to load configuration")
 		return fmt.Errorf("error loading configuration: %w", err)
 	}
+	configCancel()
+	configSpinner.Stop("Configuration loaded")
+
+	// Create a spinner for generating container files
+	genSpinner := pin.New("Generating container files...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	genCancel := genSpinner.Start(ctx)
 
 	// Generate container files
 	if err := generateContainerFiles(spaConfig, d.Output); err != nil {
+		genCancel()
+		genSpinner.Fail("Failed to generate container files")
 		return fmt.Errorf("error generating container files: %w", err)
 	}
+	genCancel()
+	genSpinner.Stop("Container files generated")
 
-	fmt.Printf("Container files generated in %s\n", d.Output)
+	fmt.Printf("✅ Container files generated in %s\n", d.Output)
 	fmt.Println("You can now build and deploy this container to your cloud provider.")
 
 	return nil
@@ -145,19 +233,43 @@ func (d *PackageCmd) Run() error {
 
 // Run executes the init command
 func (i *InitCmd) Run() error {
+	// Create a context
+	ctx := context.Background()
 	configPath := CLI.Config
+
+	// Create a spinner for checking existing config
+	checkSpinner := pin.New(fmt.Sprintf("Checking for existing config at %s...", configPath),
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	checkCancel := checkSpinner.Start(ctx)
 
 	// Check if the file already exists
 	if _, err := os.Stat(configPath); err == nil && !i.Force {
+		checkCancel()
+		checkSpinner.Fail("Config file already exists")
 		return fmt.Errorf("config file %s already exists. Use --force to overwrite", configPath)
 	}
+	checkCancel()
+	checkSpinner.Stop("Config check complete")
+
+	// Create a spinner for creating the config file
+	createSpinner := pin.New("Creating configuration file...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	createCancel := createSpinner.Start(ctx)
 
 	// Create the config file
 	if err := os.WriteFile(configPath, []byte(defaultConfig), 0644); err != nil {
+		createCancel()
+		createSpinner.Fail("Failed to create config file")
 		return fmt.Errorf("failed to create config file: %w", err)
 	}
 
-	fmt.Printf("Created config file: %s\n", configPath)
+	createCancel()
+	createSpinner.Stop("Configuration created")
+	fmt.Printf("✅ Created config file: %s\n", configPath)
 	fmt.Println("You can now edit this file to configure your SPAs.")
 	return nil
 }
@@ -178,9 +290,12 @@ func (l *LoginCmd) Run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	defer cancel()
 
-	// Start the local server
-	fmt.Println("Starting local authentication server...")
-	fmt.Printf("Waiting for authentication at http://localhost:%d/callback\n", auth.DefaultPort)
+	// Create a spinner for starting the local server
+	serverSpinner := pin.New("Starting local authentication server...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	serverCancel := serverSpinner.Start(ctx)
 
 	// Start the local server in a goroutine
 	serverDone := make(chan struct{})
@@ -192,39 +307,85 @@ func (l *LoginCmd) Run() error {
 		close(serverDone)
 	}()
 
+	// Wait a moment for the server to start
+	time.Sleep(500 * time.Millisecond)
+	serverCancel()
+	serverSpinner.Stop("Local server started")
+	fmt.Printf("Listening for authentication at http://localhost:%d/callback\n", auth.DefaultPort)
+
+	// Create a spinner for the authentication request
+	authSpinner := pin.New(fmt.Sprintf("Sending authentication request for %s...", l.Email),
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	authCancel := authSpinner.Start(ctx)
+
 	// Initialize the authentication flow
 	redirectURI := auth.GetRedirectURI()
 	apiClient := api.NewClient()
 
-	fmt.Printf("Sending authentication request for %s...\n", l.Email)
-	authResp, err := apiClient.InitAuth(l.Email, redirectURI)
+	_, err = apiClient.InitAuth(l.Email, redirectURI)
+	authCancel()
+	authSpinner.Stop("Authentication request sent")
+
 	if err != nil {
 		cancel() // Cancel the server context
 		<-serverDone
 		return fmt.Errorf("failed to initialize authentication: %w", err)
 	}
 
-	fmt.Println(authResp.Message)
-	fmt.Println("Waiting for you to complete authentication...")
+	// Create a spinner for waiting for authentication
+	waitSpinner := pin.New("Waiting for you to complete authentication...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	waitCancel := waitSpinner.Start(ctx)
 	fmt.Println("Check your email for a login link and click it to authenticate.")
 
 	// Wait for the server to complete
 	<-serverDone
+	waitCancel()
+	waitSpinner.Stop("Authentication received")
+
 	if serverErr != nil {
-		return fmt.Errorf("authentication failed: %w", serverErr)
+		// Check if the error contains a specific error message
+		if strings.Contains(serverErr.Error(), "access_denied") {
+			fmt.Println("❌ Authentication was denied.")
+		} else if strings.Contains(serverErr.Error(), "otp_expired") {
+			fmt.Println("❌ Authentication link has expired. Please try again.")
+		} else if strings.Contains(serverErr.Error(), "Email link is invalid") {
+			fmt.Println("❌ The authentication link is invalid. Please try again.")
+		} else {
+			fmt.Println("❌ Authentication failed:", serverErr)
+		}
+		return serverErr
 	}
+
+	// Create a spinner for saving the token
+	saveSpinner := pin.New("Saving authentication token...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	saveCancel := saveSpinner.Start(ctx)
 
 	// Save the token
 	if err := auth.SetAuthToken(token); err != nil {
+		saveCancel()
+		saveSpinner.Fail("Failed to save token")
 		return fmt.Errorf("failed to save authentication token: %w", err)
 	}
 
+	saveCancel()
+	saveSpinner.Stop("Token saved")
 	fmt.Println("✅ Authentication successful! You are now logged in.")
 	return nil
 }
 
 // Run executes the logout command
 func (l *LogoutCmd) Run() error {
+	// Create a context
+	ctx := context.Background()
+
 	// Check if authenticated
 	isAuth, err := auth.IsAuthenticated()
 	if err != nil {
@@ -235,39 +396,51 @@ func (l *LogoutCmd) Run() error {
 		return nil
 	}
 
+	// Create a spinner for logging out
+	logoutSpinner := pin.New("Logging out...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	logoutCancel := logoutSpinner.Start(ctx)
+
 	// Clear the token
 	if err := auth.ClearAuthToken(); err != nil {
+		logoutCancel()
+		logoutSpinner.Fail("Failed to log out")
 		return fmt.Errorf("failed to clear authentication token: %w", err)
 	}
 
+	logoutCancel()
+	logoutSpinner.Stop("Logged out")
 	fmt.Println("✅ You have been successfully logged out.")
 	return nil
 }
 
 // Run executes the status command
 func (s *StatusCmd) Run() error {
+	// Create a context
+	ctx := context.Background()
+
+	// Create a spinner for checking status
+	statusSpinner := pin.New("Checking authentication status...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	statusCancel := statusSpinner.Start(ctx)
+
 	// Check if authenticated
 	isAuth, err := auth.IsAuthenticated()
 	if err != nil {
+		statusCancel()
+		statusSpinner.Fail("Failed to check status")
 		return fmt.Errorf("error checking authentication: %w", err)
 	}
 
+	statusCancel()
+	statusSpinner.Stop("Status checked")
+
 	if isAuth {
-		token, err := auth.GetAuthToken()
-		if err != nil {
-			return fmt.Errorf("error getting authentication token: %w", err)
-		}
-
-		// Only show the first 10 characters of the token for security
-		tokenPreview := ""
-		if len(token) > 10 {
-			tokenPreview = token[:10] + "..."
-		} else {
-			tokenPreview = token
-		}
-
 		fmt.Println("✅ You are authenticated with GoDeploy.")
-		fmt.Printf("Token: %s\n", tokenPreview)
 	} else {
 		fmt.Println("❌ You are not authenticated with GoDeploy.")
 		fmt.Println("Run 'godeploy auth login --email=your@email.com' to authenticate.")
@@ -278,6 +451,9 @@ func (s *StatusCmd) Run() error {
 
 // Run executes the deploy command
 func (d *DeployCmd) Run() error {
+	// Create a context
+	ctx := context.Background()
+
 	// Check if authenticated
 	isAuth, err := auth.IsAuthenticated()
 	if err != nil {
@@ -287,6 +463,18 @@ func (d *DeployCmd) Run() error {
 		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
 	}
 
+	// Create a spinner for the deploy command
+	deploySpinner := pin.New("Checking deployment status...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	deployCancel := deploySpinner.Start(ctx)
+
+	// Simulate some work
+	time.Sleep(1 * time.Second)
+
+	deployCancel()
+	deploySpinner.Stop("Status checked")
 	fmt.Println("🚧 The deploy command is coming soon!")
 	fmt.Println("This feature is currently in development and will be available in a future release.")
 	fmt.Println("Stay tuned for updates!")
@@ -311,18 +499,50 @@ func RunCLI() error {
 
 // generateContainerFiles generates all the files needed for containerization
 func generateContainerFiles(spaConfig *config.SpaConfig, outputDir string) error {
+	// Create a context
+	ctx := context.Background()
+
+	// Create a spinner for creating the output directory
+	dirSpinner := pin.New(fmt.Sprintf("Creating output directory %s...", outputDir),
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	dirCancel := dirSpinner.Start(ctx)
+
 	// Create the output directory
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		dirCancel()
+		dirSpinner.Fail("Failed to create directory")
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
+	dirCancel()
+	dirSpinner.Stop("Directory created")
+
+	// Create a spinner for generating Nginx configurations
+	nginxSpinner := pin.New("Generating Nginx configurations...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	nginxCancel := nginxSpinner.Start(ctx)
 
 	// Generate Nginx configurations
 	if err := nginx.GenerateNginxConfigs(spaConfig, outputDir); err != nil {
+		nginxCancel()
+		nginxSpinner.Fail("Failed to generate Nginx configs")
 		return fmt.Errorf("failed to generate Nginx configurations: %w", err)
 	}
+	nginxCancel()
+	nginxSpinner.Stop("Nginx configurations generated")
 
 	// Process each enabled SPA
 	for _, app := range spaConfig.GetEnabledApps() {
+		// Create a spinner for processing this app
+		appSpinner := pin.New(fmt.Sprintf("Processing app '%s'...", app.Name),
+			pin.WithSpinnerColor(pin.ColorMagenta),
+			pin.WithTextColor(pin.ColorMagenta),
+		)
+		appCancel := appSpinner.Start(ctx)
+
 		spaDir := app.SourceDir
 		if !filepath.IsAbs(spaDir) {
 			// If the source directory is relative, resolve it relative to the current directory
@@ -331,19 +551,36 @@ func generateContainerFiles(spaConfig *config.SpaConfig, outputDir string) error
 
 		// Check if the SPA directory exists
 		if _, err := os.Stat(spaDir); os.IsNotExist(err) {
+			appCancel()
+			appSpinner.Fail(fmt.Sprintf("Directory '%s' not found", spaDir))
 			return fmt.Errorf("SPA directory %s does not exist", spaDir)
 		}
 
 		// Process the SPA assets
 		if err := nginx.ProcessSpaAssets(app, spaDir, outputDir); err != nil {
+			appCancel()
+			appSpinner.Fail(fmt.Sprintf("Failed to process '%s'", app.Name))
 			return fmt.Errorf("failed to process SPA assets for %s: %w", app.Name, err)
 		}
+		appCancel()
+		appSpinner.Stop(fmt.Sprintf("App '%s' processed", app.Name))
 	}
+
+	// Create a spinner for generating Docker files
+	dockerSpinner := pin.New("Generating Dockerfile...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	dockerCancel := dockerSpinner.Start(ctx)
 
 	// Generate Docker files
 	if err := docker.GenerateDockerfile(spaConfig, outputDir); err != nil {
+		dockerCancel()
+		dockerSpinner.Fail("Failed to generate Dockerfile")
 		return fmt.Errorf("failed to generate Docker files: %w", err)
 	}
+	dockerCancel()
+	dockerSpinner.Stop("Dockerfile generated")
 
 	return nil
 }

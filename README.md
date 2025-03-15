@@ -231,6 +231,24 @@ GoDeploy uses a secure authentication flow to protect your deployments and enabl
 3. Click the link in your email to authenticate
 4. The CLI automatically captures the token and stores it securely
 
+GoDeploy supports both hash parameters (`#access_token=xyz`) and query string parameters (`?access_token=xyz`) for maximum compatibility with different authentication providers. This makes the authentication flow more robust and flexible.
+
+The authentication system is compatible with various OAuth providers and formats, including:
+
+- Standard OAuth2 redirect formats
+- Complex hash fragments with multiple parameters
+- Supabase magic link authentication
+- Auth0 and other identity providers
+
+The authentication flow also includes comprehensive error handling for various scenarios:
+
+- Expired authentication links
+- Access denied errors
+- Invalid tokens
+- Other authentication failures
+
+These errors are presented to the user with clear, actionable messages both in the browser and in the CLI.
+
 ### Commands
 
 - `godeploy auth login --email <email>` - Authenticate with the GoDeploy service
@@ -242,6 +260,26 @@ GoDeploy uses a secure authentication flow to protect your deployments and enabl
 - Authentication tokens are stored securely in `~/.config/godeploy/config.json` (or OS equivalent)
 - Tokens are used to authenticate API requests to the GoDeploy service
 - The authentication flow uses a temporary local server that automatically shuts down after authentication
+- Support for both hash parameters and query parameters ensures compatibility with various security implementations
+
+### Terminal Experience
+
+GoDeploy features a modern terminal experience with:
+
+- Beautiful purple spinners for loading states
+- Clear success and error indicators
+- Real-time status updates during operations
+- Elegant progress visualization
+
+Every command in GoDeploy provides visual feedback:
+
+- **Authentication**: Visual indicators for login, logout, and status checks
+- **Init**: Progress indicators for config file creation
+- **Serve**: Spinners for each step of the server startup process
+- **Package**: Visual feedback for container file generation
+- **Deploy**: Status updates during the deployment process (coming soon)
+
+This enhanced terminal experience makes GoDeploy more intuitive and user-friendly, providing clear feedback at every step of the process.
 
 ---
 

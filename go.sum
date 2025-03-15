@@ -1,2 +1,4 @@
 github.com/alecthomas/kong v1.9.0 h1:Wgg0ll5Ys7xDnpgYBuBn/wPeLGAuK0NvYmEcisJgrIs=
 github.com/alecthomas/kong v1.9.0/go.mod h1:p2vqieVMeTAnaC83txKtXe8FLke2X07aruPWXyMPQrU=
+github.com/yarlson/pin v0.9.0 h1:qwmI/ots8N7d27NHEltzRpTvLAUX5vAoWaLBqiyqB2A=
+github.com/yarlson/pin v0.9.0/go.mod h1:FC/d9PacAtwh05XzSznZWhA447uvimitjgDDl5YaVLE=
