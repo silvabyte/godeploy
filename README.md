@@ -1,19 +1,32 @@
-# 🚀 GoDeploy — Effortless SPA Packaging
+# 🚀 GoDeploy — Effortless SPA Packaging & Deployment
 
 > **Simple, fast, and flexible Docker + Nginx containerization for SPAs.**  
 > **No full-stack frameworks. No infrastructure headaches. Just ship.**
 
-## 🚀 Quick Start
+---
+
+## ✨ What Is GoDeploy?
+
+GoDeploy makes it **dead-simple to package and serve SPAs (Single Page Applications)** as production-ready Docker + Nginx containers.  
+Ship any static frontend — **React, Vue, Angular, Svelte** — without SSR or complex infrastructure.
+
+- **OSS CLI** to **self-host** your SPAs in Docker.
+- **Optional SaaS** to deploy instantly to GoDeploy’s zero-infrastructure hosting.  
+  👉 [See `godeploy deploy` docs for SaaS users →](docs/deploy.md)
+
+---
+
+## ⚡ Quick Start — Self-Hosted (OSS)
 
 ### 1. Install GoDeploy
 
-Install with curl:
+With curl:
 
 ```bash
 curl -sSL https://install--7c574f3c-862a-4bc5-89d4-b1f11aaac65f.spa.godeploy.app/now.sh | bash
 ```
 
-or with go
+Or with Go:
 
 ```bash
 go install github.com/audetic/godeploy/cmd/godeploy@latest
@@ -29,13 +42,27 @@ npm run build  # React, Vue, Angular, etc.
 
 ---
 
-### 3. Initialize GoDeploy
+### 3. Initialize Your Project (Required)
 
 ```bash
 godeploy init
 ```
 
-➡️ Edit `spa-config.json` to point to your build directory (e.g., `dist` or `build`).
+➡️ **Edit `spa-config.json`** to point to your build directory and app name:
+
+```json
+{
+  "apps": [
+    {
+      "name": "main",
+      "source_dir": "./dist",
+      "path": "/",
+      "description": "My awesome SPA",
+      "enabled": true
+    }
+  ]
+}
+```
 
 ---
 
@@ -49,7 +76,7 @@ godeploy serve
 
 ---
 
-### 5. Generate Container-Ready Artifacts
+### 5. Package as a Docker + Nginx Container
 
 ```bash
 godeploy package
@@ -59,7 +86,7 @@ godeploy package
 
 - Dockerfile
 - Nginx config
-- SPA files
+- Your SPA files
 
 ---
 
@@ -71,42 +98,141 @@ docker build -t my-app .
 docker run -p 80:80 my-app
 ```
 
-Or push to your container registry and deploy to your cloud provider.
+Or push to any container registry and deploy to your cloud.
 
 ---
 
 ## 🔧 Full CLI Reference
 
-| Command                           | Description                                         |
-| --------------------------------- | --------------------------------------------------- |
-| `godeploy init`                   | Create default `spa-config.json`                    |
-| `godeploy init --force`           | Overwrite existing config                           |
-| `godeploy serve`                  | Serve SPA locally via Docker (port 8082)            |
-| `godeploy serve --port <port>`    | Use custom port                                     |
-| `godeploy serve --image-name <n>` | Use custom Docker image name                        |
-| `godeploy package`                | Generate containerized Docker + Nginx setup         |
-| `godeploy package --output <dir>` | Output to custom directory (default: `deploy/`)     |
-| `godeploy --config <file>`        | Use custom config file (default: `spa-config.json`) |
-| `godeploy auth login --email <e>` | Authenticate with the GoDeploy service              |
-| `godeploy auth logout`            | Log out from the GoDeploy service                   |
-| `godeploy auth status`            | Check authentication status                         |
-| `godeploy deploy`\*               | Deploy your SPA to the GoDeploy service             |
-| `godeploy deploy --project <p>`\* | Deploy a specific project from your spa-config.json |
+| Command                           | Description                                       |
+| --------------------------------- | ------------------------------------------------- |
+| `godeploy init`                   | Scaffold default `spa-config.json`                |
+| `godeploy serve`                  | Serve SPA locally via Docker (default: port 8082) |
+| `godeploy package`                | Create container-ready Docker + Nginx setup       |
+| `godeploy auth login --email <e>` | (SaaS) Authenticate for `godeploy deploy`         |
+| `godeploy deploy`                 | (SaaS) Instantly deploy to GoDeploy hosting       |
 
-\* _Requires authentication_
+> ℹ️ **Self-hosting?** Only `init`, `serve`, and `package` needed.  
+> 💥 **Want zero-infra hosting?** Use `godeploy deploy` — see below!
 
 ---
 
 ## ✅ Requirements
 
-- Go 1.16+
-- Docker (for `serve` + `package`)
+- **Go 1.16+**
+- **Docker** (for `serve` and `package`)
 
 ---
 
-## 📖 Learn More
+## 🌐 **Instant SPA Hosting with `godeploy deploy` (SaaS)**
 
-- [Advanced Multi-SPA & Custom Config](docs/advanced-configuration.md)
+> **Don’t want to manage servers?** Use GoDeploy’s hosted service.  
+> Get a live, HTTPS, CDN-backed URL in seconds.
+
+```bash
+godeploy auth login --email=you@example.com  # First time only
+godeploy deploy
+```
+
+✅ Example:
+
+```
+Successfully deployed!
+🌍 URL: https://my-app.godeploy.app
+```
+
+➡️ [Read Full Deploy Docs →](docs/deploy.md)
+
+---
+
+## 🤯 Why Use GoDeploy?
+
+| Frustration                             | GoDeploy Solution                         |
+| --------------------------------------- | ----------------------------------------- |
+| "I don't want Next.js/Remix for static" | Pure static SPA deploy, no SSR required   |
+| "I hate writing Docker + Nginx config"  | Auto-generated container and server setup |
+| "I just want to ship fast"              | One command to package, serve, or deploy  |
+| "I need multiple SPAs under one domain" | Built-in multi-SPA routing in config      |
+
+---
+
+## ✨ Features at a Glance
+
+### ✅ 1. **Fast SPA Containerization**
+
+Go from build to container-ready:
+
+```bash
+godeploy package
+```
+
+➡️ Output:
+
+- Dockerfile
+- Nginx config
+- Ready-to-ship SPA
+
+---
+
+### ✅ 2. **Local Docker Preview**
+
+Instant production-like local preview:
+
+```bash
+godeploy serve
+```
+
+---
+
+### ✅ 3. **Raw Nginx Performance**
+
+- **50,000+ req/sec** static file serving.
+- **Optimized cache headers**.
+- **HTML5 history mode routing**.
+- CDN-friendly — works perfectly with Cloudflare, Fastly, etc.
+
+---
+
+### ✅ 4. **Framework Agnostic**
+
+Works with any SPA stack:
+
+- React, Vue, Angular, Svelte, Solid, Astro (static mode).
+- No full-stack lock-in.
+
+---
+
+### ✅ 5. **Multi-SPA Support (Monorepo Friendly)**
+
+Serve multiple SPAs under one domain:
+
+```json
+{
+  "apps": [
+    { "name": "main", "source_dir": "dist", "path": "/" },
+    { "name": "admin", "source_dir": "admin-dist", "path": "/admin" }
+  ]
+}
+```
+
+---
+
+## ⚡ Performance vs SSR Frameworks
+
+| Task                               | GoDeploy (Nginx)   | Full-Stack SSR (Next, Remix)               |
+| ---------------------------------- | ------------------ | ------------------------------------------ |
+| Static file serving                | 🚀 ~50,000 req/sec | 🐢 Slow — SSR overhead                     |
+| First byte latency                 | ⚡ 1-5ms           | 30-100ms typical                           |
+| Concurrent connections (small VPS) | 10,000+            | Limited by Node.js event loop              |
+| Memory footprint                   | ~5-10MB            | 100-400MB+                                 |
+| CDN compatibility                  | ✅ Plug-and-play   | ❌ Complicated, prone to stale data issues |
+
+---
+
+## 📖 More Resources
+
+- [Advanced Multi-SPA Config](docs/advanced-configuration.md)
+- [Deploy Command Docs (SaaS)](docs/deploy.md)
 
 ---
 
@@ -116,163 +242,13 @@ MIT
 
 ---
 
-## 🤯 Why GoDeploy?
+## ⭐️ Support the Project
 
-If you're building a **Single Page Application (SPA)**, chances are you've hit one of these:
+If you find GoDeploy useful:
 
-- **"I don't want to use Next, Nuxt or Remix just to deploy a React/Vue app."**
-- **"I hate dealing with infrastructure"**
-- **"I just want to ship my app fast."**
-
-👉 **GoDeploy is for you.**  
-Package **any SPA** into a **production-ready Docker + Nginx container** in **minutes**, with **zero server config** and **no framework lock-in**.
+- ⭐️ [Star us on GitHub](https://github.com/matsilva/godeploy)
+- Share with other frontend devs
 
 ---
 
-## ✨ Features
-
-### 1. Simplified SPA Containerization
-
-No more fiddling with Dockerfiles or Nginx configs. Go from built assets to container-ready in seconds.
-
-```bash
-godeploy package
-```
-
-➡️ **Generates:**
-
-- Dockerfile
-- Nginx config
-- Your app, ready to ship
-
----
-
-### 2. Zero Infrastructure Headaches
-
-Test and containerize without writing any server config or understanding container orchestration.
-
-```bash
-godeploy serve
-```
-
-➡️ Spin up your SPA **locally in Docker**, instantly previewing your production setup.
-
----
-
-### 3. Blazing Fast, No Overhead — Powered by Nginx
-
-Why force a full-stack framework to serve a static app when **Nginx is made for this**?
-
-GoDeploy serves your SPA with **raw Nginx performance**, optimized for static delivery:
-
-- **Optimized cache headers** (for hashed filenames like `app.234sd.js`).
-- **Ultra-fast static file serving** — **50,000+ requests/sec** on commodity hardware.
-- **HTML5 history mode routing** for clean URLs.
-
-⚡ **Faster than Next.js, Nuxt, or Remix** when you just need an SPA — without SSR's bloat, without added runtime overhead.
-
-> **Bonus**: Ready for CDNs (Cloudflare, Fastly) — plug-and-play global caching, no SSR "staleness" to manage.
-
----
-
-### 4. Use Any Frontend Stack
-
-React, Vue, Angular, Svelte — if it builds to static files, it works. No full-stack lock-in, **just containerize your frontend.**
-
-```bash
-npm run build  # or any build tool
-godeploy init
-```
-
----
-
-### 5. Multi-SPA Support, Easy Routing
-
-Host **multiple SPAs under one domain**, each on its own route, configured via `spa-config.json`.
-
-```json
-{
-  "apps": [
-    {
-      "name": "main",
-      "source_dir": "dist",
-      "path": "/"
-    },
-    {
-      "name": "dashboard",
-      "source_dir": "dashboard-dist",
-      "path": "app"
-    }
-  ]
-}
-```
-
-➡️ Auto-routes to `/` (root) and `/app/`.
-
-The `path` property defines the URL path for each app:
-
-- Use `"path": "/"` to serve an app at the root URL
-- If not specified, it defaults to the app's `name`
-
----
-
-### 6. Quick to Learn, Fast to Ship
-
-Forget complex docs. GoDeploy is a **3-command workflow**:
-
-```bash
-godeploy init     # Scaffold config
-godeploy serve    # Test locally
-godeploy package  # Containerize for production
-```
-
----
-
-## ✨ **NEW: `godeploy deploy` — Instant SPA Hosting**
-
-> Run this:
-
-```bash
-godeploy deploy
-```
-
-➡️ And get this:
-
-```
-✅ Successfully deployed!
-🌍 URL: https://my-app.godeploy.app
-```
-
-- No AWS. No Cloudflare. No pipelines.
-- **Just run the command and your app is online — optimized, secured, and served from a global CDN.**
-
-To deploy a specific project from your spa-config.json:
-
-```bash
-godeploy deploy --project my-project
-```
-
---- More On Performance ---
-
-## 🧐 **Reality Check: Nginx vs Full-Stack Frameworks for Serving SPAs**
-
-### ⚡ **TL;DR: Nginx is orders of magnitude faster at serving static files than any full-stack SSR framework — because that's what it's built for.**
-
-| Task                                        | Nginx (Static Files)                        | Next.js / Nuxt.js / Remix (SSR/Edge/Static Hybrid)       |
-| ------------------------------------------- | ------------------------------------------- | -------------------------------------------------------- |
-| **Raw static file serving (HTML, CSS, JS)** | 🔥 ~50,000+ req/sec (depending on hardware) | ❌ Slower: adds V8 runtime, middleware, routing overhead |
-| **First byte latency (static assets)**      | ⚡ 1-5ms                                    | 🐢 30-70ms typical for dynamic/SSR content               |
-| **Concurrent connections (commodity VPS)**  | 10,000+ sustained                           | Limited, often <500 (due to Node.js single-thread & V8)  |
-| **Memory footprint (idle/static serving)**  | 🚀 ~5-10MB                                  | 🐘 100-400MB+ for typical Node.js SSR servers            |
-| **Response time variability**               | ✅ Predictable & consistent                 | ❌ Can vary under load, cold starts, edge locations      |
-| **CDN optimization compatibility**          | ✅ Plug-and-play, cache forever             | ❌ SSR adds complexity in CDN caching, stales fast       |
-
----
-
-### **Sources / Performance Context:**
-
-1. **Nginx Static Serving Benchmarks**: 40,000 to 100,000 requests/sec on modern instances ([source](https://www.nginx.com/blog/testing-the-performance-of-nginx-and-nginx-plus-web-servers/)).
-2. **Next.js Edge + SSR**: Typical latency 30-100ms for dynamic SSR pages, can increase under load ([source](https://vercel.com/docs/concepts/functions/edge-functions/edge-performance)).
-3. **Remix SSR**: Similar latency and overhead to Next.js — full SSR adds substantial routing and logic layer between client and assets ([Remix architecture docs](https://remix.run/docs/en/main/guides/data-loading)).
-4. **Node.js server limits**: Well-known event-loop saturation issues — usually requires horizontal scaling much faster than Nginx
-5. **CDN + Static combo**: Nginx plays perfectly with CDNs (Cloudflare, Fastly) for cache-control + stale-while-revalidate patterns — hard to do properly with SSR apps that require fresh data.
+> **GoDeploy — Package and ship SPAs like it's 2017. No SSR, no drama.**
