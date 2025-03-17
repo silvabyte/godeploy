@@ -54,7 +54,28 @@ build-arm64:
 
 # Cross-compilation for all platforms
 build-all:
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(OUT_DIR)/$(BINARY_MAC) ./cmd/${BINARY_NAME}
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(OUT_DIR)/$(BINARY_UNIX) ./cmd/${BINARY_NAME}
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(OUT_DIR)/$(BINARY_WIN) ./cmd/${BINARY_NAME}
-	GOOS=linux GOARCH=arm64 $(GOBUILD) -o $(OUT_DIR)/$(BINARY_ARM64) ./cmd/${BINARY_NAME}
+	mkdir -p dist
+	# macOS (Intel)
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
+	tar -czf dist/godeploy-darwin-amd64.tar.gz $(BINARY_NAME)
+	rm $(BINARY_NAME)
+	
+	# macOS (Apple Silicon)
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
+	tar -czf dist/godeploy-darwin-arm64.tar.gz $(BINARY_NAME)
+	rm $(BINARY_NAME)
+	
+	# Linux (x86_64)
+	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
+	tar -czf dist/godeploy-linux-amd64.tar.gz $(BINARY_NAME)
+	rm $(BINARY_NAME)
+	
+	# Linux (ARM64)
+	GOOS=linux GOARCH=arm64 $(GOBUILD) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
+	tar -czf dist/godeploy-linux-arm64.tar.gz $(BINARY_NAME)
+	rm $(BINARY_NAME)
+	
+	# Windows (x86_64)
+	GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(BINARY_NAME).exe ./cmd/${BINARY_NAME}
+	zip dist/godeploy-windows-amd64.zip $(BINARY_NAME).exe
+	rm $(BINARY_NAME).exe
