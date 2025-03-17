@@ -104,14 +104,21 @@ export default async function (fastify: FastifyInstance) {
       }>,
       reply: FastifyReply
     ) => {
+      const { user_id, tenant_id } = request.user;
       const deployId = uuidv4().substring(0, 8);
+      request.measure.start('deploy', {
+        reqId: request.id,
+        project: request.query.project,
+        deployId,
+        userId: user_id,
+        tenantId: tenant_id,
+      });
       logRequest(request, `[Deploy:${deployId}] Deployment request received`, {
         project: request.query.project,
       });
 
       try {
         // Extract user and tenant from auth middleware
-        const { user_id, tenant_id } = request.user;
 
         logRequest(
           request,
@@ -122,6 +129,7 @@ export default async function (fastify: FastifyInstance) {
         );
 
         // Parse multipart form
+        request.measure.add('parse_multipart');
         const parts = request.parts();
 
         if (!parts) {
@@ -129,6 +137,7 @@ export default async function (fastify: FastifyInstance) {
             request,
             `[Deploy:${deployId}] Deployment failed: No files uploaded`
           );
+          request.measure.failure('No files uploaded');
           return reply.code(400).send({ error: 'No files uploaded' });
         }
 
@@ -140,6 +149,7 @@ export default async function (fastify: FastifyInstance) {
             request,
             `[Deploy:${deployId}] Deployment failed: Project name is required`
           );
+          request.measure.failure('Project name is required');
           return reply.code(400).send({ error: 'Project name is required' });
         }
 
@@ -147,6 +157,7 @@ export default async function (fastify: FastifyInstance) {
           request,
           `[Deploy:${deployId}] Deploying to project: ${projectName}`
         );
+        request.measure.add('validate_files');
 
         // Validate files
         let archivePath: string | null = null;
@@ -156,6 +167,7 @@ export default async function (fastify: FastifyInstance) {
         logRequest(request, `[Deploy:${deployId}] Processing uploaded files`);
         for await (const part of parts) {
           if (part.type === 'file') {
+            request.measure.add('process_file');
             const buffer = await part.toBuffer();
             logRequest(
               request,
@@ -163,6 +175,7 @@ export default async function (fastify: FastifyInstance) {
             );
 
             if (part.fieldname === 'archive') {
+              request.measure.add('save_archive');
               archivePath = await FileUtils.saveBufferToTemp(
                 buffer,
                 'archive.zip'
@@ -171,7 +184,9 @@ export default async function (fastify: FastifyInstance) {
                 request,
                 `[Deploy:${deployId}] Archive saved to: ${archivePath}`
               );
+              request.measure.add('archive_saved');
             } else if (part.fieldname === 'spa_config') {
+              request.measure.add('save_config');
               configPath = await FileUtils.saveBufferToTemp(
                 buffer,
                 'spa-config.json'
@@ -180,6 +195,7 @@ export default async function (fastify: FastifyInstance) {
                 request,
                 `[Deploy:${deployId}] Config saved to: ${configPath}`
               );
+              request.measure.add('config_saved');
             }
           }
         }
@@ -190,6 +206,7 @@ export default async function (fastify: FastifyInstance) {
             request,
             `[Deploy:${deployId}] Deployment failed: Archive file is required`
           );
+          request.measure.failure('Archive file is required');
           return reply.code(400).send({ error: 'Archive file is required' });
         }
 
@@ -201,6 +218,7 @@ export default async function (fastify: FastifyInstance) {
             request,
             `[Deploy:${deployId}] Deployment failed: Invalid SPA archive structure`
           );
+          request.measure.failure('Invalid SPA archive structure');
           return reply
             .code(400)
             .send({ error: 'Invalid SPA archive structure' });
@@ -210,48 +228,103 @@ export default async function (fastify: FastifyInstance) {
           request,
           `[Deploy:${deployId}] SPA archive validation successful`
         );
+        request.measure.add('validate_archive');
 
         // Check if project exists
         logRequest(
           request,
           `[Deploy:${deployId}] Checking if project exists: ${projectName}`
         );
+        request.measure.add('get_project');
         const project = await dbService.getProjectByName(
           projectName,
           tenant_id
         );
 
+        let projectId;
+
         if (!project) {
-          // Return 404 error if project doesn't exist
+          request.measure.add('create_project');
+          // Create the project if it doesn't exist
           logRequest(
             request,
-            `[Deploy:${deployId}] Project not found: ${projectName}`
+            `[Deploy:${deployId}] Project not found, creating new project: ${projectName}`
           );
-          return reply.code(404).send({
-            error: `Project '${projectName}' not found`,
-            message: `Please initialize a new project first with: godeploy project create --name ${projectName}`,
-          });
-        }
 
-        logRequest(
-          request,
-          `[Deploy:${deployId}] Project found: ${projectName}, ID: ${project.id.substring(
-            0,
-            8
-          )}...`
-        );
+          // Generate a subdomain for the project
+          const subdomain = projectName
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '-');
+
+          // Create the project
+          const newProject = await dbService.createProject({
+            tenant_id,
+            owner_id: user_id,
+            name: projectName,
+            subdomain,
+          });
+
+          if (!newProject) {
+            request.measure.failure('Failed to create project');
+            logRequest(
+              request,
+              `[Deploy:${deployId}] Failed to create project: ${projectName}`
+            );
+            return reply.code(500).send({
+              error: 'Failed to create project',
+              message: 'Could not create the project automatically',
+            });
+          }
+
+          request.measure.add('project_created', {
+            projectId: newProject.id,
+          });
+          logRequest(
+            request,
+            `[Deploy:${deployId}] Project created successfully: ${projectName}, ID: ${newProject.id.substring(
+              0,
+              8
+            )}...`
+          );
+
+          projectId = newProject.id;
+        } else {
+          request.measure.add('project_found', {
+            projectId: project.id,
+          });
+          logRequest(
+            request,
+            `[Deploy:${deployId}] Project found: ${projectName}, ID: ${project.id.substring(
+              0,
+              8
+            )}...`
+          );
+
+          projectId = project.id;
+        }
 
         // Create a deploy record with pending status
         logRequest(
           request,
           `[Deploy:${deployId}] Creating deploy record with status: pending`
         );
+        request.measure.add('create_deploy');
+
+        // Get the subdomain from either existing project or the newly created one
+        const subdomain = project
+          ? project.subdomain
+          : projectName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
         const deploy = await dbService.recordDeploy({
           tenant_id,
-          project_id: project.id,
+          project_id: projectId,
           user_id,
-          url: constructCdnUrl(project.subdomain, tenant_id),
+          url: constructCdnUrl(subdomain, tenant_id),
           status: 'pending',
+        });
+
+        request.measure.add('deploy_created', {
+          deployId: deploy.id,
         });
 
         logRequest(
@@ -268,25 +341,32 @@ export default async function (fastify: FastifyInstance) {
             request,
             `[Deploy:${deployId}] Starting upload to DigitalOcean Spaces`
           );
+          request.measure.add('upload_to_spaces');
           const cdnUrl = await storageService.processSpaArchive(
             archivePath,
             tenant_id,
-            project.id,
-            project.subdomain
+            projectId,
+            subdomain
           );
 
           logRequest(
             request,
             `[Deploy:${deployId}] Upload complete, CDN URL: ${cdnUrl}`
           );
+          request.measure.add('upload_complete', {
+            cdnUrl,
+          });
 
           // Update deploy status to success
           logRequest(
             request,
             `[Deploy:${deployId}] Updating deploy status to: success`
           );
+          request.measure.add('update_deploy_status');
           await dbService.updateDeployStatus(deploy.id!, 'success');
-
+          request.measure.success({
+            deployId: deploy.id,
+          });
           // Return success response
           logRequest(request, `[Deploy:${deployId}] Deployment successful`);
           return reply.code(200).send({
@@ -294,6 +374,7 @@ export default async function (fastify: FastifyInstance) {
             url: cdnUrl,
           });
         } catch (error) {
+          request.measure.failure(error);
           // Update deploy status to failed
           const errorMessage =
             error instanceof Error ? error.message : 'Unknown error';

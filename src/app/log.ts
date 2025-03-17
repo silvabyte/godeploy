@@ -9,8 +9,11 @@ export class Logger {
   info(data: unknown, message: string) {
     this.logger.log(message, data);
   }
-  error(data: unknown, message: string) {
-    this.logger.log(message, data);
+  error(error: Error, data: unknown, message?: string) {
+    this.logger.log(message ?? error.message, {
+      error,
+      ...(data as Record<string, unknown>),
+    });
   }
   warn(data: unknown, message: string) {
     this.logger.log(message, data);

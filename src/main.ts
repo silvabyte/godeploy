@@ -45,29 +45,8 @@ const logger = new Logger(telemetryKey as string);
 
 // Instantiate Fastify with some config
 const server = Fastify({
-  logger: false,
+  logger: true,
 });
-
-// Request/Reply Hooks
-// onRequest
-// preParsing
-// preValidation
-// preHandler
-// preSerialization
-// onError
-// onSend
-// onResponse
-// onTimeout
-// onRequestAbort
-// Manage Errors from a hook
-// Respond to a request from a hook
-// Application Hooks
-// onReady
-// onListen
-// onClose
-// preClose
-// onRoute
-// onRegister
 
 const headerMasked = (
   headers: Record<string, string | string[] | undefined>
