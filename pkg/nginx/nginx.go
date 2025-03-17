@@ -48,31 +48,53 @@ http {
         set $port ":$1";
     }
 
-    # Root redirect to default app
-    location = / {
-        return 301 $scheme://$host$port/{{.DefaultAppPath}}/;
-    }
-
-    # Handle root favicon.ico - redirect to default app's favicon
-    location = /favicon.ico {
-        return 301 $scheme://$host$port/{{.DefaultAppPath}}/favicon.ico;
-    }
-
     # Include app-specific configurations
     include /etc/nginx/conf.d/apps/*/*.conf;
 
     # Default fallback for all apps
     {{range .Apps}}
+    {{if eq .Path "/"}}
+    # Root path configuration
+    location = / {
+        alias   /usr/share/nginx/html/{{.Name}}/;
+        try_files $uri $uri/ /{{.Name}}/index.html;
+        add_header Cache-Control "no-store, no-cache, must-revalidate";
+    }
+    location / {
+        alias   /usr/share/nginx/html/{{.Name}}/;
+        try_files $uri $uri/ /{{.Name}}/index.html;
+        add_header Cache-Control "no-store, no-cache, must-revalidate";
+    }
+    # Handle root favicon.ico
+    location = /favicon.ico {
+        alias   /usr/share/nginx/html/{{.Name}}/favicon.ico;
+        add_header Cache-Control "no-store, no-cache, must-revalidate";
+    }
+    {{else}}
+    # Non-root path configuration
     location /{{.Path}}/ {
         alias   /usr/share/nginx/html/{{.Name}}/;
         try_files $uri $uri/ /{{.Name}}/index.html;
         add_header Cache-Control "no-store, no-cache, must-revalidate";
     }
     {{end}}
+    {{end}}
 }
 `
 
-	jsConfTemplate = `location ~* ^/{{.AppPath}}/assets/{{.BaseName}}.js([.]map)?$ {
+	jsConfTemplate = `{{if eq .AppPath "/"}}
+location ~* ^/assets/{{.BaseName}}.js([.]map)?$ {
+    expires off;
+    add_header Cache-Control "no-cache";
+    return 303 /assets/{{.FileName}}$1;
+}
+location ~* ^/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]js(?:[.]map)?)$ {
+    alias   /usr/share/nginx/html/{{.AppName}}/assets/$1;
+    expires max;
+    add_header Cache-Control "public; immutable";
+}
+{{else}}
+location ~* ^/{{.AppPath}}/assets/{{.BaseName}}.js([.]map)?$ {
     expires off;
     add_header Cache-Control "no-cache";
     return 303 /{{.AppPath}}/assets/{{.FileName}}$1;
@@ -82,9 +104,22 @@ location ~* ^/{{.AppPath}}/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]js(?:[.]map)?)$ 
     expires max;
     add_header Cache-Control "public; immutable";
 }
+{{end}}
 `
 
-	cssConfTemplate = `location ~* ^/{{.AppPath}}/assets/{{.BaseName}}.css([.]map)?$ {
+	cssConfTemplate = `{{if eq .AppPath "/"}}
+location ~* ^/assets/{{.BaseName}}.css([.]map)?$ {
+    expires off;
+    add_header Cache-Control "no-cache";
+    return 303 /assets/{{.FileName}}$1;
+}
+location ~* ^/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]css(?:[.]map)?)$ {
+    alias   /usr/share/nginx/html/{{.AppName}}/assets/$1;
+    expires max;
+    add_header Cache-Control "public; immutable";
+}
+{{else}}
+location ~* ^/{{.AppPath}}/assets/{{.BaseName}}.css([.]map)?$ {
     expires off;
     add_header Cache-Control "no-cache";
     return 303 /{{.AppPath}}/assets/{{.FileName}}$1;
@@ -94,15 +129,23 @@ location ~* ^/{{.AppPath}}/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]css(?:[.]map)?)$
     expires max;
     add_header Cache-Control "public; immutable";
 }
+{{end}}
 `
 
-	localesConfTemplate = `location ~* ^/{{.AppPath}}/locales/(.+)$ {
+	localesConfTemplate = `{{if eq .AppPath "/"}}
+location ~* ^/locales/(.+)$ {
+    alias   /usr/share/nginx/html/{{.AppName}}/locales/$1;
+    add_header Cache-Control "no-cache";
+}
+{{else}}
+location ~* ^/{{.AppPath}}/locales/(.+)$ {
     alias   /usr/share/nginx/html/{{.AppName}}/locales/$1;
     add_header Cache-Control "no-cache";
 }
 location ~* ^/locales/(.+)$ {
     return 301 $scheme://$host$port/{{.AppPath}}/locales/$1;
 }
+{{end}}
 `
 )
 
@@ -134,15 +177,6 @@ func GenerateNginxConfigs(spaConfig *config.SpaConfig, outputDir string) error {
 		return fmt.Errorf("failed to write nginx.conf: %w", err)
 	}
 
-	// Get the default app's path
-	defaultAppPath := ""
-	for _, app := range spaConfig.Apps {
-		if app.Name == spaConfig.DefaultApp {
-			defaultAppPath = app.Path
-			break
-		}
-	}
-
 	// Generate default.conf
 	tmpl, err := template.New("default.conf").Parse(defaultConfTemplate)
 	if err != nil {
@@ -156,13 +190,9 @@ func GenerateNginxConfigs(spaConfig *config.SpaConfig, outputDir string) error {
 	defer defaultConfFile.Close()
 
 	data := struct {
-		DefaultApp     string
-		DefaultAppPath string
-		Apps           []config.App
+		Apps []config.App
 	}{
-		DefaultApp:     spaConfig.DefaultApp,
-		DefaultAppPath: defaultAppPath,
-		Apps:           spaConfig.GetEnabledApps(),
+		Apps: spaConfig.GetEnabledApps(),
 	}
 
 	if err := tmpl.Execute(defaultConfFile, data); err != nil {
@@ -201,13 +231,20 @@ func ProcessSpaAssets(app config.App, spaDir, outputDir string) error {
 		// Update base href
 		contentStr := string(content)
 		baseHrefRegex := regexp.MustCompile(`<base href="[^"]*"`)
+
+		// Determine the base href value based on the path
+		baseHrefValue := "/"
+		if app.Path != "/" {
+			baseHrefValue = fmt.Sprintf("/%s/", app.Path)
+		}
+
 		if baseHrefRegex.MatchString(contentStr) {
-			contentStr = baseHrefRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<base href="/%s/"`, app.Path))
+			contentStr = baseHrefRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<base href="%s"`, baseHrefValue))
 		} else {
 			// If base href doesn't exist, add it
 			headRegex := regexp.MustCompile(`<head>`)
 			contentStr = headRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<head>
-    <base href="/%s/" />`, app.Path))
+    <base href="%s" />`, baseHrefValue))
 		}
 
 		if err := os.WriteFile(indexPath, []byte(contentStr), 0644); err != nil {

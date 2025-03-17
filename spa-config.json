@@ -1,10 +1,9 @@
 {
-  "default_app": "yourAppName",
   "apps": [
     {
       "name": "yourAppName",
       "source_dir": "dist",
-      "path": "yourAppName",
+      "path": "/",
       "description": "Your application description",
       "enabled": true
     }

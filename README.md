@@ -192,12 +192,11 @@ Host **multiple SPAs under one domain**, each on its own route, configured via `
 
 ```json
 {
-  "default_app": "auth",
   "apps": [
     {
-      "name": "auth",
+      "name": "main",
       "source_dir": "dist",
-      "path": "auth"
+      "path": "/"
     },
     {
       "name": "dashboard",
@@ -208,9 +207,12 @@ Host **multiple SPAs under one domain**, each on its own route, configured via `
 }
 ```
 
-➡️ Auto-routes to `/`, `/auth/`, `/app/`.
+➡️ Auto-routes to `/` (root) and `/app/`.
 
-The `path` property defines the URL path for each app. If not specified, it defaults to the app's `name`.
+The `path` property defines the URL path for each app:
+
+- Use `"path": "/"` to serve an app at the root URL
+- If not specified, it defaults to the app's `name`
 
 ---
 

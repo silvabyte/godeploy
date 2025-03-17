@@ -12,13 +12,12 @@ Host **multiple SPAs under one domain**, each on its own route — great for das
 
 ```json
 {
-  "default_app": "auth",
   "apps": [
     {
-      "name": "auth",
+      "name": "main",
       "source_dir": "dist",
-      "path": "auth",
-      "description": "Authentication app",
+      "path": "/",
+      "description": "Main application (served at root)",
       "enabled": true
     },
     {
@@ -34,22 +33,20 @@ Host **multiple SPAs under one domain**, each on its own route — great for das
 
 ### Configuration Properties
 
-| Property      | Description                                                | Required |
-| ------------- | ---------------------------------------------------------- | -------- |
-| `name`        | Unique identifier for the app                              | Yes      |
-| `source_dir`  | Directory containing built SPA files                       | Yes      |
-| `path`        | URL path for the app (defaults to `name` if not specified) | No       |
-| `description` | Human-readable description                                 | No       |
-| `enabled`     | Whether the app is enabled                                 | Yes      |
+| Property      | Description                                                                  | Required |
+| ------------- | ---------------------------------------------------------------------------- | -------- |
+| `name`        | Unique identifier for the app                                                | Yes      |
+| `source_dir`  | Directory containing built SPA files                                         | Yes      |
+| `path`        | URL path for the app (use "/" for root, defaults to `name` if not specified) | No       |
+| `description` | Human-readable description                                                   | No       |
+| `enabled`     | Whether the app is enabled                                                   | Yes      |
 
 ### Automatic Routes
 
-| App Name    | URL Paths     |
-| ----------- | ------------- |
-| `auth`      | `/`, `/auth/` |
-| `dashboard` | `/app/`       |
-
-> ✅ **Note**: `default_app` is served on `/` and its path-based route.
+| App Name    | URL Paths |
+| ----------- | --------- |
+| `main`      | `/`       |
+| `dashboard` | `/app/`   |
 
 ---
 

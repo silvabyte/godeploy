@@ -76,12 +76,11 @@ type DeployCmd struct {
 
 // defaultConfig is the default configuration template
 const defaultConfig = `{
-  "default_app": "yourAppName",
   "apps": [
     {
       "name": "yourAppName",
       "source_dir": "dist",
-      "path": "yourAppPath",
+      "path": "/",
       "description": "Your application description",
       "enabled": true
     }
@@ -508,7 +507,12 @@ func (d *DeployCmd) Run() error {
 	// Determine the project name
 	projectName := d.Project
 	if projectName == "" {
-		projectName = spaConfig.DefaultApp
+		// If no project is specified, use the first enabled app
+		enabledApps := spaConfig.GetEnabledApps()
+		if len(enabledApps) == 0 {
+			return fmt.Errorf("no enabled apps found in SPA configuration")
+		}
+		projectName = enabledApps[0].Name
 	}
 
 	// Validate the project name
