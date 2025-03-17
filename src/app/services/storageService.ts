@@ -73,7 +73,6 @@ export class StorageService {
   async processSpaArchive(
     archivePath: string,
     tenantId: string,
-    projectId: string,
     projectName: string
   ): Promise<string> {
     // Create a temporary directory to extract the archive
@@ -93,7 +92,7 @@ export class StorageService {
       }
 
       // Upload all files with appropriate cache headers
-      const baseKey = `spa-projects/${tenantId}/${projectId}`;
+      const baseKey = `spa-projects/${tenantId}/${projectName}`;
       const cdnUrl = constructCdnUrl(projectName, tenantId);
 
       // Process all files recursively

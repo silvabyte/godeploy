@@ -10,7 +10,7 @@ export function constructCdnUrl(
   const subdomain =
     !!tenant && project.indexOf(tenant) !== -1
       ? project
-      : `${project}-${tenant}`;
+      : `${project}--${tenant}`;
 
   // For now, we're not using tenant information in the URL construction,
   // but having it as a parameter allows for future flexibility

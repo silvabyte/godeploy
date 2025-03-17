@@ -345,8 +345,7 @@ export default async function (fastify: FastifyInstance) {
           const cdnUrl = await storageService.processSpaArchive(
             archivePath,
             tenant_id,
-            projectId,
-            subdomain
+            projectName
           );
 
           logRequest(
