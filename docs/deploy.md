@@ -9,13 +9,15 @@ GoDeploy's `deploy` command transforms how you ship Single Page Applications. No
 ```bash
 # Install GoDeploy CLI
 curl -sSL https://install--7c574f3c-862a-4bc5-89d4-b1f11aaac65f.spa.godeploy.app/now.sh | bash
-```
 
-```bash
+# Init your project
+godeploy init
+
+#make sure to configure spa-config.json
+
 # Build your SPA
 npm run build
 
-godeploy deploy
 
 # Deploy it instantly
 godeploy deploy
