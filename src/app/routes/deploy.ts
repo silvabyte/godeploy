@@ -211,22 +211,24 @@ export default async function (fastify: FastifyInstance) {
         }
 
         // Validate the SPA archive
-        logRequest(request, `[Deploy:${deployId}] Validating SPA archive`);
+        logRequest(request, `[Deploy:${deployId}] Validating archive`);
         const isValidArchive = await FileUtils.validateSpaArchive(archivePath);
         if (!isValidArchive) {
           logRequest(
             request,
-            `[Deploy:${deployId}] Deployment failed: Invalid SPA archive structure`
+            `[Deploy:${deployId}] Deployment failed: Invalid archive structure`
           );
-          request.measure.failure('Invalid SPA archive structure');
-          return reply
-            .code(400)
-            .send({ error: 'Invalid SPA archive structure' });
+          request.measure.failure('Invalid archive structure');
+          return reply.code(400).send({
+            error: 'Invalid archive structure',
+            message:
+              'The archive appears to be empty or corrupted. Please ensure it contains at least one valid file.',
+          });
         }
 
         logRequest(
           request,
-          `[Deploy:${deployId}] SPA archive validation successful`
+          `[Deploy:${deployId}] Archive validation successful`
         );
         request.measure.add('validate_archive');
 

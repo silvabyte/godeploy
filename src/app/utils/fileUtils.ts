@@ -38,15 +38,56 @@ export class FileUtils {
         const zip = new AdmZip(archivePath);
         zip.extractAllTo(tempDir, true);
 
-        // Check for index.html
-        const indexPath = path.join(tempDir, 'index.html');
-        await fs.access(indexPath);
+        // Check if the archive contains any files
+        const files = await fs.readdir(tempDir);
 
-        return true;
+        // Archive should contain at least one file
+        if (files.length === 0) {
+          return false;
+        }
+
+        // Check if there are any valid static files
+        const hasValidFiles = await FileUtils.hasValidStaticFiles(tempDir);
+
+        return hasValidFiles;
       } finally {
         // Clean up
         await fs.rm(tempDir, { recursive: true, force: true });
       }
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Check if a directory contains valid static files
+   * @param dirPath Path to the directory
+   */
+  static async hasValidStaticFiles(dirPath: string): Promise<boolean> {
+    try {
+      const entries = await fs.readdir(dirPath, { withFileTypes: true });
+
+      if (entries.length === 0) {
+        return false;
+      }
+
+      // Check for valid files
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          // Recursively check subdirectories
+          const hasValidInSubdir = await FileUtils.hasValidStaticFiles(
+            path.join(dirPath, entry.name)
+          );
+          if (hasValidInSubdir) {
+            return true;
+          }
+        } else if (entry.isFile()) {
+          // Any file is considered valid
+          return true;
+        }
+      }
+
+      return false;
     } catch (error) {
       return false;
     }

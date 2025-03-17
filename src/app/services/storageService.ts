@@ -67,7 +67,6 @@ export class StorageService {
    * Process and upload a SPA archive to DigitalOcean Spaces
    * @param archivePath Path to the SPA zip archive
    * @param tenantId Tenant ID
-   * @param projectId Project ID
    * @param projectName Project name for the subdomain
    */
   async processSpaArchive(
@@ -82,14 +81,6 @@ export class StorageService {
       // Extract the archive
       const zip = new AdmZip(archivePath);
       zip.extractAllTo(tempDir, true);
-
-      // Validate the SPA structure (must have index.html)
-      const indexPath = path.join(tempDir, 'index.html');
-      try {
-        await fs.access(indexPath);
-      } catch (error) {
-        throw new Error('Invalid SPA archive: index.html not found');
-      }
 
       // Upload all files with appropriate cache headers
       const baseKey = `spa-projects/${tenantId}/${projectName}`;
@@ -145,21 +136,92 @@ export class StorageService {
     const ext = path.extname(filename).toLowerCase();
 
     const contentTypes: Record<string, string> = {
+      // HTML
       '.html': 'text/html',
+      '.htm': 'text/html',
+
+      // Stylesheets
       '.css': 'text/css',
+
+      // JavaScript
       '.js': 'application/javascript',
+      '.mjs': 'application/javascript',
+
+      // JSON
       '.json': 'application/json',
+
+      // Images
       '.png': 'image/png',
       '.jpg': 'image/jpeg',
       '.jpeg': 'image/jpeg',
       '.gif': 'image/gif',
       '.svg': 'image/svg+xml',
+      '.webp': 'image/webp',
       '.ico': 'image/x-icon',
+      '.bmp': 'image/bmp',
+      '.tiff': 'image/tiff',
+      '.tif': 'image/tiff',
+
+      // Fonts
       '.woff': 'font/woff',
       '.woff2': 'font/woff2',
       '.ttf': 'font/ttf',
       '.eot': 'application/vnd.ms-fontobject',
       '.otf': 'font/otf',
+
+      // Documents
+      '.pdf': 'application/pdf',
+      '.doc': 'application/msword',
+      '.docx':
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      '.xls': 'application/vnd.ms-excel',
+      '.xlsx':
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      '.ppt': 'application/vnd.ms-powerpoint',
+      '.pptx':
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+
+      // Text
+      '.txt': 'text/plain',
+      '.csv': 'text/csv',
+      '.md': 'text/markdown',
+      '.markdown': 'text/markdown',
+
+      // Scripts
+      '.sh': 'text/x-sh',
+      '.bash': 'text/x-sh',
+      '.zsh': 'text/x-sh',
+      '.py': 'text/x-python',
+      '.rb': 'text/x-ruby',
+      '.pl': 'text/x-perl',
+      '.php': 'text/x-php',
+
+      // Archives
+      '.zip': 'application/zip',
+      '.tar': 'application/x-tar',
+      '.gz': 'application/gzip',
+      '.rar': 'application/vnd.rar',
+      '.7z': 'application/x-7z-compressed',
+
+      // Audio
+      '.mp3': 'audio/mpeg',
+      '.wav': 'audio/wav',
+      '.ogg': 'audio/ogg',
+      '.flac': 'audio/flac',
+      '.aac': 'audio/aac',
+
+      // Video
+      '.mp4': 'video/mp4',
+      '.webm': 'video/webm',
+      '.avi': 'video/x-msvideo',
+      '.mov': 'video/quicktime',
+      '.wmv': 'video/x-ms-wmv',
+
+      // Other
+      '.xml': 'application/xml',
+      '.yaml': 'application/yaml',
+      '.yml': 'application/yaml',
+      '.toml': 'application/toml',
     };
 
     return contentTypes[ext] || 'application/octet-stream';
@@ -173,17 +235,59 @@ export class StorageService {
     const ext = path.extname(filename).toLowerCase();
     const basename = path.basename(filename).toLowerCase();
 
-    // No cache for index.html and spa-config.json
-    if (basename === 'index.html' || basename === 'spa-config.json') {
+    // No cache for HTML files, config files, and executable scripts
+    // This ensures users always get the latest version of these critical files
+    if (
+      ext === '.html' ||
+      ext === '.htm' ||
+      ext === '.sh' ||
+      ext === '.bash' ||
+      ext === '.py' ||
+      ext === '.rb' ||
+      ext === '.php' ||
+      ext === '.pl' ||
+      basename.includes('config') ||
+      basename.includes('settings') ||
+      basename === 'install' ||
+      basename === 'setup' ||
+      basename.startsWith('run-')
+    ) {
       return 'no-cache';
     }
 
     // Long-term caching for hashed assets (containing a hash in the filename)
-    if (/\.[a-f0-9]{8,}\./.test(filename)) {
+    if (
+      /\.[a-f0-9]{8,}\./.test(filename) ||
+      /[-_][a-f0-9]{8,}\./.test(filename)
+    ) {
       return 'max-age=31536000, immutable';
     }
 
+    // Medium-term caching for static assets
+    const staticAssets = [
+      '.css',
+      '.js',
+      '.mjs',
+      '.png',
+      '.jpg',
+      '.jpeg',
+      '.gif',
+      '.svg',
+      '.webp',
+      '.woff',
+      '.woff2',
+      '.ttf',
+      '.eot',
+      '.otf',
+      '.mp3',
+      '.mp4',
+      '.webm',
+    ];
+    if (staticAssets.includes(ext)) {
+      return 'max-age=604800'; // 7 days
+    }
+
     // Default cache control for other assets
-    return 'max-age=86400';
+    return 'max-age=86400'; // 1 day
   }
 }
