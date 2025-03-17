@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.4] - 2025-03-17
+
+* refactor: revert install script refactor
+* refactor: readme
+* refactor: install script
+* chore: refine deploy docs
+* chore: refactor installation script
+* chore: release v0.1.3
+
 ## [0.1.3] - 2025-03-17
 
 * fix: update installation script URL in README and deployment documentation
