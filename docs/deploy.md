@@ -7,8 +7,15 @@ GoDeploy's `deploy` command transforms how you ship Single Page Applications. No
 ## ⚡ Quick Start
 
 ```bash
+# Install GoDeploy CLI
+curl -sSL https://install.godeploy.app | bash
+```
+
+```bash
 # Build your SPA
 npm run build
+
+godeploy deploy
 
 # Deploy it instantly
 godeploy deploy
