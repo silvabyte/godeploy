@@ -10,6 +10,7 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/audetic/godeploy/pkg/api"
+	"github.com/audetic/godeploy/pkg/archive"
 	"github.com/audetic/godeploy/pkg/auth"
 	"github.com/audetic/godeploy/pkg/config"
 	"github.com/audetic/godeploy/pkg/docker"
@@ -27,7 +28,7 @@ var CLI struct {
 	Package PackageCmd `cmd:"" help:"Generate container files for deployment"`
 	Init    InitCmd    `cmd:"" help:"Initialize a new spa-config.json file"`
 	Auth    AuthCmd    `cmd:"" help:"Authentication commands"`
-	Deploy  DeployCmd  `cmd:"" help:"Deploy your SPA to the GoDeploy service (Coming Soon)"`
+	Deploy  DeployCmd  `cmd:"" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
 }
 
 // ServeCmd represents the serve command
@@ -69,7 +70,8 @@ type StatusCmd struct {
 
 // DeployCmd represents the deploy command
 type DeployCmd struct {
-	Output string `help:"Output directory for container files" default:"deploy"`
+	Project string `help:"Project name for deployment" default:""`
+	Output  string `help:"Output directory for spa build files" default:"dist"`
 }
 
 // defaultConfig is the default configuration template
@@ -79,6 +81,7 @@ const defaultConfig = `{
     {
       "name": "yourAppName",
       "source_dir": "dist",
+      "path": "yourAppPath",
       "description": "Your application description",
       "enabled": true
     }
@@ -90,49 +93,6 @@ const defaultConfig = `{
 func (s *ServeCmd) Run() error {
 	// Create a context
 	ctx := context.Background()
-
-	// Create a spinner for checking authentication
-	authSpinner := pin.New("Checking authentication status...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	authCancel := authSpinner.Start(ctx)
-
-	// Check if we have a token locally
-	token, err := auth.GetAuthToken()
-	if err != nil {
-		authCancel()
-		authSpinner.Fail("Failed to check authentication")
-		return fmt.Errorf("error checking authentication: %w", err)
-	}
-
-	// If there's no token, the user is not authenticated
-	if token == "" {
-		authCancel()
-		authSpinner.Fail("Not authenticated")
-		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
-	}
-
-	// We have a token, now verify it with the API
-	apiClient := api.NewClient()
-	verifyResp, err := apiClient.VerifyToken(token)
-
-	// Handle API connection errors
-	if err != nil {
-		authCancel()
-		authSpinner.Fail("Failed to verify token")
-		return fmt.Errorf("error verifying authentication: %w", err)
-	}
-
-	// Check if the token is valid
-	if !verifyResp.Valid {
-		authCancel()
-		authSpinner.Fail("Invalid authentication")
-		return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login --email=your@email.com' to authenticate")
-	}
-
-	authCancel()
-	authSpinner.Stop("Authentication verified")
 
 	// Create a spinner for loading configuration
 	configSpinner := pin.New("Loading SPA configuration...",
@@ -190,49 +150,6 @@ func (s *ServeCmd) Run() error {
 func (d *PackageCmd) Run() error {
 	// Create a context
 	ctx := context.Background()
-
-	// Create a spinner for checking authentication
-	authSpinner := pin.New("Checking authentication status...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	authCancel := authSpinner.Start(ctx)
-
-	// Check if we have a token locally
-	token, err := auth.GetAuthToken()
-	if err != nil {
-		authCancel()
-		authSpinner.Fail("Failed to check authentication")
-		return fmt.Errorf("error checking authentication: %w", err)
-	}
-
-	// If there's no token, the user is not authenticated
-	if token == "" {
-		authCancel()
-		authSpinner.Fail("Not authenticated")
-		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
-	}
-
-	// We have a token, now verify it with the API
-	apiClient := api.NewClient()
-	verifyResp, err := apiClient.VerifyToken(token)
-
-	// Handle API connection errors
-	if err != nil {
-		authCancel()
-		authSpinner.Fail("Failed to verify token")
-		return fmt.Errorf("error verifying authentication: %w", err)
-	}
-
-	// Check if the token is valid
-	if !verifyResp.Valid {
-		authCancel()
-		authSpinner.Fail("Invalid authentication")
-		return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login --email=your@email.com' to authenticate")
-	}
-
-	authCancel()
-	authSpinner.Stop("Authentication verified")
 
 	// Create a spinner for loading configuration
 	configSpinner := pin.New("Loading SPA configuration...",
@@ -571,21 +488,121 @@ func (d *DeployCmd) Run() error {
 	authCancel()
 	authSpinner.Stop("Authentication verified")
 
-	// Create a spinner for the deploy command
-	deploySpinner := pin.New("Checking deployment status...",
+	// Load the SPA configuration
+	configSpinner := pin.New("Loading SPA configuration...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	configCancel := configSpinner.Start(ctx)
+
+	spaConfig, err := config.LoadConfig(CLI.Config)
+	if err != nil {
+		configCancel()
+		configSpinner.Fail("Failed to load SPA configuration")
+		return fmt.Errorf("error loading SPA configuration: %w", err)
+	}
+
+	configCancel()
+	configSpinner.Stop("SPA configuration loaded")
+
+	// Determine the project name
+	projectName := d.Project
+	if projectName == "" {
+		projectName = spaConfig.DefaultApp
+	}
+
+	// Validate the project name
+	app, found := spaConfig.GetAppByName(projectName)
+	if !found {
+		return fmt.Errorf("project '%s' not found in SPA configuration", projectName)
+	}
+
+	if !app.Enabled {
+		return fmt.Errorf("project '%s' is disabled in SPA configuration", projectName)
+	}
+
+	// Create a temporary directory for the zip file
+	tempDir, err := os.MkdirTemp("", "godeploy-*")
+	if err != nil {
+		return fmt.Errorf("failed to create temporary directory: %w", err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	// Create the zip file path
+	zipFilePath := filepath.Join(tempDir, projectName+".zip")
+
+	// Create a spinner for creating the zip archive
+	zipSpinner := pin.New(fmt.Sprintf("Creating zip archive for project '%s'...", projectName),
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	zipCancel := zipSpinner.Start(ctx)
+
+	// Get the absolute path of the source directory
+	sourceDir := app.SourceDir
+	if !filepath.IsAbs(sourceDir) {
+		// If the source directory is relative, make it absolute
+		// relative to the current working directory
+		cwd, err := os.Getwd()
+		if err != nil {
+			zipCancel()
+			zipSpinner.Fail("Failed to get current working directory")
+			return fmt.Errorf("failed to get current working directory: %w", err)
+		}
+		sourceDir = filepath.Join(cwd, sourceDir)
+	}
+
+	// Check if the source directory exists
+	if _, err := os.Stat(sourceDir); os.IsNotExist(err) {
+		zipCancel()
+		zipSpinner.Fail("Source directory not found")
+		return fmt.Errorf("source directory '%s' not found", app.SourceDir)
+	}
+
+	// Create the zip archive
+	err = archive.CreateZipFromDirectory(sourceDir, zipFilePath)
+	if err != nil {
+		zipCancel()
+		zipSpinner.Fail("Failed to create zip archive")
+		return fmt.Errorf("error creating zip archive: %w", err)
+	}
+
+	zipCancel()
+	zipSpinner.Stop("Zip archive created")
+
+	// Read the zip file
+	zipData, err := archive.ReadZipFile(zipFilePath)
+	if err != nil {
+		return fmt.Errorf("error reading zip file: %w", err)
+	}
+
+	// Read the SPA configuration file
+	configData, err := os.ReadFile(CLI.Config)
+	if err != nil {
+		return fmt.Errorf("error reading SPA configuration file: %w", err)
+	}
+
+	// Create a spinner for deploying the SPA
+	deploySpinner := pin.New(fmt.Sprintf("Deploying project '%s' to GoDeploy...", projectName),
 		pin.WithSpinnerColor(pin.ColorMagenta),
 		pin.WithTextColor(pin.ColorMagenta),
 	)
 	deployCancel := deploySpinner.Start(ctx)
 
-	// Simulate some work
-	time.Sleep(1 * time.Second)
+	// Deploy the SPA
+	deployResp, err := apiClient.Deploy(projectName, configData, zipData)
+	if err != nil {
+		deployCancel()
+		deploySpinner.Fail("Failed to deploy project")
+		return fmt.Errorf("error deploying project: %w", err)
+	}
 
 	deployCancel()
-	deploySpinner.Stop("Status checked")
-	fmt.Println("🚧 The deploy command is coming soon!")
-	fmt.Println("This feature is currently in development and will be available in a future release.")
-	fmt.Println("Stay tuned for updates!")
+	deploySpinner.Stop("Project deployed successfully")
+
+	// Print the deployment URL
+	fmt.Println("✅ Successfully deployed!")
+	fmt.Printf("🌍 URL: %s\n", deployResp.URL)
 
 	return nil
 }

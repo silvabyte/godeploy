@@ -17,6 +17,7 @@ type SpaConfig struct {
 type App struct {
 	Name        string `json:"name"`
 	SourceDir   string `json:"source_dir"`
+	Path        string `json:"path"`
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
 }
@@ -40,10 +41,14 @@ func LoadConfig(configPath string) (*SpaConfig, error) {
 
 	// Check if the default app is in the list of apps and is enabled
 	defaultAppFound := false
-	for _, app := range config.Apps {
+	for i, app := range config.Apps {
+		// If path is not specified, use the name as the default path
+		if app.Path == "" {
+			config.Apps[i].Path = app.Name
+		}
+
 		if app.Name == config.DefaultApp && app.Enabled {
 			defaultAppFound = true
-			break
 		}
 	}
 

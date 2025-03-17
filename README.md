@@ -77,20 +77,23 @@ Or push to your container registry and deploy to your cloud provider.
 
 ## 🔧 Full CLI Reference
 
-| Command                           | Description                                             |
-| --------------------------------- | ------------------------------------------------------- |
-| `godeploy init`                   | Create default `spa-config.json`                        |
-| `godeploy init --force`           | Overwrite existing config                               |
-| `godeploy serve`                  | Serve SPA locally via Docker (port 8082)                |
-| `godeploy serve --port <port>`    | Use custom port                                         |
-| `godeploy serve --image-name <n>` | Use custom Docker image name                            |
-| `godeploy package`                | Generate containerized Docker + Nginx setup             |
-| `godeploy package --output <dir>` | Output to custom directory (default: `deploy/`)         |
-| `godeploy --config <file>`        | Use custom config file (default: `spa-config.json`)     |
-| `godeploy auth login --email <e>` | Authenticate with the GoDeploy service                  |
-| `godeploy auth logout`            | Log out from the GoDeploy service                       |
-| `godeploy auth status`            | Check authentication status                             |
-| 🚧 `godeploy deploy`              | **Coming soon** — One-command SaaS deploy (join alpha!) |
+| Command                           | Description                                         |
+| --------------------------------- | --------------------------------------------------- |
+| `godeploy init`                   | Create default `spa-config.json`                    |
+| `godeploy init --force`           | Overwrite existing config                           |
+| `godeploy serve`                  | Serve SPA locally via Docker (port 8082)            |
+| `godeploy serve --port <port>`    | Use custom port                                     |
+| `godeploy serve --image-name <n>` | Use custom Docker image name                        |
+| `godeploy package`                | Generate containerized Docker + Nginx setup         |
+| `godeploy package --output <dir>` | Output to custom directory (default: `deploy/`)     |
+| `godeploy --config <file>`        | Use custom config file (default: `spa-config.json`) |
+| `godeploy auth login --email <e>` | Authenticate with the GoDeploy service              |
+| `godeploy auth logout`            | Log out from the GoDeploy service                   |
+| `godeploy auth status`            | Check authentication status                         |
+| `godeploy deploy`\*               | Deploy your SPA to the GoDeploy service             |
+| `godeploy deploy --project <p>`\* | Deploy a specific project from your spa-config.json |
+
+\* _Requires authentication_
 
 ---
 
@@ -191,13 +194,23 @@ Host **multiple SPAs under one domain**, each on its own route, configured via `
 {
   "default_app": "auth",
   "apps": [
-    { "name": "auth", "source_dir": "dist" },
-    { "name": "dashboard", "source_dir": "dashboard-dist" }
+    {
+      "name": "auth",
+      "source_dir": "dist",
+      "path": "auth"
+    },
+    {
+      "name": "dashboard",
+      "source_dir": "dashboard-dist",
+      "path": "app"
+    }
   ]
 }
 ```
 
-➡️ Auto-routes to `/`, `/auth/`, `/dashboard/`.
+➡️ Auto-routes to `/`, `/auth/`, `/app/`.
+
+The `path` property defines the URL path for each app. If not specified, it defaults to the app's `name`.
 
 ---
 
@@ -213,28 +226,32 @@ godeploy package  # Containerize for production
 
 ---
 
-## 🚧 **Coming Soon: `godeploy deploy` — Instant SPA Hosting (Join Alpha)**
+## ✨ **NEW: `godeploy deploy` — Instant SPA Hosting**
 
-> Imagine running this:
+> Run this:
 
 ```bash
 godeploy deploy
 ```
 
-➡️ And getting this:
+➡️ And get this:
 
 ```
-🎉 Your app is live at: https://my-app.godeploy.app
+✅ Successfully deployed!
+🌍 URL: https://my-app.godeploy.app
 ```
 
 - No AWS. No Cloudflare. No pipelines.
 - **Just run the command and your app is online — optimized, secured, and served from a global CDN.**
 
-💥 **Be first in line** for **alpha access**:  
-👉 [**Sign up here**](https://godeploy.app/alpha) (coming soon)
+To deploy a specific project from your spa-config.json:
+
+```bash
+godeploy deploy --project my-project
+```
 
 **⭐ Star this repo** to support the project and follow updates!  
-[https://github.com/matsilva/godeploy](https://github.com/matsilva/godeploy)
+[https://github.com/audetic/godeploy](https://github.com/audetic/godeploy)
 
 --- More On Performance ---
 

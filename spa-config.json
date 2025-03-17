@@ -4,6 +4,7 @@
     {
       "name": "yourAppName",
       "source_dir": "dist",
+      "path": "yourAppName",
       "description": "Your application description",
       "enabled": true
     }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"time"
 
@@ -64,6 +65,20 @@ type ErrorResponse struct {
 	Error   string `json:"error"`
 	Message string `json:"message"`
 	Status  int    `json:"status"`
+}
+
+// DeployRequest represents a request to deploy a SPA
+type DeployRequest struct {
+	Project   string `json:"project"`
+	SpaConfig []byte `json:"spa_config"`
+	Archive   []byte `json:"archive"`
+}
+
+// DeployResponse represents a response from the deploy endpoint
+type DeployResponse struct {
+	Success bool   `json:"success"`
+	URL     string `json:"url"`
+	Error   string `json:"error,omitempty"`
 }
 
 // InitAuth initializes the authentication flow
@@ -197,4 +212,84 @@ func (c *Client) DoAuthenticatedRequest(req *http.Request) (*http.Response, erro
 // GetAuthToken gets the auth token from the auth package
 func (c *Client) GetAuthToken() (string, error) {
 	return auth.GetAuthToken()
+}
+
+// Deploy deploys a SPA to the GoDeploy service
+func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte) (*DeployResponse, error) {
+	// Create a new multipart writer
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	// Add the project field
+	if err := writer.WriteField("project", project); err != nil {
+		return nil, fmt.Errorf("failed to write project field: %w", err)
+	}
+
+	// Add the spa_config file
+	spaConfigPart, err := writer.CreateFormFile("spa_config", "spa-config.json")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create spa_config form file: %w", err)
+	}
+	if _, err := spaConfigPart.Write(spaConfigData); err != nil {
+		return nil, fmt.Errorf("failed to write spa_config data: %w", err)
+	}
+
+	// Add the archive file
+	archivePart, err := writer.CreateFormFile("archive", project+".zip")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create archive form file: %w", err)
+	}
+	if _, err := archivePart.Write(archiveData); err != nil {
+		return nil, fmt.Errorf("failed to write archive data: %w", err)
+	}
+
+	// Close the writer
+	if err := writer.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close multipart writer: %w", err)
+	}
+
+	// Create the request
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/deploy?project=%s", c.BaseURL, project), body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// Set the content type
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	// Send the authenticated request
+	resp, err := c.DoAuthenticatedRequest(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	// Check the status code
+	if resp.StatusCode != http.StatusOK {
+		// Try to parse the error response
+		var errResp ErrorResponse
+		if err := json.Unmarshal(respBody, &errResp); err == nil && errResp.Error != "" {
+			return nil, fmt.Errorf("API error: %s", errResp.Error)
+		}
+		return nil, fmt.Errorf("unexpected status code: %d, body: %s", resp.StatusCode, string(respBody))
+	}
+
+	// Decode the response
+	var deployResp DeployResponse
+	if err := json.Unmarshal(respBody, &deployResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	// Check for errors
+	if !deployResp.Success {
+		return nil, fmt.Errorf("deployment failed: %s", deployResp.Error)
+	}
+
+	return &deployResp, nil
 }

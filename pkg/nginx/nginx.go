@@ -50,12 +50,12 @@ http {
 
     # Root redirect to default app
     location = / {
-        return 301 $scheme://$host$port/{{.DefaultApp}}/;
+        return 301 $scheme://$host$port/{{.DefaultAppPath}}/;
     }
 
     # Handle root favicon.ico - redirect to default app's favicon
     location = /favicon.ico {
-        return 301 $scheme://$host$port/{{.DefaultApp}}/favicon.ico;
+        return 301 $scheme://$host$port/{{.DefaultAppPath}}/favicon.ico;
     }
 
     # Include app-specific configurations
@@ -63,7 +63,7 @@ http {
 
     # Default fallback for all apps
     {{range .Apps}}
-    location /{{.Name}}/ {
+    location /{{.Path}}/ {
         alias   /usr/share/nginx/html/{{.Name}}/;
         try_files $uri $uri/ /{{.Name}}/index.html;
         add_header Cache-Control "no-store, no-cache, must-revalidate";
@@ -72,36 +72,36 @@ http {
 }
 `
 
-	jsConfTemplate = `location ~* ^/{{.AppName}}/assets/{{.BaseName}}.js([.]map)?$ {
+	jsConfTemplate = `location ~* ^/{{.AppPath}}/assets/{{.BaseName}}.js([.]map)?$ {
     expires off;
     add_header Cache-Control "no-cache";
-    return 303 /{{.AppName}}/assets/{{.FileName}}$1;
+    return 303 /{{.AppPath}}/assets/{{.FileName}}$1;
 }
-location ~* ^/{{.AppName}}/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]js(?:[.]map)?)$ {
+location ~* ^/{{.AppPath}}/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]js(?:[.]map)?)$ {
     alias   /usr/share/nginx/html/{{.AppName}}/assets/$1;
     expires max;
     add_header Cache-Control "public; immutable";
 }
 `
 
-	cssConfTemplate = `location ~* ^/{{.AppName}}/assets/{{.BaseName}}.css([.]map)?$ {
+	cssConfTemplate = `location ~* ^/{{.AppPath}}/assets/{{.BaseName}}.css([.]map)?$ {
     expires off;
     add_header Cache-Control "no-cache";
-    return 303 /{{.AppName}}/assets/{{.FileName}}$1;
+    return 303 /{{.AppPath}}/assets/{{.FileName}}$1;
 }
-location ~* ^/{{.AppName}}/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]css(?:[.]map)?)$ {
+location ~* ^/{{.AppPath}}/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]css(?:[.]map)?)$ {
     alias   /usr/share/nginx/html/{{.AppName}}/assets/$1;
     expires max;
     add_header Cache-Control "public; immutable";
 }
 `
 
-	localesConfTemplate = `location ~* ^/{{.AppName}}/locales/(.+)$ {
+	localesConfTemplate = `location ~* ^/{{.AppPath}}/locales/(.+)$ {
     alias   /usr/share/nginx/html/{{.AppName}}/locales/$1;
     add_header Cache-Control "no-cache";
 }
 location ~* ^/locales/(.+)$ {
-    return 301 $scheme://$host$port/{{.AppName}}/locales/$1;
+    return 301 $scheme://$host$port/{{.AppPath}}/locales/$1;
 }
 `
 )
@@ -109,6 +109,7 @@ location ~* ^/locales/(.+)$ {
 // AssetInfo holds information about a hashed asset file
 type AssetInfo struct {
 	AppName   string
+	AppPath   string
 	BaseName  string
 	FileName  string
 	Extension string
@@ -133,6 +134,15 @@ func GenerateNginxConfigs(spaConfig *config.SpaConfig, outputDir string) error {
 		return fmt.Errorf("failed to write nginx.conf: %w", err)
 	}
 
+	// Get the default app's path
+	defaultAppPath := ""
+	for _, app := range spaConfig.Apps {
+		if app.Name == spaConfig.DefaultApp {
+			defaultAppPath = app.Path
+			break
+		}
+	}
+
 	// Generate default.conf
 	tmpl, err := template.New("default.conf").Parse(defaultConfTemplate)
 	if err != nil {
@@ -146,11 +156,13 @@ func GenerateNginxConfigs(spaConfig *config.SpaConfig, outputDir string) error {
 	defer defaultConfFile.Close()
 
 	data := struct {
-		DefaultApp string
-		Apps       []config.App
+		DefaultApp     string
+		DefaultAppPath string
+		Apps           []config.App
 	}{
-		DefaultApp: spaConfig.DefaultApp,
-		Apps:       spaConfig.GetEnabledApps(),
+		DefaultApp:     spaConfig.DefaultApp,
+		DefaultAppPath: defaultAppPath,
+		Apps:           spaConfig.GetEnabledApps(),
 	}
 
 	if err := tmpl.Execute(defaultConfFile, data); err != nil {
@@ -190,80 +202,76 @@ func ProcessSpaAssets(app config.App, spaDir, outputDir string) error {
 		contentStr := string(content)
 		baseHrefRegex := regexp.MustCompile(`<base href="[^"]*"`)
 		if baseHrefRegex.MatchString(contentStr) {
-			contentStr = baseHrefRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<base href="/%s/"`, app.Name))
+			contentStr = baseHrefRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<base href="/%s/"`, app.Path))
 		} else {
 			// If base href doesn't exist, add it
 			headRegex := regexp.MustCompile(`<head>`)
 			contentStr = headRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<head>
-    <base href="/%s/" />`, app.Name))
+    <base href="/%s/" />`, app.Path))
 		}
 
-		// Update asset paths
-		contentStr = strings.ReplaceAll(contentStr, `src="/assets/`, fmt.Sprintf(`src="/%s/assets/`, app.Name))
-		contentStr = strings.ReplaceAll(contentStr, `href="/assets/`, fmt.Sprintf(`href="/%s/assets/`, app.Name))
-
 		if err := os.WriteFile(indexPath, []byte(contentStr), 0644); err != nil {
-			return fmt.Errorf("failed to write updated index.html: %w", err)
+			return fmt.Errorf("failed to write index.html: %w", err)
 		}
 	}
 
-	// Process assets directory
-	assetsDir := filepath.Join(appDir, "assets")
-	if _, err := os.Stat(assetsDir); err == nil {
-		// Process JS files
-		jsFiles, err := findHashedFiles(assetsDir, ".js", app.Name)
+	// Find and process JS files
+	jsFiles, err := findHashedFiles(filepath.Join(appDir, "assets"), ".js", app.Name)
+	if err != nil {
+		return fmt.Errorf("failed to find JS files: %w", err)
+	}
+
+	// Update the AppPath field for each JS file
+	for i := range jsFiles {
+		jsFiles[i].AppPath = app.Path
+	}
+
+	// Find and process CSS files
+	cssFiles, err := findHashedFiles(filepath.Join(appDir, "assets"), ".css", app.Name)
+	if err != nil {
+		return fmt.Errorf("failed to find CSS files: %w", err)
+	}
+
+	// Update the AppPath field for each CSS file
+	for i := range cssFiles {
+		cssFiles[i].AppPath = app.Path
+	}
+
+	// Generate JS and CSS configurations
+	if len(jsFiles) > 0 || len(cssFiles) > 0 {
+		assetsConfPath := filepath.Join(appConfigDir, "assets.conf")
+		assetsConfFile, err := os.Create(assetsConfPath)
 		if err != nil {
-			return fmt.Errorf("failed to find JS files: %w", err)
+			return fmt.Errorf("failed to create assets.conf: %w", err)
 		}
+		defer assetsConfFile.Close()
 
-		if len(jsFiles) > 0 {
-			jsConfPath := filepath.Join(appConfigDir, "js.conf")
-			jsConfFile, err := os.Create(jsConfPath)
+		// Process JS files
+		for _, jsFile := range jsFiles {
+			tmpl, err := template.New("js.conf").Parse(jsConfTemplate)
 			if err != nil {
-				return fmt.Errorf("failed to create js.conf: %w", err)
-			}
-			defer jsConfFile.Close()
-
-			jsTmpl, err := template.New("js.conf").Parse(jsConfTemplate)
-			if err != nil {
-				return fmt.Errorf("failed to parse js.conf template: %w", err)
+				return fmt.Errorf("failed to parse JS template: %w", err)
 			}
 
-			for _, asset := range jsFiles {
-				if err := jsTmpl.Execute(jsConfFile, asset); err != nil {
-					return fmt.Errorf("failed to execute js.conf template: %w", err)
-				}
+			if err := tmpl.Execute(assetsConfFile, jsFile); err != nil {
+				return fmt.Errorf("failed to execute JS template: %w", err)
 			}
 		}
 
 		// Process CSS files
-		cssFiles, err := findHashedFiles(assetsDir, ".css", app.Name)
-		if err != nil {
-			return fmt.Errorf("failed to find CSS files: %w", err)
-		}
-
-		if len(cssFiles) > 0 {
-			cssConfPath := filepath.Join(appConfigDir, "css.conf")
-			cssConfFile, err := os.Create(cssConfPath)
+		for _, cssFile := range cssFiles {
+			tmpl, err := template.New("css.conf").Parse(cssConfTemplate)
 			if err != nil {
-				return fmt.Errorf("failed to create css.conf: %w", err)
-			}
-			defer cssConfFile.Close()
-
-			cssTmpl, err := template.New("css.conf").Parse(cssConfTemplate)
-			if err != nil {
-				return fmt.Errorf("failed to parse css.conf template: %w", err)
+				return fmt.Errorf("failed to parse CSS template: %w", err)
 			}
 
-			for _, asset := range cssFiles {
-				if err := cssTmpl.Execute(cssConfFile, asset); err != nil {
-					return fmt.Errorf("failed to execute css.conf template: %w", err)
-				}
+			if err := tmpl.Execute(assetsConfFile, cssFile); err != nil {
+				return fmt.Errorf("failed to execute CSS template: %w", err)
 			}
 		}
 	}
 
-	// Process locales directory
+	// Check if locales directory exists
 	localesDir := filepath.Join(appDir, "locales")
 	if _, err := os.Stat(localesDir); err == nil {
 		localesConfPath := filepath.Join(appConfigDir, "locales.conf")
@@ -273,19 +281,22 @@ func ProcessSpaAssets(app config.App, spaDir, outputDir string) error {
 		}
 		defer localesConfFile.Close()
 
-		localesTmpl, err := template.New("locales.conf").Parse(localesConfTemplate)
+		// Create locales configuration
+		tmpl, err := template.New("locales.conf").Parse(localesConfTemplate)
 		if err != nil {
-			return fmt.Errorf("failed to parse locales.conf template: %w", err)
+			return fmt.Errorf("failed to parse locales template: %w", err)
 		}
 
 		data := struct {
 			AppName string
+			AppPath string
 		}{
 			AppName: app.Name,
+			AppPath: app.Path,
 		}
 
-		if err := localesTmpl.Execute(localesConfFile, data); err != nil {
-			return fmt.Errorf("failed to execute locales.conf template: %w", err)
+		if err := tmpl.Execute(localesConfFile, data); err != nil {
+			return fmt.Errorf("failed to execute locales template: %w", err)
 		}
 	}
 
@@ -301,6 +312,10 @@ func findHashedFiles(dir, ext string, appName string) ([]AssetInfo, error) {
 
 	entries, err := os.ReadDir(dir)
 	if err != nil {
+		if os.IsNotExist(err) {
+			// If the directory doesn't exist, return an empty slice
+			return assets, nil
+		}
 		return nil, fmt.Errorf("failed to read directory %s: %w", dir, err)
 	}
 
@@ -319,6 +334,7 @@ func findHashedFiles(dir, ext string, appName string) ([]AssetInfo, error) {
 			baseName := matches[1]
 			assets = append(assets, AssetInfo{
 				AppName:   appName,
+				AppPath:   "", // This will be set by the caller
 				BaseName:  baseName,
 				FileName:  fileName,
 				Extension: ext,
