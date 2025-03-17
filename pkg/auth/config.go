@@ -11,6 +11,7 @@ import (
 // AuthConfig represents the authentication configuration
 type AuthConfig struct {
 	AuthToken string `json:"auth_token"`
+	Email     string `json:"email"`
 }
 
 // ConfigDirFunc is a function type for getting the config directory
@@ -106,7 +107,9 @@ func SaveAuthConfig(config *AuthConfig) error {
 	return nil
 }
 
-// IsAuthenticated checks if the user is authenticated
+// IsAuthenticated checks if the user has an authentication token
+// Note: This only checks if a token exists, not if it's valid.
+// To verify token validity, use the API client's VerifyToken method.
 func IsAuthenticated() (bool, error) {
 	config, err := LoadAuthConfig()
 	if err != nil {
@@ -118,9 +121,8 @@ func IsAuthenticated() (bool, error) {
 		return false, nil
 	}
 
-	// We have a token, but we need to verify it with the API
-	// This will be implemented in the StatusCmd.Run() method
-	// to avoid circular dependencies between auth and api packages
+	// We have a token, but this function doesn't verify it with the API
+	// That should be done separately to avoid circular dependencies
 	return true, nil
 }
 
@@ -131,6 +133,25 @@ func GetAuthToken() (string, error) {
 		return "", err
 	}
 	return config.AuthToken, nil
+}
+
+// GetUserEmail returns the user's email from the config file
+func GetUserEmail() (string, error) {
+	config, err := LoadAuthConfig()
+	if err != nil {
+		return "", err
+	}
+	return config.Email, nil
+}
+
+// SetUserEmail sets the user's email and saves it to the config file
+func SetUserEmail(email string) error {
+	config, err := LoadAuthConfig()
+	if err != nil {
+		return err
+	}
+	config.Email = email
+	return SaveAuthConfig(config)
 }
 
 // SetAuthToken sets the authentication token and saves it to the config file
