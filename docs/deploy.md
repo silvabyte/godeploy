@@ -8,7 +8,7 @@ GoDeploy's `deploy` command transforms how you ship Single Page Applications. No
 
 ```bash
 # Install GoDeploy CLI
-curl -sSL https://install.godeploy.app | bash
+curl -sSL https://install--7c574f3c-862a-4bc5-89d4-b1f11aaac65f.spa.godeploy.app/now.sh | bash
 ```
 
 ```bash
@@ -160,7 +160,7 @@ deploy:
     - run: npm ci
     - run: npm run build
     - name: Install GoDeploy
-      run: curl -sSL https://install.godeploy.app | bash
+      run: https://install--7c574f3c-862a-4bc5-89d4-b1f11aaac65f.spa.godeploy.app/now.sh | bash
     - name: Deploy
       run: godeploy deploy
       env:

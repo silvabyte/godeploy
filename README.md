@@ -10,7 +10,7 @@
 Install with curl:
 
 ```bash
-curl -sSL https://install.godeploy.app | bash
+curl -sSL https://install--7c574f3c-862a-4bc5-89d4-b1f11aaac65f.spa.godeploy.app/now.sh | bash
 ```
 
 or with go
