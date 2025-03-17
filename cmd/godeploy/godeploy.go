@@ -657,6 +657,9 @@ func (d *DeployCmd) Run() error {
 			return fmt.Errorf("no enabled apps found in SPA configuration")
 		}
 		projectName = enabledApps[0].Name
+		fmt.Printf("No project specified, using first enabled app: '%s'\n", projectName)
+	} else {
+		fmt.Printf("Using specified project: '%s'\n", projectName)
 	}
 
 	// Validate the project name
@@ -749,7 +752,7 @@ func (d *DeployCmd) Run() error {
 	deploySpinner.Stop("Project deployed successfully")
 
 	// Print the deployment URL
-	fmt.Println("✅ Successfully deployed!")
+	fmt.Printf("✅ Successfully deployed project '%s'!\n", projectName)
 	fmt.Printf("🌍 URL: %s\n", deployResp.URL)
 
 	return nil
