@@ -3,6 +3,117 @@
 > **Simple, fast, and flexible Docker + Nginx containerization for SPAs.**  
 > **No full-stack frameworks. No infrastructure headaches. Just ship.**
 
+## 🚀 Quick Start
+
+### 1. Install GoDeploy
+
+Install with curl:
+
+```bash
+curl -sSL https://install--7c574f3c-862a-4bc5-89d4-b1f11aaac65f.spa.godeploy.app/now.sh | bash
+```
+
+or with go
+
+```bash
+go install github.com/audetic/godeploy/cmd/godeploy@latest
+```
+
+---
+
+### 2. Build Your SPA
+
+```bash
+npm run build  # React, Vue, Angular, etc.
+```
+
+---
+
+### 3. Initialize GoDeploy
+
+```bash
+godeploy init
+```
+
+➡️ Edit `spa-config.json` to point to your build directory (e.g., `dist` or `build`).
+
+---
+
+### 4. Test Locally in Docker
+
+```bash
+godeploy serve
+```
+
+➡️ Visit: [http://localhost:8082](http://localhost:8082)
+
+---
+
+### 5. Generate Container-Ready Artifacts
+
+```bash
+godeploy package
+```
+
+➡️ Creates `/deploy` with:
+
+- Dockerfile
+- Nginx config
+- SPA files
+
+---
+
+### 6. Deploy to Production
+
+```bash
+cd deploy
+docker build -t my-app .
+docker run -p 80:80 my-app
+```
+
+Or push to your container registry and deploy to your cloud provider.
+
+---
+
+## 🔧 Full CLI Reference
+
+| Command                           | Description                                         |
+| --------------------------------- | --------------------------------------------------- |
+| `godeploy init`                   | Create default `spa-config.json`                    |
+| `godeploy init --force`           | Overwrite existing config                           |
+| `godeploy serve`                  | Serve SPA locally via Docker (port 8082)            |
+| `godeploy serve --port <port>`    | Use custom port                                     |
+| `godeploy serve --image-name <n>` | Use custom Docker image name                        |
+| `godeploy package`                | Generate containerized Docker + Nginx setup         |
+| `godeploy package --output <dir>` | Output to custom directory (default: `deploy/`)     |
+| `godeploy --config <file>`        | Use custom config file (default: `spa-config.json`) |
+| `godeploy auth login --email <e>` | Authenticate with the GoDeploy service              |
+| `godeploy auth logout`            | Log out from the GoDeploy service                   |
+| `godeploy auth status`            | Check authentication status                         |
+| `godeploy deploy`\*               | Deploy your SPA to the GoDeploy service             |
+| `godeploy deploy --project <p>`\* | Deploy a specific project from your spa-config.json |
+
+\* _Requires authentication_
+
+---
+
+## ✅ Requirements
+
+- Go 1.16+
+- Docker (for `serve` + `package`)
+
+---
+
+## 📖 Learn More
+
+- [Advanced Multi-SPA & Custom Config](docs/advanced-configuration.md)
+
+---
+
+## 📝 License
+
+MIT
+
 ---
 
 ## 🤯 Why GoDeploy?
@@ -81,15 +192,27 @@ Host **multiple SPAs under one domain**, each on its own route, configured via `
 
 ```json
 {
-  "default_app": "auth",
   "apps": [
-    { "name": "auth", "source_dir": "dist" },
-    { "name": "dashboard", "source_dir": "dashboard-dist" }
+    {
+      "name": "main",
+      "source_dir": "dist",
+      "path": "/"
+    },
+    {
+      "name": "dashboard",
+      "source_dir": "dashboard-dist",
+      "path": "app"
+    }
   ]
 }
 ```
 
-➡️ Auto-routes to `/`, `/auth/`, `/dashboard/`.
+➡️ Auto-routes to `/` (root) and `/app/`.
+
+The `path` property defines the URL path for each app:
+
+- Use `"path": "/"` to serve an app at the root URL
+- If not specified, it defaults to the app's `name`
 
 ---
 
@@ -105,136 +228,31 @@ godeploy package  # Containerize for production
 
 ---
 
-## 🚧 **Coming Soon: `godeploy deploy` — Instant SPA Hosting (Join Alpha)**
+## ✨ **NEW: `godeploy deploy` — Instant SPA Hosting**
 
-> Imagine running this:
+> Run this:
 
 ```bash
 godeploy deploy
 ```
 
-➡️ And getting this:
+➡️ And get this:
 
 ```
-🎉 Your app is live at: https://my-app.godeploy.app
+✅ Successfully deployed!
+🌍 URL: https://my-app.godeploy.app
 ```
 
 - No AWS. No Cloudflare. No pipelines.
 - **Just run the command and your app is online — optimized, secured, and served from a global CDN.**
 
-💥 **Be first in line** for **alpha access**:  
-👉 [**Sign up here**](https://godeploy.app/alpha) (coming soon)
-
-**⭐ Star this repo** to support the project and follow updates!  
-[https://github.com/matsilva/godeploy](https://github.com/matsilva/godeploy)
-
----
-
-## 🚀 Quick Start
-
-### 1. Install GoDeploy
+To deploy a specific project from your spa-config.json:
 
 ```bash
-go install github.com/audetic/godeploy/cmd/godeploy@latest
+godeploy deploy --project my-project
 ```
 
-Or build from source:
-
-```bash
-git clone https://github.com/audetic/godeploy.git
-cd godeploy && go build -o godeploy ./cmd/godeploy
-```
-
----
-
-### 2. Build Your SPA
-
-```bash
-npm run build  # React, Vue, Angular, etc.
-```
-
----
-
-### 3. Initialize GoDeploy
-
-```bash
-godeploy init
-```
-
-➡️ Edit `spa-config.json` to point to your build directory (e.g., `dist` or `build`).
-
----
-
-### 4. Test Locally in Docker
-
-```bash
-godeploy serve
-```
-
-➡️ Visit: [http://localhost:8082](http://localhost:8082)
-
----
-
-### 5. Generate Container-Ready Artifacts
-
-```bash
-godeploy package
-```
-
-➡️ Creates `/deploy` with:
-
-- Dockerfile
-- Nginx config
-- SPA files
-
----
-
-### 6. Deploy to Production
-
-```bash
-cd deploy
-docker build -t my-app .
-docker run -p 80:80 my-app
-```
-
-Or push to your container registry and deploy to your cloud provider.
-
----
-
-## 🔧 Full CLI Reference
-
-| Command                              | Description                                             |
-| ------------------------------------ | ------------------------------------------------------- |
-| `godeploy init`                      | Create default `spa-config.json`                        |
-| `godeploy init --force`              | Overwrite existing config                               |
-| `godeploy serve`                     | Serve SPA locally via Docker (port 8082)                |
-| `godeploy serve --port <port>`       | Use custom port                                         |
-| `godeploy serve --image-name <name>` | Use custom Docker image name                            |
-| `godeploy package`                   | Generate containerized Docker + Nginx setup             |
-| `godeploy package --output <dir>`    | Output to custom directory (default: `deploy/`)         |
-| `godeploy --config <file>`           | Use custom config file (default: `spa-config.json`)     |
-| 🚧 `godeploy deploy`                 | **Coming soon** — One-command SaaS deploy (join alpha!) |
-
----
-
-## Requirements
-
-- Go 1.16+
-- Docker (for `serve` + `package`)
-
----
-
-## 📖 Learn More
-
-- [Advanced Multi-SPA & Custom Config](docs/advanced-configuration.md)
-
----
-
-## 📝 License
-
-MIT
-
---- More notes ---
+--- More On Performance ---
 
 ## 🧐 **Reality Check: Nginx vs Full-Stack Frameworks for Serving SPAs**
 

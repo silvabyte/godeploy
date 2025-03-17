@@ -9,14 +9,14 @@ import (
 
 // SpaConfig represents the configuration for multiple SPAs
 type SpaConfig struct {
-	DefaultApp string `json:"default_app"`
-	Apps       []App  `json:"apps"`
+	Apps []App `json:"apps"`
 }
 
 // App represents a single SPA configuration
 type App struct {
 	Name        string `json:"name"`
 	SourceDir   string `json:"source_dir"`
+	Path        string `json:"path"`
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
 }
@@ -34,21 +34,17 @@ func LoadConfig(configPath string) (*SpaConfig, error) {
 	}
 
 	// Validate the configuration
-	if config.DefaultApp == "" {
-		return nil, fmt.Errorf("default_app is required in the configuration")
+	if len(config.Apps) == 0 {
+		return nil, fmt.Errorf("at least one app must be defined in the configuration")
 	}
 
-	// Check if the default app is in the list of apps and is enabled
-	defaultAppFound := false
-	for _, app := range config.Apps {
-		if app.Name == config.DefaultApp && app.Enabled {
-			defaultAppFound = true
-			break
+	// Set default paths if not specified
+	for i, app := range config.Apps {
+		// If path is not specified, use the name as the default path
+		if app.Path == "" {
+			fmt.Printf("Setting default path for app %s to /%s\n", app.Name, app.Name)
+			config.Apps[i].Path = app.Name
 		}
-	}
-
-	if !defaultAppFound {
-		return nil, fmt.Errorf("default app '%s' not found or not enabled in the configuration", config.DefaultApp)
 	}
 
 	return &config, nil

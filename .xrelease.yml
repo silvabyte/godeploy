@@ -37,7 +37,7 @@ release:
     - type: commit-push
     - type: github-release
       assets:
-        - 'out/godeploy-*'
+        - 'dist/godeploy-*'
     # run any custom commands here, which will run after the release is created
     # - type: custom
     #   name: 'go-mod-tidy'

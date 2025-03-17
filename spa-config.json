@@ -1,11 +1,11 @@
 {
-    "default_app": "auth",
-    "apps": [
-        {
-            "name": "auth",
-            "source_dir": "example-spa/dist",
-            "description": "Authentication application",
-            "enabled": true
-        }
-    ]
+  "apps": [
+    {
+      "name": "install",
+      "source_dir": "./install",
+      "path": "/",
+      "description": "Hosts the install script for godeploy using, godeploy awwww ya boiiiiiii",
+      "enabled": true
+    }
+  ]
 }

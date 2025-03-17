@@ -12,17 +12,18 @@ Host **multiple SPAs under one domain**, each on its own route — great for das
 
 ```json
 {
-  "default_app": "auth",
   "apps": [
     {
-      "name": "auth",
+      "name": "main",
       "source_dir": "dist",
-      "description": "Authentication app",
+      "path": "/",
+      "description": "Main application (served at root)",
       "enabled": true
     },
     {
       "name": "dashboard",
       "source_dir": "dashboard-dist",
+      "path": "app",
       "description": "User dashboard app",
       "enabled": true
     }
@@ -30,14 +31,22 @@ Host **multiple SPAs under one domain**, each on its own route — great for das
 }
 ```
 
+### Configuration Properties
+
+| Property      | Description                                                                  | Required |
+| ------------- | ---------------------------------------------------------------------------- | -------- |
+| `name`        | Unique identifier for the app                                                | Yes      |
+| `source_dir`  | Directory containing built SPA files                                         | Yes      |
+| `path`        | URL path for the app (use "/" for root, defaults to `name` if not specified) | No       |
+| `description` | Human-readable description                                                   | No       |
+| `enabled`     | Whether the app is enabled                                                   | Yes      |
+
 ### Automatic Routes
 
-| App Name    | URL Paths     |
-| ----------- | ------------- |
-| `auth`      | `/`, `/auth/` |
-| `dashboard` | `/dashboard/` |
-
-> ✅ **Note**: `default_app` is served on `/` and its name-based path.
+| App Name    | URL Paths |
+| ----------- | --------- |
+| `main`      | `/`       |
+| `dashboard` | `/app/`   |
 
 ---
 
@@ -97,16 +106,47 @@ godeploy init [options]
 
 ## ✅ Complete CLI Reference
 
-| Command                              | Description                                       |
-| ------------------------------------ | ------------------------------------------------- |
-| `godeploy init`                      | Create a default `spa-config.json`                |
-| `godeploy init --force`              | Overwrite existing config                         |
-| `godeploy package`                   | Generate containerized Docker + Nginx setup       |
-| `godeploy package --output <dir>`    | Output to custom directory                        |
-| `godeploy serve`                     | Serve SPAs locally in Docker (default port: 8082) |
-| `godeploy serve --port <port>`       | Serve on custom port                              |
-| `godeploy serve --image-name <name>` | Use custom Docker image name                      |
-| `godeploy --config <file>`           | Use a custom config file                          |
+| Command                              | Description                                         |
+| ------------------------------------ | --------------------------------------------------- |
+| `godeploy init`                      | Create default `spa-config.json`                    |
+| `godeploy init --force`              | Overwrite existing config                           |
+| `godeploy serve`                     | Serve SPA locally via Docker (port 8082)            |
+| `godeploy serve --port <port>`       | Use custom port                                     |
+| `godeploy serve --image-name <name>` | Use custom Docker image name                        |
+| `godeploy package`                   | Generate containerized Docker + Nginx setup         |
+| `godeploy package --output <dir>`    | Output to custom directory (default: `deploy/`)     |
+| `godeploy --config <file>`           | Use custom config file (default: `spa-config.json`) |
+
+---
+
+## 📂 Example: Custom Output Directory
+
+```bash
+godeploy package --output="custom-output"
+```
+
+➡️ Container files will be created in `custom-output/`.
+
+---
+
+## 🔑 Feature Recap
+
+| Feature               | Supported          |
+| --------------------- | ------------------ |
+| Single-SPA            | ✅                 |
+| Multi-SPA             | ✅                 |
+| Custom Output Dir     | ✅                 |
+| Custom Docker Image   | ✅                 |
+| Custom Ports (serve)  | ✅                 |
+| Localization          | ✅ (auto-detected) |
+| Hashed Asset Handling | ✅                 |
+
+---
+
+## 💡 Pro Tip
+
+Need more control over Nginx?
+➡️ After running `godeploy package`, **edit the generated `nginx.conf`** before building your Docker image.
 
 ---
 
@@ -173,29 +213,4 @@ Generated `Dockerfile` includes:
 godeploy package --output custom-output
 ```
 
-➡️ Container files will be created in `custom-output/`.
-
----
-
-## 🔑 Feature Recap
-
-| Feature               | Supported          |
-| --------------------- | ------------------ |
-| Single-SPA            | ✅                 |
-| Multi-SPA             | ✅                 |
-| Custom Output Dir     | ✅                 |
-| Custom Docker Image   | ✅                 |
-| Custom Ports (serve)  | ✅                 |
-| Localization          | ✅ (auto-detected) |
-| Hashed Asset Handling | ✅                 |
-
----
-
-## 💡 Pro Tip
-
-Need more control over Nginx?
-➡️ After running `godeploy package`, **edit the generated `nginx.conf`** before building your Docker image.
-
-```
-
-```
+➡️ Container files will be created in `
