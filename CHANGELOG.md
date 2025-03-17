@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.3] - 2025-03-17
+
+* fix: update installation script URL in README and deployment documentation
+* docs: add installation instructions for GoDeploy CLI in deployment guide
+* feat: update SPA configuration and enhance deployment messaging
+* chore: rename install.sh to now.sh
+* feat: enhance authentication process with email handling and token verification
+* refactor: update SPA configuration to remove `default_app`
+* feat: implement `godeploy deploy` command for instant SPA hosting
+* fix: update asset path in release configuration from 'out' to 'dist'
+* feat: enhance build process and installation instructions
+* docs: remove outdated authentication section from README
+* feat: implement token verification for authentication commands
+* feat: enhance authentication flow and user experience
+* refactor: update authentication commands a
+* feat: implement authentication commands and update README with CLI reference
+* chore: release v0.1.2
+
 ## [0.1.2] - 2025-03-14
 
 * chore: clean up emoji use
