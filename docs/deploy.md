@@ -97,19 +97,6 @@ Example output:
 
 ---
 
-## 💡 **Recap**
-
-| Step                              | Command                                       |
-| --------------------------------- | --------------------------------------------- | ----- |
-| **Install CLI**                   | `curl -sSL https://install--...               | bash` |
-| **Login to GoDeploy**             | `godeploy auth login --email=you@example.com` |
-| **Initialize Project (Required)** | `godeploy init`                               |
-| **Edit `spa-config.json`**        | Edit source_dir, name, description, enabled   |
-| **Build Your SPA**                | `npm run build`                               |
-| **Deploy Live**                   | `godeploy deploy`                             |
-
----
-
 ## 🔑 **Need Help?**
 
 - **Email**: [support@godeploy.app](mailto:support@godeploy.app)
