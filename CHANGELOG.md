@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0] - 2025-03-19
+
+* chore: update readme
+* feat: introduce godeploy.config.json for configuration management and update documentation
+* feat: enhance Makefile for multi-app and single-app with build and run commands
+* feat: enhance Docker and Nginx integration with improved logging and cleanup
+* fix: multiapp serving
+* feat: add multi-app static examples
+* chore: remove mangled deploy.md table
+* chore: release v0.1.4
+
 ## [0.1.4] - 2025-03-17
 
 * refactor: revert install script refactor
