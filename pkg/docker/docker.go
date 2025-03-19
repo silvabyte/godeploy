@@ -13,10 +13,10 @@ import (
 
 // Templates for Docker files
 const (
-	dockerfileTemplate = `FROM nginx:1.13-alpine
+	dockerfileTemplate = `FROM nginx:1.25-alpine
 
 # Install required tools
-RUN apk add --no-cache bash curl jq
+RUN apk add --no-cache bash 
 
 # Copy Nginx configuration
 COPY etc/nginx/ /etc/nginx/
@@ -26,7 +26,7 @@ RUN mkdir -p /usr/share/nginx/html
 
 # Copy the SPAs
 {{range .Apps}}
-COPY usr/share/nginx/html/{{.Name}}/ /usr/share/nginx/html/{{.Name}}/
+COPY usr/share/nginx/html/{{.Slug}}/ /usr/share/nginx/html/{{.Slug}}/
 {{end}}
 
 # Expose standard HTTP port
@@ -106,7 +106,7 @@ func RunLocalDocker(outputDir string, port int, imageName string) error {
 
 	// Build the Docker image
 	fmt.Println("Building Docker image...")
-	if err := runCommand("docker", "build", "-t", imageName, outputDir); err != nil {
+	if err := runCommand("docker", "build", "--no-cache", "-t", imageName, outputDir); err != nil {
 		return fmt.Errorf("failed to build Docker image: %w", err)
 	}
 

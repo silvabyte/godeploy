@@ -802,45 +802,13 @@ func generateContainerFiles(spaConfig *config.SpaConfig, outputDir string) error
 	nginxCancel := nginxSpinner.Start(ctx)
 
 	// Generate Nginx configurations
-	if err := nginx.GenerateNginxConfigs(spaConfig, outputDir); err != nil {
+	if err := nginx.GenerateNginxConfigs(ctx, spaConfig, outputDir); err != nil {
 		nginxCancel()
 		nginxSpinner.Fail("Failed to generate Nginx configs")
 		return fmt.Errorf("failed to generate Nginx configurations: %w", err)
 	}
 	nginxCancel()
 	nginxSpinner.Stop("Nginx configurations generated")
-
-	// Process each enabled SPA
-	for _, app := range spaConfig.GetEnabledApps() {
-		// Create a spinner for processing this app
-		appSpinner := pin.New(fmt.Sprintf("Processing app '%s'...", app.Name),
-			pin.WithSpinnerColor(pin.ColorMagenta),
-			pin.WithTextColor(pin.ColorMagenta),
-		)
-		appCancel := appSpinner.Start(ctx)
-
-		spaDir := app.SourceDir
-		if !filepath.IsAbs(spaDir) {
-			// If the source directory is relative, resolve it relative to the current directory
-			spaDir = filepath.Join(".", spaDir)
-		}
-
-		// Check if the SPA directory exists
-		if _, err := os.Stat(spaDir); os.IsNotExist(err) {
-			appCancel()
-			appSpinner.Fail(fmt.Sprintf("Directory '%s' not found", spaDir))
-			return fmt.Errorf("SPA directory %s does not exist", spaDir)
-		}
-
-		// Process the SPA assets
-		if err := nginx.ProcessSpaAssets(app, spaDir, outputDir); err != nil {
-			appCancel()
-			appSpinner.Fail(fmt.Sprintf("Failed to process '%s'", app.Name))
-			return fmt.Errorf("failed to process SPA assets for %s: %w", app.Name, err)
-		}
-		appCancel()
-		appSpinner.Stop(fmt.Sprintf("App '%s' processed", app.Name))
-	}
 
 	// Create a spinner for generating Docker files
 	dockerSpinner := pin.New("Generating Dockerfile...",
