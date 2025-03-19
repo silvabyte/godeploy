@@ -14,91 +14,76 @@ Ship any static frontend — **React, Vue, Angular, Svelte** — without SSR or 
 - **Optional SaaS** to deploy instantly to GoDeploy’s zero-infrastructure hosting.  
   👉 [See `godeploy deploy` docs for SaaS users →](docs/deploy.md)
 
----
-
 ## ⚡ Quick Start — Self-Hosted (OSS)
 
-### 1. Install GoDeploy
-
-With curl:
+1️⃣ **Install GoDeploy**
 
 ```bash
 curl -sSL https://install--7c574f3c-862a-4bc5-89d4-b1f11aaac65f.spa.godeploy.app/now.sh | bash
-```
-
-Or with Go:
-
-```bash
+# OR
 go install github.com/audetic/godeploy/cmd/godeploy@latest
 ```
 
----
-
-### 2. Build Your SPA
+2️⃣ **Build your SPA**
 
 ```bash
 npm run build  # React, Vue, Angular, etc.
 ```
 
----
-
-### 3. Initialize Your Project (Required)
+3️⃣ **Init & Configure**
 
 ```bash
 godeploy init
 ```
 
-➡️ **Edit `spa-config.json`** to point to your build directory and app name:
+Edit `godeploy.config.json` to set `source_dir` to your app's production build folder, eg: `dist`
 
 ```json
-{
-  "apps": [
-    {
-      "name": "main",
-      "source_dir": "./dist",
-      "path": "/",
-      "description": "My awesome SPA",
-      "enabled": true
-    }
-  ]
-}
+{ "apps": [{ "name": "your-app", "source_dir": "dist", "path": "/", "description": "Single application", "enabled": true }] }
 ```
 
----
-
-### 4. Test Locally in Docker
+4️⃣ **Run Locally**
 
 ```bash
 godeploy serve
 ```
 
-➡️ Visit: [http://localhost:8082](http://localhost:8082)
+➡️ [localhost:8082](http://localhost:8082)
 
----
-
-### 5. Package as a Docker + Nginx Container
+5️⃣ **Package & Deploy**
 
 ```bash
 godeploy package
+cd deploy && docker build -t my-app . && docker run -p 80:80 my-app
 ```
 
-➡️ Creates `/deploy` with:
-
-- Dockerfile
-- Nginx config
-- Your SPA files
+Done. 🚀
 
 ---
 
-### 6. Deploy to Production
+## 🎯 Examples
+
+Want to see GoDeploy in action? Check out our example implementations:
+
+- **[Multi-App Demo](examples/multi-app)** - Deploy multiple SPAs under one domain:
+
+  - Home app at `/`
+  - Dashboard at `/dashboard`
+  - Auth portal at `/auth`
+
+- **[Single-App Demo](examples/single-app)** - Basic single SPA deployment
+
+To run the demos:
 
 ```bash
-cd deploy
-docker build -t my-app .
-docker run -p 80:80 my-app
+# For multi-app demo
+cd examples/multi-app && make run-demo
+
+# For single-app demo
+cd examples/single-app && make run-demo
 ```
 
-Or push to any container registry and deploy to your cloud.
+See [examples/README.md](examples/README.md) for detailed instructions and prerequisites.
 
 ---
 
@@ -106,7 +91,7 @@ Or push to any container registry and deploy to your cloud.
 
 | Command                           | Description                                       |
 | --------------------------------- | ------------------------------------------------- |
-| `godeploy init`                   | Scaffold default `spa-config.json`                |
+| `godeploy init`                   | Scaffold default `godeploy.config.json`           |
 | `godeploy serve`                  | Serve SPA locally via Docker (default: port 8082) |
 | `godeploy package`                | Create container-ready Docker + Nginx setup       |
 | `godeploy auth login --email <e>` | (SaaS) Authenticate for `godeploy deploy`         |

@@ -21,12 +21,12 @@ import (
 // CLI represents the command-line interface structure
 var CLI struct {
 	// Global flags
-	Config string `help:"Path to the SPA configuration file" default:"spa-config.json"`
+	Config string `help:"Path to the SPA configuration file" default:"godeploy.config.json"`
 
 	// Commands
 	Serve   ServeCmd   `cmd:"" help:"Start a local server for testing"`
 	Package PackageCmd `cmd:"" help:"Generate container files for deployment"`
-	Init    InitCmd    `cmd:"" help:"Initialize a new spa-config.json file"`
+	Init    InitCmd    `cmd:"" help:"Initialize a new godeploy.config.json file"`
 	Auth    AuthCmd    `cmd:"" help:"Authentication commands"`
 	Deploy  DeployCmd  `cmd:"" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
 }
