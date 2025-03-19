@@ -15,6 +15,9 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
+COPY run.sh .
+RUN chmod +x run.sh
+
 # Expose the port
 EXPOSE 80
 
