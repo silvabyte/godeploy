@@ -59,18 +59,16 @@ http {
     {{if eq .Path "/"}}
     # Root path configuration
     location / {
-        alias   /usr/share/nginx/html/{{.Name}}/;
+        alias   /usr/share/nginx/html/{{.Slug}}/;
         index index.html;
         try_files $uri /index.html;
     }
     {{else}}
-	
-
-    # Catch-all for subpaths (handles /dashboard/doesntexist)
+    # Catch-all for subpaths
     location ~ ^{{.Path}}/?(.*)$ {
-        root /usr/share/nginx/html/;
+        alias /usr/share/nginx/html/{{.Slug}}/;
         index index.html;
-        try_files /{{.Name}}/$1.html /{{.Name}}/$1 /{{.Name}}/index.html;
+        try_files $1 /index.html =404;
     }
     {{end}}
     {{end}}
@@ -89,6 +87,11 @@ type AssetInfo struct {
 
 // GenerateNginxConfigs generates all Nginx configuration files
 func GenerateNginxConfigs(ctx context.Context, spaConfig *config.SpaConfig, outputDir string) error {
+	appSpinner := pin.New("Creating Nginx directories",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	appCancel := appSpinner.Start(ctx)
 	// Create output directories
 	nginxDir := filepath.Join(outputDir, "etc", "nginx")
 	confDir := filepath.Join(nginxDir, "conf.d")
@@ -133,11 +136,7 @@ func GenerateNginxConfigs(ctx context.Context, spaConfig *config.SpaConfig, outp
 
 	for _, app := range spaConfig.GetEnabledApps() {
 		// Create a spinner for processing this app
-		appSpinner := pin.New(fmt.Sprintf("Processing app '%s'...", app.Name),
-			pin.WithSpinnerColor(pin.ColorMagenta),
-			pin.WithTextColor(pin.ColorMagenta),
-		)
-		appCancel := appSpinner.Start(ctx)
+		appSpinner.UpdateMessage(fmt.Sprintf("Processing app '%s'...", app.Name))
 
 		spaDir := app.SourceDir
 		if !filepath.IsAbs(spaDir) {
@@ -159,8 +158,10 @@ func GenerateNginxConfigs(ctx context.Context, spaConfig *config.SpaConfig, outp
 			return fmt.Errorf("failed to process SPA assets for %s: %w", app.Name, err)
 		}
 		appCancel()
-		appSpinner.Stop(fmt.Sprintf("App '%s' processed", app.Name))
+		appSpinner.UpdateMessage(fmt.Sprintf("App '%s' processed", app.Name))
 	}
+
+	appSpinner.Stop("Nginx configurations generated")
 
 	return nil
 }
@@ -207,6 +208,17 @@ func ProcessSpaAssets(app config.App, spaDir, outputDir string) error {
 		return fmt.Errorf("failed to generate dynamic locations.conf: %w", err)
 	}
 
+	return nil
+}
+
+func CleanDeployDir(deployDir string) error {
+	if _, err := os.Stat(deployDir); os.IsNotExist(err) {
+		return nil
+	}
+
+	if err := os.RemoveAll(deployDir); err != nil {
+		return fmt.Errorf("failed to remove directory %s: %w", deployDir, err)
+	}
 	return nil
 }
 

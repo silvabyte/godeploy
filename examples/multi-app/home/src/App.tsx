@@ -19,9 +19,9 @@ export default function App() {
 
   const multiAppExample = `{
   "apps": [
-    { "name": "main", "source_dir": "dist", "path": "/" },
-    { "name": "dashboard", "source_dir": "dashboard-dist", "path": "/dashboard" },
-    { "name": "auth", "source_dir": "auth-dist", "path": "/auth" }
+    { "name": "home", "source_dir": "home/dist", "path": "/" },
+    { "name": "dashboard", "source_dir": "dashboard/dist", "path": "/dashboard" },
+    { "name": "auth", "source_dir": "auth/dist", "path": "/auth" }
   ]
 }`;
 

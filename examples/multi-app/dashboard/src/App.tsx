@@ -206,7 +206,9 @@ export default function App() {
               {/* Sidebar component, swap this element with another sidebar if you like */}
               <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 ring-1 ring-white/10">
                 <div className="flex h-16 shrink-0 items-center">
-                  <Logo className="h-16 -ml-8 [&_circle]:!fill-indigo-500 [&_path]:!stroke-white [&_tspan]:!fill-white" />
+                  <a href="/">
+                    <Logo className="h-16 -ml-8 [&_circle]:!fill-indigo-500 [&_path]:!stroke-white [&_tspan]:!fill-white" />
+                  </a>
                 </div>
                 <nav className="flex flex-1 flex-col">
                   <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -271,7 +273,9 @@ export default function App() {
         <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 ring-1 ring-white/5">
-            <Logo className="h-16 -ml-8 [&_circle]:!fill-indigo-500 [&_path]:!stroke-white [&_tspan]:!fill-white" />
+            <a href="/">
+              <Logo className="h-16 -ml-8 [&_circle]:!fill-indigo-500 [&_path]:!stroke-white [&_tspan]:!fill-white" />
+            </a>
             <nav className="flex flex-1 flex-col">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>

@@ -108,7 +108,7 @@ func (s *ServeCmd) Run() error {
 		return fmt.Errorf("error loading configuration: %w", err)
 	}
 	configCancel()
-	configSpinner.Stop("Configuration loaded")
+	configSpinner.Stop("Config loaded: " + CLI.Config)
 
 	// Create a spinner for generating container files
 	genSpinner := pin.New("Generating container files...",
@@ -132,16 +132,15 @@ func (s *ServeCmd) Run() error {
 		pin.WithTextColor(pin.ColorMagenta),
 	)
 	dockerCancel := dockerSpinner.Start(ctx)
+	defer dockerCancel()
 
 	// Run the server locally
-	if err := docker.RunLocalDocker(s.Output, s.Port, s.ImageName); err != nil {
-		dockerCancel()
+	if err := docker.RunLocalDocker(dockerSpinner, s.Output, s.Port, s.ImageName); err != nil {
 		dockerSpinner.Fail("Failed to start Docker")
+		//TODO: log the error to the ~/.config/godeploy/logs/docker.log file
 		return fmt.Errorf("error running Docker: %w", err)
 	}
-	dockerCancel()
-	dockerSpinner.Stop("Docker server started")
-
+	dockerSpinner.Stop("Docker server stopped")
 	return nil
 }
 
@@ -778,6 +777,19 @@ func generateContainerFiles(spaConfig *config.SpaConfig, outputDir string) error
 	// Create a context
 	ctx := context.Background()
 
+	spinner := pin.New("Cleaning deploy directory",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	spinnerCancel := spinner.Start(ctx)
+	defer spinnerCancel()
+	spinner.Start(ctx)
+
+	if err := nginx.CleanDeployDir(outputDir); err != nil {
+		spinner.Fail("Failed to clean deploy directory")
+		return fmt.Errorf("failed to clean deploy directory: %w", err)
+	}
+
 	// Create a spinner for creating the output directory
 	dirSpinner := pin.New(fmt.Sprintf("Creating output directory %s...", outputDir),
 		pin.WithSpinnerColor(pin.ColorMagenta),
@@ -792,7 +804,7 @@ func generateContainerFiles(spaConfig *config.SpaConfig, outputDir string) error
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 	dirCancel()
-	dirSpinner.Stop("Directory created")
+	dirSpinner.Stop("Directory created: " + outputDir)
 
 	// Create a spinner for generating Nginx configurations
 	nginxSpinner := pin.New("Generating Nginx configurations...",
