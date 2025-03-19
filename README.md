@@ -200,20 +200,6 @@ Serve multiple SPAs under one domain:
 }
 ```
 
----
-
-## ⚡ Performance vs SSR Frameworks
-
-| Task                               | GoDeploy (Nginx)   | Full-Stack SSR (Next, Remix)               |
-| ---------------------------------- | ------------------ | ------------------------------------------ |
-| Static file serving                | 🚀 ~50,000 req/sec | 🐢 Slow — SSR overhead                     |
-| First byte latency                 | ⚡ 1-5ms           | 30-100ms typical                           |
-| Concurrent connections (small VPS) | 10,000+            | Limited by Node.js event loop              |
-| Memory footprint                   | ~5-10MB            | 100-400MB+                                 |
-| CDN compatibility                  | ✅ Plug-and-play   | ❌ Complicated, prone to stale data issues |
-
----
-
 ## 📖 More Resources
 
 - [Advanced Multi-SPA Config](docs/advanced-configuration.md)
