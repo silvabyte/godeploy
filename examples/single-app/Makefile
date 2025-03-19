@@ -1,16 +1,9 @@
-.PHONY: build-apps build-godeploy run-demo run-demo-local check-install-godeploy
-
-# Build all frontend applications
-build-apps:
-	@echo "Building frontend applications..."
-	@cd home && npm install && npm run build
-	@cd dashboard && npm install && npm run build
-	@cd auth && npm install && npm run build
+.PHONY: build-godeploy run-demo run-demo-local check-install-godeploy
 
 # Build the godeploy binary from source
 build-godeploy:
 	@echo "Building godeploy binary..."
-	@cd ../../ && make build && cp out/godeploy ./examples/multi-app/
+	@cd ../../ && make build && cp out/godeploy ./examples/single-app/
 
 # Check and install godeploy if not present
 check-install-godeploy:
@@ -20,11 +13,11 @@ check-install-godeploy:
 	fi
 
 # Run the demo using local binary
-run-demo-local: build-apps build-godeploy
+run-demo-local: build-godeploy
 	@echo "Running demo with local binary..."
 	./godeploy serve
 
 # Run the demo using installed godeploy
-run-demo: build-apps check-install-godeploy
+run-demo: check-install-godeploy
 	@echo "Running demo with installed godeploy..."
 	godeploy serve

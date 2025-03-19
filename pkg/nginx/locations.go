@@ -32,7 +32,7 @@ func GenerateNginxLocations(app config.App, srcDir, nginxConfPath string) error 
 
 		webPath, alias := getPaths(app, relPath)
 
-		locationBlock := createLocationBlock(info.Name(), webPath, alias, app, relPath)
+		locationBlock := createLocationBlock(info.Name(), webPath, alias, relPath)
 		if locationBlock != "" {
 			locations = append(locations, locationBlock)
 		}
@@ -61,7 +61,7 @@ func getPaths(app config.App, relPath string) (webPath, alias string) {
 }
 
 // createLocationBlock generates the appropriate Nginx location block.
-func createLocationBlock(fileName, webPath, alias string, app config.App, relPath string) string {
+func createLocationBlock(fileName, webPath, alias string, relPath string) string {
 	if strings.HasSuffix(fileName, ".html") {
 		urlPath := strings.TrimSuffix(webPath, ".html")
 		fileAlias := alias
