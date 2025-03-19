@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/gosimple/slug"
 )
 
 // SpaConfig represents the configuration for multiple SPAs
@@ -15,6 +17,7 @@ type SpaConfig struct {
 // App represents a single SPA configuration
 type App struct {
 	Name        string `json:"name"`
+	Slug        string `json:"slug"`
 	SourceDir   string `json:"source_dir"`
 	Path        string `json:"path"`
 	Description string `json:"description"`
@@ -31,6 +34,11 @@ func LoadConfig(configPath string) (*SpaConfig, error) {
 	var config SpaConfig
 	if err := json.Unmarshal(data, &config); err != nil {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
+	}
+
+	for i, app := range config.Apps {
+		slug := slug.Make(app.Name)
+		config.Apps[i].Slug = slug
 	}
 
 	// Validate the configuration

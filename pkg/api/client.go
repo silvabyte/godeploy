@@ -226,7 +226,7 @@ func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte
 	}
 
 	// Add the spa_config file
-	spaConfigPart, err := writer.CreateFormFile("spa_config", "spa-config.json")
+	spaConfigPart, err := writer.CreateFormFile("spa_config", "godeploy.config.json")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create spa_config form file: %w", err)
 	}

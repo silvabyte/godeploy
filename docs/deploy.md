@@ -30,7 +30,7 @@ godeploy auth login --email=you@example.com
 
 ## ⚙️ **Step 3. Initialize Your Project (Required)**
 
-Run this command to create a `spa-config.json` for your app:
+Run this command to create a `godeploy.config.json` for your app:
 
 ```bash
 godeploy init
@@ -38,9 +38,9 @@ godeploy init
 
 ---
 
-## ✏️ **Step 4. Edit Your `spa-config.json` (Important!)**
+## ✏️ **Step 4. Edit Your `godeploy.config.json` (Important!)**
 
-Open `spa-config.json` in your editor and **customize it to match your app**.
+Open `godeploy.config.json` in your editor and **customize it to match your app**.
 
 Example template:
 

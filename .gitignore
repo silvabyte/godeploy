@@ -8,6 +8,7 @@
 *.so
 *.dylib
 
+
 out
 .DS_Store
 
@@ -18,7 +19,9 @@ godeploy
 !cmd/godeploy
 
 dist
-!example-spa/dist
+!examples/multi-app/auth/dist
+!examples/multi-app/dashboard/dist
+!examples/multi-app/home/dist
 deploy/
 # godeploy
 # Output of the go coverage tool, specifically when used with LiteIDE

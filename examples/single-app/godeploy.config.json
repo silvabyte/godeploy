@@ -1,0 +1,11 @@
+{
+    "apps": [
+        {
+            "name": "single-app",
+            "source_dir": "build",
+            "path": "/",
+            "description": "Single application",
+            "enabled": true
+        }
+    ]
+}

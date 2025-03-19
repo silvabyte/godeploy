@@ -1,17 +1,17 @@
 package nginx
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"text/template"
 
 	"github.com/audetic/godeploy/pkg/config"
+	"github.com/yarlson/pin"
 )
 
-// Templates for Nginx configuration
 const (
 	mainNginxConfTemplate = `user  nginx;
 worker_processes  1;
@@ -34,7 +34,7 @@ http {
     gzip  on;
     gzip_types text/plain application/xml application/javascript text/css;
 
-    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/conf.d/default.conf;
 }
 `
 
@@ -51,101 +51,28 @@ http {
     # Include app-specific configurations
     include /etc/nginx/conf.d/apps/*/*.conf;
 
-    # Default fallback for all apps
+    # Default caching behavior
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+
+    # App-specific configurations
     {{range .Apps}}
     {{if eq .Path "/"}}
     # Root path configuration
-    location = / {
-        alias   /usr/share/nginx/html/{{.Name}}/;
-        try_files $uri $uri/ /{{.Name}}/index.html;
-        add_header Cache-Control "no-store, no-cache, must-revalidate";
-    }
     location / {
-        alias   /usr/share/nginx/html/{{.Name}}/;
-        try_files $uri $uri/ /{{.Name}}/index.html;
-        add_header Cache-Control "no-store, no-cache, must-revalidate";
-    }
-    # Handle root favicon.ico
-    location = /favicon.ico {
-        alias   /usr/share/nginx/html/{{.Name}}/favicon.ico;
-        add_header Cache-Control "no-store, no-cache, must-revalidate";
+        alias   /usr/share/nginx/html/{{.Slug}}/;
+        index index.html;
+        try_files $uri /index.html;
     }
     {{else}}
-    # Non-root path configuration
-    location /{{.Path}}/ {
-        alias   /usr/share/nginx/html/{{.Name}}/;
-        try_files $uri $uri/ /{{.Name}}/index.html;
-        add_header Cache-Control "no-store, no-cache, must-revalidate";
+    # Catch-all for subpaths
+    location ~ ^{{.Path}}/?(.*)$ {
+        alias /usr/share/nginx/html/{{.Slug}}/;
+        index index.html;
+        try_files $1 /index.html =404;
     }
     {{end}}
     {{end}}
 }
-`
-
-	jsConfTemplate = `{{if eq .AppPath "/"}}
-location ~* ^/assets/{{.BaseName}}.js([.]map)?$ {
-    expires off;
-    add_header Cache-Control "no-cache";
-    return 303 /assets/{{.FileName}}$1;
-}
-location ~* ^/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]js(?:[.]map)?)$ {
-    alias   /usr/share/nginx/html/{{.AppName}}/assets/$1;
-    expires max;
-    add_header Cache-Control "public; immutable";
-}
-{{else}}
-location ~* ^/{{.AppPath}}/assets/{{.BaseName}}.js([.]map)?$ {
-    expires off;
-    add_header Cache-Control "no-cache";
-    return 303 /{{.AppPath}}/assets/{{.FileName}}$1;
-}
-location ~* ^/{{.AppPath}}/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]js(?:[.]map)?)$ {
-    alias   /usr/share/nginx/html/{{.AppName}}/assets/$1;
-    expires max;
-    add_header Cache-Control "public; immutable";
-}
-{{end}}
-`
-
-	cssConfTemplate = `{{if eq .AppPath "/"}}
-location ~* ^/assets/{{.BaseName}}.css([.]map)?$ {
-    expires off;
-    add_header Cache-Control "no-cache";
-    return 303 /assets/{{.FileName}}$1;
-}
-location ~* ^/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]css(?:[.]map)?)$ {
-    alias   /usr/share/nginx/html/{{.AppName}}/assets/$1;
-    expires max;
-    add_header Cache-Control "public; immutable";
-}
-{{else}}
-location ~* ^/{{.AppPath}}/assets/{{.BaseName}}.css([.]map)?$ {
-    expires off;
-    add_header Cache-Control "no-cache";
-    return 303 /{{.AppPath}}/assets/{{.FileName}}$1;
-}
-location ~* ^/{{.AppPath}}/assets/({{.BaseName}}-[a-zA-Z0-9]*[.]css(?:[.]map)?)$ {
-    alias   /usr/share/nginx/html/{{.AppName}}/assets/$1;
-    expires max;
-    add_header Cache-Control "public; immutable";
-}
-{{end}}
-`
-
-	localesConfTemplate = `{{if eq .AppPath "/"}}
-location ~* ^/locales/(.+)$ {
-    alias   /usr/share/nginx/html/{{.AppName}}/locales/$1;
-    add_header Cache-Control "no-cache";
-}
-{{else}}
-location ~* ^/{{.AppPath}}/locales/(.+)$ {
-    alias   /usr/share/nginx/html/{{.AppName}}/locales/$1;
-    add_header Cache-Control "no-cache";
-}
-location ~* ^/locales/(.+)$ {
-    return 301 $scheme://$host$port/{{.AppPath}}/locales/$1;
-}
-{{end}}
 `
 )
 
@@ -159,7 +86,12 @@ type AssetInfo struct {
 }
 
 // GenerateNginxConfigs generates all Nginx configuration files
-func GenerateNginxConfigs(spaConfig *config.SpaConfig, outputDir string) error {
+func GenerateNginxConfigs(ctx context.Context, spaConfig *config.SpaConfig, outputDir string) error {
+	appSpinner := pin.New("Creating Nginx directories",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	appCancel := appSpinner.Start(ctx)
 	// Create output directories
 	nginxDir := filepath.Join(outputDir, "etc", "nginx")
 	confDir := filepath.Join(nginxDir, "conf.d")
@@ -178,7 +110,10 @@ func GenerateNginxConfigs(spaConfig *config.SpaConfig, outputDir string) error {
 	}
 
 	// Generate default.conf
-	tmpl, err := template.New("default.conf").Parse(defaultConfTemplate)
+	funcMap := template.FuncMap{
+		"hasPrefix": strings.HasPrefix,
+	}
+	tmpl, err := template.New("default.conf").Funcs(funcMap).Parse(defaultConfTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to parse default.conf template: %w", err)
 	}
@@ -199,13 +134,46 @@ func GenerateNginxConfigs(spaConfig *config.SpaConfig, outputDir string) error {
 		return fmt.Errorf("failed to execute default.conf template: %w", err)
 	}
 
+	for _, app := range spaConfig.GetEnabledApps() {
+		// Create a spinner for processing this app
+		appSpinner.UpdateMessage(fmt.Sprintf("Processing app '%s'...", app.Name))
+
+		spaDir := app.SourceDir
+		if !filepath.IsAbs(spaDir) {
+			// If the source directory is relative, resolve it relative to the current directory
+			spaDir = filepath.Join(".", spaDir)
+		}
+
+		// Check if the SPA directory exists
+		if _, err := os.Stat(spaDir); os.IsNotExist(err) {
+			appCancel()
+			appSpinner.Fail(fmt.Sprintf("Directory '%s' not found", spaDir))
+			return fmt.Errorf("SPA directory %s does not exist", spaDir)
+		}
+
+		// Process the SPA assets
+		if err := ProcessSpaAssets(app, spaDir, outputDir); err != nil {
+			appCancel()
+			appSpinner.Fail(fmt.Sprintf("Failed to process '%s'", app.Name))
+			return fmt.Errorf("failed to process SPA assets for %s: %w", app.Name, err)
+		}
+		appCancel()
+		appSpinner.UpdateMessage(fmt.Sprintf("App '%s' processed", app.Name))
+	}
+
+	appSpinner.Stop("Nginx configurations generated")
+
 	return nil
+}
+
+func normalizePath(path string) string {
+	return strings.Trim(path, "/")
 }
 
 // ProcessSpaAssets processes the assets of a SPA and generates Nginx configurations
 func ProcessSpaAssets(app config.App, spaDir, outputDir string) error {
-	appDir := filepath.Join(outputDir, "usr", "share", "nginx", "html", app.Name)
-	appConfigDir := filepath.Join(outputDir, "etc", "nginx", "conf.d", "apps", app.Name)
+	appDir := filepath.Join(outputDir, "usr", "share", "nginx", "html", app.Slug)
+	appConfigDir := filepath.Join(outputDir, "etc", "nginx", "conf.d", "apps", app.Slug)
 
 	// Create app directories
 	dirs := []string{appDir, appConfigDir}
@@ -220,166 +188,38 @@ func ProcessSpaAssets(app config.App, spaDir, outputDir string) error {
 		return fmt.Errorf("failed to copy SPA files: %w", err)
 	}
 
+	//TODO: do this for all html files
 	// Fix base href in index.html
 	indexPath := filepath.Join(appDir, "index.html")
 	if _, err := os.Stat(indexPath); err == nil {
-		content, err := os.ReadFile(indexPath)
-		if err != nil {
-			return fmt.Errorf("failed to read index.html: %w", err)
-		}
-
-		// Update base href
-		contentStr := string(content)
-		baseHrefRegex := regexp.MustCompile(`<base href="[^"]*"`)
-
-		// Determine the base href value based on the path
 		baseHrefValue := "/"
 		if app.Path != "/" {
-			baseHrefValue = fmt.Sprintf("/%s/", app.Path)
+			baseHrefValue = fmt.Sprintf("/%s/", normalizePath(app.Path))
 		}
 
-		if baseHrefRegex.MatchString(contentStr) {
-			contentStr = baseHrefRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<base href="%s"`, baseHrefValue))
-		} else {
-			// If base href doesn't exist, add it
-			headRegex := regexp.MustCompile(`<head>`)
-			contentStr = headRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<head>
-    <base href="%s" />`, baseHrefValue))
-		}
-
-		if err := os.WriteFile(indexPath, []byte(contentStr), 0644); err != nil {
-			return fmt.Errorf("failed to write index.html: %w", err)
+		if err := FixBaseHref(indexPath, baseHrefValue); err != nil {
+			return fmt.Errorf("failed to fix base href: %w", err)
 		}
 	}
 
-	// Find and process JS files
-	jsFiles, err := findHashedFiles(filepath.Join(appDir, "assets"), ".js", app.Name)
-	if err != nil {
-		return fmt.Errorf("failed to find JS files: %w", err)
-	}
-
-	// Update the AppPath field for each JS file
-	for i := range jsFiles {
-		jsFiles[i].AppPath = app.Path
-	}
-
-	// Find and process CSS files
-	cssFiles, err := findHashedFiles(filepath.Join(appDir, "assets"), ".css", app.Name)
-	if err != nil {
-		return fmt.Errorf("failed to find CSS files: %w", err)
-	}
-
-	// Update the AppPath field for each CSS file
-	for i := range cssFiles {
-		cssFiles[i].AppPath = app.Path
-	}
-
-	// Generate JS and CSS configurations
-	if len(jsFiles) > 0 || len(cssFiles) > 0 {
-		assetsConfPath := filepath.Join(appConfigDir, "assets.conf")
-		assetsConfFile, err := os.Create(assetsConfPath)
-		if err != nil {
-			return fmt.Errorf("failed to create assets.conf: %w", err)
-		}
-		defer assetsConfFile.Close()
-
-		// Process JS files
-		for _, jsFile := range jsFiles {
-			tmpl, err := template.New("js.conf").Parse(jsConfTemplate)
-			if err != nil {
-				return fmt.Errorf("failed to parse JS template: %w", err)
-			}
-
-			if err := tmpl.Execute(assetsConfFile, jsFile); err != nil {
-				return fmt.Errorf("failed to execute JS template: %w", err)
-			}
-		}
-
-		// Process CSS files
-		for _, cssFile := range cssFiles {
-			tmpl, err := template.New("css.conf").Parse(cssConfTemplate)
-			if err != nil {
-				return fmt.Errorf("failed to parse CSS template: %w", err)
-			}
-
-			if err := tmpl.Execute(assetsConfFile, cssFile); err != nil {
-				return fmt.Errorf("failed to execute CSS template: %w", err)
-			}
-		}
-	}
-
-	// Check if locales directory exists
-	localesDir := filepath.Join(appDir, "locales")
-	if _, err := os.Stat(localesDir); err == nil {
-		localesConfPath := filepath.Join(appConfigDir, "locales.conf")
-		localesConfFile, err := os.Create(localesConfPath)
-		if err != nil {
-			return fmt.Errorf("failed to create locales.conf: %w", err)
-		}
-		defer localesConfFile.Close()
-
-		// Create locales configuration
-		tmpl, err := template.New("locales.conf").Parse(localesConfTemplate)
-		if err != nil {
-			return fmt.Errorf("failed to parse locales template: %w", err)
-		}
-
-		data := struct {
-			AppName string
-			AppPath string
-		}{
-			AppName: app.Name,
-			AppPath: app.Path,
-		}
-
-		if err := tmpl.Execute(localesConfFile, data); err != nil {
-			return fmt.Errorf("failed to execute locales template: %w", err)
-		}
+	// Generate a single dynamic locations.conf
+	locationsConfPath := filepath.Join(appConfigDir, "locations.conf")
+	if err := GenerateNginxLocations(app, appDir, locationsConfPath); err != nil {
+		return fmt.Errorf("failed to generate dynamic locations.conf: %w", err)
 	}
 
 	return nil
 }
 
-// findHashedFiles finds hashed files in a directory
-func findHashedFiles(dir, ext string, appName string) ([]AssetInfo, error) {
-	var assets []AssetInfo
-
-	// Regular expression to match hashed filenames (e.g., index-CgbRfOA8.js)
-	re := regexp.MustCompile(`^([a-zA-Z0-9_-]+)-([a-zA-Z0-9]+)(\.[a-zA-Z0-9]+)$`)
-
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		if os.IsNotExist(err) {
-			// If the directory doesn't exist, return an empty slice
-			return assets, nil
-		}
-		return nil, fmt.Errorf("failed to read directory %s: %w", dir, err)
+func CleanDeployDir(deployDir string) error {
+	if _, err := os.Stat(deployDir); os.IsNotExist(err) {
+		return nil
 	}
 
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-
-		fileName := entry.Name()
-		if !strings.HasSuffix(fileName, ext) {
-			continue
-		}
-
-		matches := re.FindStringSubmatch(fileName)
-		if len(matches) == 4 {
-			baseName := matches[1]
-			assets = append(assets, AssetInfo{
-				AppName:   appName,
-				AppPath:   "", // This will be set by the caller
-				BaseName:  baseName,
-				FileName:  fileName,
-				Extension: ext,
-			})
-		}
+	if err := os.RemoveAll(deployDir); err != nil {
+		return fmt.Errorf("failed to remove directory %s: %w", deployDir, err)
 	}
-
-	return assets, nil
+	return nil
 }
 
 // copyDir copies a directory recursively

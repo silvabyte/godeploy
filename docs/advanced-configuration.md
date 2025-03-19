@@ -8,7 +8,7 @@ Level up your SPA containerization with **multi-app support**, **custom Docker o
 
 Host **multiple SPAs under one domain**, each on its own route — great for dashboards, admin panels, or microsites.
 
-### Example `spa-config.json`
+### Example `godeploy.config.json`
 
 ```json
 {
@@ -54,9 +54,9 @@ Host **multiple SPAs under one domain**, each on its own route — great for das
 
 ### 🌍 Global Option
 
-| Option                       | Description                                           |
-| ---------------------------- | ----------------------------------------------------- |
-| `--config="spa-config.json"` | Use a custom config file (default: `spa-config.json`) |
+| Option                            | Description                                                |
+| --------------------------------- | ---------------------------------------------------------- |
+| `--config="godeploy.config.json"` | Use a custom config file (default: `godeploy.config.json`) |
 
 ---
 
@@ -98,24 +98,24 @@ Scaffold a default config quickly.
 godeploy init [options]
 ```
 
-| Option        | Description                          |
-| ------------- | ------------------------------------ |
-| `-f, --force` | Overwrite existing `spa-config.json` |
+| Option        | Description                               |
+| ------------- | ----------------------------------------- |
+| `-f, --force` | Overwrite existing `godeploy.config.json` |
 
 ---
 
 ## ✅ Complete CLI Reference
 
-| Command                              | Description                                         |
-| ------------------------------------ | --------------------------------------------------- |
-| `godeploy init`                      | Create default `spa-config.json`                    |
-| `godeploy init --force`              | Overwrite existing config                           |
-| `godeploy serve`                     | Serve SPA locally via Docker (port 8082)            |
-| `godeploy serve --port <port>`       | Use custom port                                     |
-| `godeploy serve --image-name <name>` | Use custom Docker image name                        |
-| `godeploy package`                   | Generate containerized Docker + Nginx setup         |
-| `godeploy package --output <dir>`    | Output to custom directory (default: `deploy/`)     |
-| `godeploy --config <file>`           | Use custom config file (default: `spa-config.json`) |
+| Command                              | Description                                              |
+| ------------------------------------ | -------------------------------------------------------- |
+| `godeploy init`                      | Create default `godeploy.config.json`                    |
+| `godeploy init --force`              | Overwrite existing config                                |
+| `godeploy serve`                     | Serve SPA locally via Docker (port 8082)                 |
+| `godeploy serve --port <port>`       | Use custom port                                          |
+| `godeploy serve --image-name <name>` | Use custom Docker image name                             |
+| `godeploy package`                   | Generate containerized Docker + Nginx setup              |
+| `godeploy package --output <dir>`    | Output to custom directory (default: `deploy/`)          |
+| `godeploy --config <file>`           | Use custom config file (default: `godeploy.config.json`) |
 
 ---
 
@@ -154,7 +154,7 @@ Need more control over Nginx?
 
 ### 1. **Config-Driven, Zero-Code Setup**
 
-- Define each SPA and source directory in `spa-config.json`.
+- Define each SPA and source directory in `godeploy.config.json`.
 - Supports **multi-app routing** out of the box.
 
 ---
