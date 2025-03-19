@@ -3,7 +3,7 @@ import fp from 'fastify-plugin';
 import rateLimit from '@fastify/rate-limit';
 
 // Keep only the most critical suspicious paths
-const SUSPICIOUS_PATHS = [
+export const SUSPICIOUS_PATHS = [
   '/.env',
   '/.git/config',
   '/.ssh/id_rsa',
@@ -11,7 +11,7 @@ const SUSPICIOUS_PATHS = [
   '/phpmyadmin',
 ];
 
-const blockedIPs = new Set<string>();
+export const blockedIPs = new Set<string>();
 
 /**
  * This plugins adds minimal rate limit support
@@ -39,26 +39,26 @@ export default fp(async function (fastify: FastifyInstance) {
     }
   );
 
-  // Keep minimal protection against obvious abuse attempts
-  fastify.addHook('onRequest', async (request, reply) => {
-    const ip = request.ip;
+  // // Keep minimal protection against obvious abuse attempts
+  // fastify.addHook('onRequest', async (request, reply) => {
+  //   const ip = request.ip;
 
-    // Block already flagged IPs
-    if (blockedIPs.has(ip)) {
-      return reply.code(429).send({ message: 'Too Many Requests' });
-    }
+  //   // Block already flagged IPs
+  //   if (blockedIPs.has(ip)) {
+  //     return reply.code(429).send({ message: 'Too Many Requests' });
+  //   }
 
-    // Only check for the most suspicious paths
-    if (SUSPICIOUS_PATHS.some((path) => request.url.includes(path))) {
-      request.log.debug(
-        `Suspicious request detected from IP: ${ip} - ${request.url}`
-      );
-      // Block IP after detection
-      blockedIPs.add(ip);
+  //   // Only check for the most suspicious paths
+  //   if (SUSPICIOUS_PATHS.some((path) => request.url.includes(path))) {
+  //     request.log.debug(
+  //       `Suspicious request detected from IP: ${ip} - ${request.url}`
+  //     );
+  //     // Block IP after detection
+  //     blockedIPs.add(ip);
 
-      return reply
-        .code(429)
-        .send({ message: 'Blocked due to suspicious activity' });
-    }
-  });
+  //     return reply
+  //       .code(429)
+  //       .send({ message: 'Blocked due to suspicious activity' });
+  //   }
+  // });
 });
