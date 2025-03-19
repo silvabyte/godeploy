@@ -1,24 +1,37 @@
-import telemetry from 'telemetry-sh';
+import pino from 'pino';
 
 export class Logger {
-  private logger: typeof telemetry;
-  constructor(key: string, logger: typeof telemetry = telemetry) {
-    this.logger = telemetry;
-    this.logger.init(key);
+  level: string;
+  private logger: pino.Logger;
+  constructor(logger: pino.Logger = pino(), level: string = 'info') {
+    this.logger = logger;
+    this.level = level;
   }
-  info(data: unknown, message: string) {
-    this.logger.log(message, data);
+  setLevel(level: string) {
+    this.level = level;
   }
-  error(error: Error, data: unknown, message?: string) {
-    this.logger.log(message ?? error.message, {
-      error,
-      ...(data as Record<string, unknown>),
-    });
+  info(data: unknown, message?: string) {
+    this.logger.info(data, message);
   }
-  warn(data: unknown, message: string) {
-    this.logger.log(message, data);
+  error(error: unknown, message?: string) {
+    this.logger.error(error, message);
   }
-  debug(data: unknown, message: string) {
-    this.logger.log(message, data);
+  warn(data: unknown, message?: string) {
+    this.logger.warn(data, message);
+  }
+  debug(data: unknown, message?: string) {
+    this.logger.debug(data, message);
+  }
+  trace(data: unknown, message?: string) {
+    this.logger.trace(data, message);
+  }
+  fatal(error: unknown) {
+    this.logger.fatal(error);
+  }
+  silent(data: unknown, message?: string) {
+    this.logger.silent(data, message);
+  }
+  child(bindings: pino.Bindings, options?: pino.ChildLoggerOptions) {
+    return new Logger(this.logger.child(bindings, options));
   }
 }

@@ -12,7 +12,6 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 38444;
-const telemetryKey = process.env.TELEMETRY_KEY;
 
 // Extend FastifyRequest to include user property
 declare module 'fastify' {
@@ -41,11 +40,11 @@ declare module 'fastify' {
   }
 }
 
-const logger = new Logger(telemetryKey as string);
+const logger = new Logger();
 
 // Instantiate Fastify with some config
 const server = Fastify({
-  logger: true,
+  loggerInstance: logger,
 });
 
 const headerMasked = (
@@ -99,9 +98,12 @@ server.decorateRequest('resetMeasure', function () {
 
 server.addHook('onRequest', (request, reply, done) => {
   request.measure.start('request', {
+    requestId: request.headers['x-request-id'] ?? request.id,
     url: request.url,
     method: request.method,
     headers: headerMasked(request.headers),
+    ...(request.user?.user_id && { user_id: request.user.user_id }),
+    ...(request.user?.tenant_id && { tenant_id: request.user.tenant_id }),
   });
   done();
 });

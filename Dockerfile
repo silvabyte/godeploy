@@ -18,4 +18,4 @@ COPY . .
 # Expose the port
 EXPOSE 80
 
-CMD [ "node_modules/.bin/tsx", "src/main.ts" ]
+CMD [ "./run.sh" ]
