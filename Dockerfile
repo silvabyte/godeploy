@@ -1,10 +1,12 @@
-
 FROM docker.io/node:lts-alpine
 
 ENV APP_URL=https://api.godeploy.app    
 ENV PORT=80
 
+RUN apk add --no-cache bash
 
+# Create and set working directory
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
@@ -15,10 +17,7 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
-COPY run.sh .
-RUN chmod +x run.sh
-
 # Expose the port
 EXPOSE 80
 
-CMD [ "./run.sh" ]
+CMD [ "sh", "/app/scripts/run.sh" ]
