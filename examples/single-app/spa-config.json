@@ -1,0 +1,10 @@
+{
+    "apps": [
+        {
+            "name": "single-app",
+            "source_dir": "build",
+            "description": "Single application",
+            "enabled": true
+        }
+    ]
+}

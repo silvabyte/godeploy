@@ -72,11 +72,20 @@ http {
     }
     {{else}}
     # Non-root path configuration
-    location /{{.Path}}/ {
+    {{$path := .Path}}
+    {{if hasPrefix $path "/"}}
+    location {{$path}}/ {
         alias   /usr/share/nginx/html/{{.Name}}/;
         try_files $uri $uri/ /{{.Name}}/index.html;
         add_header Cache-Control "no-store, no-cache, must-revalidate";
     }
+    {{else}}
+    location /{{$path}}/ {
+        alias   /usr/share/nginx/html/{{.Name}}/;
+        try_files $uri $uri/ /{{.Name}}/index.html;
+        add_header Cache-Control "no-store, no-cache, must-revalidate";
+    }
+    {{end}}
     {{end}}
     {{end}}
 }
@@ -178,7 +187,10 @@ func GenerateNginxConfigs(spaConfig *config.SpaConfig, outputDir string) error {
 	}
 
 	// Generate default.conf
-	tmpl, err := template.New("default.conf").Parse(defaultConfTemplate)
+	funcMap := template.FuncMap{
+		"hasPrefix": strings.HasPrefix,
+	}
+	tmpl, err := template.New("default.conf").Funcs(funcMap).Parse(defaultConfTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to parse default.conf template: %w", err)
 	}
@@ -239,7 +251,7 @@ func ProcessSpaAssets(app config.App, spaDir, outputDir string) error {
 		}
 
 		if baseHrefRegex.MatchString(contentStr) {
-			contentStr = baseHrefRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<base href="%s"`, baseHrefValue))
+			contentStr = baseHrefRegex.ReplaceAllString(contentStr, fmt.Sprintf(`<base href="%s" />`, baseHrefValue))
 		} else {
 			// If base href doesn't exist, add it
 			headRegex := regexp.MustCompile(`<head>`)
