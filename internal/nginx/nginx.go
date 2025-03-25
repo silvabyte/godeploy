@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/audetic/godeploy/pkg/config"
+	"github.com/audetic/godeploy/internal/config"
 	"github.com/yarlson/pin"
 )
 

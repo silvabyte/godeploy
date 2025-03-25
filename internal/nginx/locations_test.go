@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/audetic/godeploy/pkg/config"
-	"github.com/audetic/godeploy/pkg/nginx"
+	"github.com/audetic/godeploy/internal/config"
+	"github.com/audetic/godeploy/internal/nginx"
 )
 
 func TestGenerateNginxLocations(t *testing.T) {

@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/alecthomas/kong"
-	"github.com/audetic/godeploy/pkg/api"
-	"github.com/audetic/godeploy/pkg/archive"
-	"github.com/audetic/godeploy/pkg/auth"
-	"github.com/audetic/godeploy/pkg/config"
-	"github.com/audetic/godeploy/pkg/docker"
-	"github.com/audetic/godeploy/pkg/nginx"
+	"github.com/audetic/godeploy/internal/api"
+	"github.com/audetic/godeploy/internal/archive"
+	"github.com/audetic/godeploy/internal/auth"
+	"github.com/audetic/godeploy/internal/config"
+	"github.com/audetic/godeploy/internal/docker"
+	"github.com/audetic/godeploy/internal/nginx"
 	"github.com/yarlson/pin"
 )
 

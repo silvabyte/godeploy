@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/audetic/godeploy/pkg/config"
+	"github.com/audetic/godeploy/internal/config"
 )
 
 // Location represents an Nginx location block.
