@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.1] - 2025-03-29
+
+* chore: remove dated architecture doc
+* feat: add make test on ci
+* feat: refactor auth callback templates
+* chore: update readme
+* chore: add architecture document
+* refactor: pkg to internal
+* chore: add ignore cursor config files
+* fix: multi-app config path
+* chore: release v0.2.0
+
 ## [0.2.0] - 2025-03-19
 
 * chore: update readme
