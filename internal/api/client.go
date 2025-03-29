@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/audetic/godeploy/pkg/auth"
+	"github.com/audetic/godeploy/internal/auth"
 )
 
 const (

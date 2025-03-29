@@ -20,7 +20,7 @@ all: test build
 
 # Run tests
 test: 
-	$(GOTEST) 
+	$(GOTEST) -v ./...
 
 # Build the project
 build: 

@@ -1,225 +1,117 @@
-# 🚀 GoDeploy — Effortless SPA Packaging & Deployment
+# GoDeploy — Effortless Web App Packaging & Deployment
 
-> **Simple, fast, and flexible Docker + Nginx containerization for SPAs.**  
-> **No full-stack frameworks. No infrastructure headaches. Just ship.**
+GoDeploy makes it simple to package and serve browser-based applications as production-ready Docker + Nginx containers. Ship any static frontend — React, Vue, Angular, Svelte, client-side games, static sites like blogs — without SSR or complex infrastructure.
 
----
+## About
 
-## ✨ What Is GoDeploy?
+GoDeploy is designed to make deploying your web applications fast and straightforward. Package your app into a Docker + Nginx container for self-hosting or deploy directly to GoDeploy’s zero-infrastructure hosting.
 
-GoDeploy makes it **dead-simple to package and serve SPAs (Single Page Applications)** as production-ready Docker + Nginx containers.  
-Ship any static frontend — **React, Vue, Angular, Svelte** — without SSR or complex infrastructure.
+- OSS CLI for self-hosted deployments.
+- SaaS option for fast, zero-config hosting with HTTPS and global CDN.
 
-- **OSS CLI** to **self-host** your SPAs in Docker.
-- **Optional SaaS** to deploy instantly to GoDeploy’s zero-infrastructure hosting.  
-  👉 [See `godeploy deploy` docs for SaaS users →](docs/deploy.md)
+## OSS Features
 
-## ⚡ Quick Start — Self-Hosted (OSS)
+- Browser-first deployment: Supports any app that can run in the browser (SPAs, client-side JS games, static sites, etc.).
+- Framework agnostic: Works with React, Vue, Angular, Svelte, and more.
+- Simple packaging: Creates a Docker + Nginx setup.
+- Local preview: Serve your app locally in a Docker container.
+- Performance optimized: Proper cache control and hashing for optimal browser performance. Fast and secure with global CDN support.
 
-1️⃣ **Install GoDeploy**
+## Pro Features
 
-```bash
-curl -sSL https://install--7c574f3c-862a-4bc5-89d4-b1f11aaac65f.spa.godeploy.app/now.sh | bash
-# OR
-go install github.com/audetic/godeploy/cmd/godeploy@latest
-```
+- Zero-infrastructure hosting: Instantly deploy to GoDeploy’s servers.
+- Automatic HTTPS: Secure, live URL with zero configuration.
+- Global CDN: Fast, reliable static file delivery.
+- Multi-app support: Serve multiple apps under one domain.
 
-2️⃣ **Build your SPA**
+## Quick Start
 
-```bash
-npm run build  # React, Vue, Angular, etc.
-```
-
-3️⃣ **Init & Configure**
+1. Install GoDeploy
 
 ```bash
-godeploy init
+curl -sSL https://install.godeploy.app/now.sh | bash
 ```
 
-Edit `godeploy.config.json` to set `source_dir` to your app's production build folder, eg: `dist`
-
-```json
-{ "apps": [{ "name": "your-app", "source_dir": "dist", "path": "/", "description": "Single application", "enabled": true }] }
-```
-
-4️⃣ **Run Locally**
+2. Build your app
 
 ```bash
-godeploy serve
+npm run build
 ```
 
-➡️ [localhost:8082](http://localhost:8082)
-
-5️⃣ **Package & Deploy**
+3. Deploy
 
 ```bash
-godeploy package
-cd deploy && docker build -t my-app . && docker run -p 80:80 my-app
+godeploy deploy --project my-app
 ```
 
-Done. 🚀
-
----
-
-## 🎯 Examples
-
-Want to see GoDeploy in action? Check out our example implementations:
-
-- **[Multi-App Demo](examples/multi-app)** - Deploy multiple SPAs under one domain:
-
-  - Home app at `/`
-  - Dashboard at `/dashboard`
-  - Auth portal at `/auth`
-
-- **[Single-App Demo](examples/single-app)** - Basic single SPA deployment
-
-To run the demos:
-
-```bash
-# For multi-app demo
-cd examples/multi-app && make run-demo
-
-# For single-app demo
-cd examples/single-app && make run-demo
-```
-
-See [examples/README.md](examples/README.md) for detailed instructions and prerequisites.
-
----
-
-## 🔧 Full CLI Reference
-
-| Command                           | Description                                       |
-| --------------------------------- | ------------------------------------------------- |
-| `godeploy init`                   | Scaffold default `godeploy.config.json`           |
-| `godeploy serve`                  | Serve SPA locally via Docker (default: port 8082) |
-| `godeploy package`                | Create container-ready Docker + Nginx setup       |
-| `godeploy auth login --email <e>` | (SaaS) Authenticate for `godeploy deploy`         |
-| `godeploy deploy`                 | (SaaS) Instantly deploy to GoDeploy hosting       |
-
-> ℹ️ **Self-hosting?** Only `init`, `serve`, and `package` needed.  
-> 💥 **Want zero-infra hosting?** Use `godeploy deploy` — see below!
-
----
-
-## ✅ Requirements
-
-- **Go 1.16+**
-- **Docker** (for `serve` and `package`)
-
----
-
-## 🌐 **Instant SPA Hosting with `godeploy deploy` (SaaS)**
-
-> **Don’t want to manage servers?** Use GoDeploy’s hosted service.  
-> Get a live, HTTPS, CDN-backed URL in seconds.
-
-```bash
-godeploy auth login --email=you@example.com  # First time only
-godeploy deploy
-```
-
-✅ Example:
+Your app is live at:
 
 ```
-Successfully deployed!
-🌍 URL: https://my-app.godeploy.app
+https://my-app-12345.godeploy.app
 ```
 
-➡️ [Read Full Deploy Docs →](docs/deploy.md)
+Or if you are using the OSS
 
----
-
-## 🤯 Why Use GoDeploy?
-
-| Frustration                             | GoDeploy Solution                         |
-| --------------------------------------- | ----------------------------------------- |
-| "I don't want Next.js/Remix for static" | Pure static SPA deploy, no SSR required   |
-| "I hate writing Docker + Nginx config"  | Auto-generated container and server setup |
-| "I just want to ship fast"              | One command to package, serve, or deploy  |
-| "I need multiple SPAs under one domain" | Built-in multi-SPA routing in config      |
-
----
-
-## ✨ Features at a Glance
-
-### ✅ 1. **Fast SPA Containerization**
-
-Go from build to container-ready:
+3.1 Package your app into a docker container
 
 ```bash
 godeploy package
 ```
 
-➡️ Output:
+Your app's Dockerfile and assets are now available in `./deploy` directory.
+Deploy your container to where ever you'd like. We'd recommend digital ocean for $5/month.
 
-- Dockerfile
-- Nginx config
-- Ready-to-ship SPA
+## Why GoDeploy?
 
----
+| Problem                      | GoDeploy Solution                |
+| ---------------------------- | -------------------------------- |
+| Complex deployment processes | One-command deploy               |
+| Full-stack platform lock-in  | Works with any browser-based app |
+| Server setup and management  | Managed, zero-config hosting     |
+| Setting up HTTPS and CDN     | Automatic with GoDeploy          |
 
-### ✅ 2. **Local Docker Preview**
+## Pro and OSS Comparison
 
-Instant production-like local preview:
+| Feature                           | OSS | Pro (SaaS) |
+| --------------------------------- | --- | ---------- |
+| Self-hosting with Docker          | Yes | No         |
+| Instant deploy with HTTPS and CDN | No  | Yes        |
+| Automatic subdomains              | No  | Yes        |
+| Multi-app support                 | Yes | Yes        |
 
-```bash
-godeploy serve
-```
+## OSS FAQ
 
----
+**What type of performance can I expect for my SPA using Nginx?**
+Running your SPA on a $5 DigitalOcean droplet with Nginx can deliver impressive performance, thanks to Nginx's efficiency in handling static content. Example stats from similar setups include:
 
-### ✅ 3. **Raw Nginx Performance**
+- **Requests per second:** Over 10,000 req/sec for static file serving.
+- **Response time:** Typically under 10ms for cached content.
+- **Throughput:** Handles thousands of concurrent connections without degradation.
+- **CPU usage:** Minimal due to Nginx's asynchronous, event-driven architecture.
 
-- **50,000+ req/sec** static file serving.
-- **Optimized cache headers**.
-- **HTML5 history mode routing**.
-- CDN-friendly — works perfectly with Cloudflare, Fastly, etc.
+This makes GoDeploy highly suitable for content-heavy SPAs, client-side games, and static websites with high traffic, without the need for expensive infrastructure.
 
----
+**How is GoDeploy better than putting your files in an S3 bucket?**
+While S3 can host static files, GoDeploy offers more robust application serving through Nginx, including features like caching, automatic HTTPS, and routing. Additionally, GoDeploy handles multi-app configurations under one domain, making it ideal for dashboards, admin panels, and other multi-SPA setups. With GoDeploy, you get both local development support and global CDN-backed production hosting without configuring AWS services manually.
 
-### ✅ 4. **Framework Agnostic**
+**Why use Nginx?**
+Nginx is a high-performance web server that excels at serving static content. It efficiently handles large numbers of concurrent connections and provides fast content delivery, making it an ideal choice for static web apps. Additionally, it supports caching and reverse proxying, further improving performance and scalability.
 
-Works with any SPA stack:
+**Do I need to rewrite my app to use GoDeploy?**
+No. GoDeploy works with any web app that builds to static files.
 
-- React, Vue, Angular, Svelte, Solid, Astro (static mode).
-- No full-stack lock-in.
+**What makes GoDeploy different from Vercel/Netlify?**
+GoDeploy focuses on static web app deployment, offering simplicity without SSR.
 
----
+**Can I deploy to my own server?**
+Yes. Use the OSS CLI to package your app as a Docker container.
 
-### ✅ 5. **Multi-SPA Support (Monorepo Friendly)**
+## Pro FAQ
 
-Serve multiple SPAs under one domain:
+**How does GoDeploy handle HTTPS?**
+GoDeploy automatically provisions HTTPS certificates through Let's Encrypt, ensuring your app is secure by default without any manual configuration.
 
-```json
-{
-  "apps": [
-    { "name": "main", "source_dir": "dist", "path": "/" },
-    { "name": "admin", "source_dir": "admin-dist", "path": "/admin" }
-  ]
-}
-```
+**How can I manage multiple apps with Pro?**
+With Pro, each project is treated as a separate app and gets its own domain or subdomain. This setup is ideal when your apps need to be hosted independently or have different configurations. In contrast, the OSS version supports serving multiple apps from the same origin domain, making it easier to host multiple SPAs together.
 
-## 📖 More Resources
-
-- [Advanced Multi-SPA Config](docs/advanced-configuration.md)
-- [Deploy Command Docs (SaaS)](docs/deploy.md)
-
----
-
-## 📝 License
-
-MIT
-
----
-
-## ⭐️ Support the Project
-
-If you find GoDeploy useful:
-
-- ⭐️ [Star us on GitHub](https://github.com/matsilva/godeploy)
-- Share with other frontend devs
-
----
-
-> **GoDeploy — Package and ship SPAs like it's 2017. No SSR, no drama.**
+**What kind of analytics are available with GoDeploy?** GoDeploy provides analytics to track deployment success and usage. More advanced DORA related analytics are planned for future releases.
