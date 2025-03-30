@@ -1,4 +1,6 @@
 # GoDeploy — Effortless Web App Packaging & Deployment
+[![CI](https://github.com/matsilva/godeploy/actions/workflows/go.yml/badge.svg)](https://github.com/matsilva/godeploy/actions/workflows/go.yml)
+[![Release: Automated with xrelease](https://img.shields.io/badge/Release-Automated%20with%20xrelease-blueviolet?logo=github&logoColor=white)](https://github.com/matsilva/xrelease)
 
 GoDeploy makes it simple to package and serve browser-based applications as production-ready Docker + Nginx containers. Ship any static frontend — React, Vue, Angular, Svelte, client-side games, static sites like blogs — without SSR or complex infrastructure.
 
