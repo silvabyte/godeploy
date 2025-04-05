@@ -6,6 +6,7 @@
   "scripts": {
     "test": "vitest run",
     "test:smoke": "tsx src/smoke-tests/deploy.smoke.ts",
+    "test:auth": "tsx src/smoke-tests/auth.smoke.ts",
     "start": "tsx src/main.ts",
     "dev": "tsx watch src/main.ts",
     "format": "npx -y prettier . --write",

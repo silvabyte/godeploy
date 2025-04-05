@@ -15,7 +15,7 @@ declare module 'fastify' {
 
 const dbPlugin: FastifyPluginAsync = async (fastify) => {
   // Initialize services
-  const db = new DatabaseService();
+  const db = new DatabaseService(fastify.supabase);
 
   // Decorate fastify with our services
   fastify.decorate('db', db);

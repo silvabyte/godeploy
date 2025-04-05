@@ -119,36 +119,81 @@ export default async function (fastify: FastifyInstance) {
 
   // Endpoint to verify a token (useful for CLI to check if token is valid)
   fastify.get('/api/auth/verify', {
-    ...routeSchemas.authVerify,
     handler: async (request: FastifyRequest, reply: FastifyReply) => {
       request.measure.start('auth_verify');
 
-      request.measure.add('extract_bearer_token');
-      const tokenResult = extractBearerToken(request.headers.authorization);
+      try {
+        // Extract token from authorization header
+        if (!request.headers.authorization) {
+          request.measure.failure('Missing authorization header');
+          return reply.code(401).send({
+            valid: false,
+            error: 'Missing authorization header',
+          });
+        }
 
-      if (tokenResult.error) {
-        request.measure.failure(tokenResult.error);
-        return reply.code(401).send({
+        const parts = request.headers.authorization.split(' ');
+        if (parts.length !== 2 || parts[0] !== 'Bearer') {
+          request.measure.failure('Invalid authorization format');
+          return reply.code(401).send({
+            valid: false,
+            error: 'Invalid authorization format',
+          });
+        }
+
+        const token = parts[1];
+
+        // Use Supabase client directly for token verification
+        request.measure.add('verify_token');
+        const { data, error } = await fastify.supabase.auth.getUser(token);
+
+        if (error || !data.user) {
+          const errorMsg = error?.message || 'Invalid token';
+          request.measure.failure(errorMsg);
+          return reply.code(401).send({
+            valid: false,
+            error: errorMsg,
+          });
+        }
+
+        // Get tenant info for this user
+        request.measure.add('get_tenant_info');
+        const { data: userData, error: userError } = await fastify.supabase
+          .from('users')
+          .select('tenant_id')
+          .eq('id', data.user.id)
+          .single();
+
+        if (userError || !userData) {
+          request.measure.failure('User not found');
+          return reply.code(401).send({
+            valid: false,
+            error: 'User not found',
+          });
+        }
+
+        // Return successful response
+        request.measure.success();
+        return reply.code(200).send({
+          valid: true,
+          user: {
+            id: data.user.id,
+            email: data.user.email || '',
+            tenant_id: userData.tenant_id,
+          },
+        });
+      } catch (error) {
+        // Ensure all errors include the 'valid' property
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        request.log.error('Auth verification error', { error: errorMessage });
+        request.measure.failure(errorMessage);
+
+        return reply.code(500).send({
           valid: false,
-          error: tokenResult.error,
+          error: 'Error verifying token',
         });
       }
-
-      const result = await request.db.auth.getUserByToken(tokenResult.data!);
-
-      if (result.error || !result.data) {
-        request.measure.failure(result.error || 'Unauthorized: Invalid token');
-        return reply.code(401).send({
-          valid: false,
-          error: result.error || 'Unauthorized: Invalid token',
-        });
-      }
-
-      request.measure.success();
-      return reply.code(200).send({
-        valid: true,
-        user: result.data,
-      });
     },
   });
 }
