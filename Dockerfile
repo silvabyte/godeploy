@@ -3,7 +3,7 @@ FROM docker.io/node:lts-alpine
 ENV APP_URL=https://api.godeploy.app    
 ENV PORT=80
 
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash zip unzip
 
 # Create and set working directory
 WORKDIR /app

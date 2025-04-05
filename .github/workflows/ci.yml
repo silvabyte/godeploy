@@ -20,46 +20,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
+        run: npm install
 
       - name: Test
         run: npm test
-
-  deploy:
-    needs: build
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      # - name: Build
-      #   run: npm run build
-
-      # - name: Deploy to DigitalOcean
-      #   uses: digitalocean/app_action@v1.1.5
-      #   with:
-      #     app_name: godeploy-api
-      #     token: ${{ secrets.DIGITALOCEAN_TOKEN }}
-      #     images: |
-      #       [
-      #         {
-      #           "name": "godeploy-api",
-      #           "registry_type": "DOCKER_HUB",
-      #           "registry": "registry.digitalocean.com/godeploy",
-      #           "repository": "godeploy-api",
-      #           "tag": "${{ github.sha }}"
-      #         }
-      #       ]

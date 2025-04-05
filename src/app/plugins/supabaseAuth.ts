@@ -38,8 +38,10 @@ export default fp(async (fastify) => {
   fastify.addHook(
     'preHandler',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      // Skip auth for routes that don't need it
-      if (request.routeOptions.config?.auth === false) {
+      if (
+        !request.routeOptions.schema?.security ||
+        request.routeOptions.schema?.security.length === 0
+      ) {
         logAuth(request, 'Auth skipped for route with auth:false config');
         return;
       }

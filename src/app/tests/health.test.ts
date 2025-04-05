@@ -1,7 +1,16 @@
-import { test } from 'node:test';
-import assert from 'node:assert';
+import { expect, describe, it, beforeAll } from 'vitest';
+import { buildApp } from '../build/build';
 
-test('Health check', async () => {
-  // This is a placeholder test that always passes
-  assert.strictEqual(1, 1);
+describe('Health check', async () => {
+  let server: Awaited<ReturnType<typeof buildApp>>;
+  beforeAll(async () => {
+    server = await buildApp();
+  });
+  it('should return 200', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/health',
+    });
+    expect(response.statusCode).toBe(200);
+  });
 });

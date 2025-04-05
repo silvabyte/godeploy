@@ -4,7 +4,8 @@
   "main": "src/main.ts",
   "type": "module",
   "scripts": {
-    "test": "node --test src/app/tests",
+    "test": "vitest run",
+    "test:smoke": "tsx src/smoke-tests/deploy.smoke.ts",
     "start": "tsx src/main.ts",
     "dev": "tsx watch src/main.ts",
     "format": "npx -y prettier . --write",
@@ -39,28 +40,39 @@
     "@types/uuid": "^10.0.0",
     "adm-zip": "^0.5.16",
     "archiver": "^6.0.2",
+    "await-to-js": "^3.0.0",
     "axios": "^1.8.3",
     "dotenv": "^16.4.7",
+    "execa": "^9.5.2",
     "fastify": "~5.2.1",
     "fastify-plugin": "~5.0.1",
     "flat": "^6.0.1",
     "form-data": "^4.0.2",
     "mkdirp": "^3.0.1",
+    "nanoid": "^5.1.5",
+    "ora": "^8.2.0",
     "pino": "^9.6.0",
     "rimraf": "^5.0.10",
     "slugify": "^1.6.6",
     "telemetry-sh": "^1.0.10",
     "tsx": "^4.19.3",
-    "uuid": "^11.1.0"
+    "undici": "^7.7.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.24.2",
+    "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
     "@types/node": "~18.16.9",
+    "@types/node-fetch": "^2.6.12",
+    "chalk": "^5.4.1",
     "husky": "^9.1.7",
     "prettier": "^2.6.2",
     "tslib": "^2.3.0",
-    "typescript": "~5.7.2"
+    "typescript": "~5.7.2",
+    "vitest": "^3.1.1",
+    "vitest-mock-extended": "^3.1.0"
   },
   "lint-staged": {
     "**/*": [

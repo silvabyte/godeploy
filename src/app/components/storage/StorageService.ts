@@ -1,13 +1,20 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { createReadStream, ReadStream } from 'fs';
 import { join } from 'path';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
-import * as crypto from 'crypto';
-import AdmZip from 'adm-zip';
-import { constructCdnUrl } from '../utils/urlUtils';
+import { to } from 'await-to-js';
+import { constructCdnUrl } from '../../utils/urlUtils';
+import { Zip } from './Zip';
+//TODO: ensure we use streams for all file operations to avoid inevitable nodejs memory issues
+// couple the above with plimit library to limit the number of concurrent file operations our server does at a time to avoid overloading the server
+
+interface Result<T> {
+  data: T | null;
+  error: string | null;
+}
 
 // DigitalOcean Spaces configuration
 const spacesEndpoint = process.env.DIGITAL_OCEAN_SPACES_ENDPOINT || '';
@@ -33,13 +40,14 @@ export class StorageService {
    * @param key Path within the bucket where the file will be stored
    * @param contentType MIME type of the file
    * @param cacheControl Cache-Control header value
+   * @returns Result containing the uploaded file URL or error message
    */
   async uploadFile(
     fileStream: ReadStream,
     key: string,
     contentType: string,
     cacheControl: string
-  ): Promise<string> {
+  ): Promise<Result<string>> {
     try {
       const upload = new Upload({
         client: s3Client,
@@ -53,13 +61,25 @@ export class StorageService {
         },
       });
 
-      await upload.done();
-      return `https://${bucketName}.${spacesEndpoint}/${key}`;
-    } catch (error: unknown) {
-      console.error('Error uploading file:', error);
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Failed to upload file: ${errorMessage}`);
+      const [uploadErr] = await to(upload.done());
+      if (uploadErr) {
+        return {
+          data: null,
+          error: `Failed to upload file: ${uploadErr.message}`,
+        };
+      }
+
+      return {
+        data: `https://${bucketName}.${spacesEndpoint}/${key}`,
+        error: null,
+      };
+    } catch (err) {
+      return {
+        data: null,
+        error: `Failed to upload file: ${
+          err instanceof Error ? err.message : 'Unknown error'
+        }`,
+      };
     }
   }
 
@@ -68,31 +88,53 @@ export class StorageService {
    * @param archivePath Path to the SPA zip archive
    * @param tenantId Tenant ID
    * @param projectName Project name for the subdomain
+   * @returns Result containing the CDN URL or error message
    */
   async processSpaArchive(
     archivePath: string,
     tenantId: string,
     projectName: string
-  ): Promise<string> {
+  ): Promise<Result<string>> {
     // Create a temporary directory to extract the archive
-    const tempDir = await fs.mkdtemp(join(os.tmpdir(), 'godeploy-'));
+    const [mkdirErr, tempDir] = await to(
+      fs.mkdtemp(join(os.tmpdir(), 'godeploy-'))
+    );
+    if (mkdirErr) {
+      return {
+        data: null,
+        error: `Failed to create temp directory: ${mkdirErr.message}`,
+      };
+    }
 
     try {
       // Extract the archive
-      const zip = new AdmZip(archivePath);
-      zip.extractAllTo(tempDir, true);
+      try {
+        await Zip.extract(archivePath, tempDir);
+      } catch (extractErr) {
+        return {
+          data: null,
+          error: `Failed to extract archive: ${
+            extractErr instanceof Error
+              ? extractErr.message
+              : 'Unknown zip error'
+          }`,
+        };
+      }
 
       // Upload all files with appropriate cache headers
       const baseKey = `spa-projects/${tenantId}/${projectName}`;
       const cdnUrl = constructCdnUrl(projectName, tenantId);
 
       // Process all files recursively
-      await this.uploadDirectory(tempDir, baseKey);
+      const uploadResult = await this.uploadDirectory(tempDir, baseKey);
+      if (uploadResult.error) {
+        return uploadResult;
+      }
 
-      return cdnUrl;
+      return { data: cdnUrl, error: null };
     } finally {
       // Clean up temporary directory
-      await fs.rm(tempDir, { recursive: true, force: true });
+      await to(fs.rm(tempDir, { recursive: true, force: true }));
     }
   }
 
@@ -100,12 +142,21 @@ export class StorageService {
    * Upload a directory recursively to DigitalOcean Spaces
    * @param dirPath Local directory path
    * @param baseKey Base key (path) in the bucket
+   * @returns Result indicating success or error
    */
   private async uploadDirectory(
     dirPath: string,
     baseKey: string
-  ): Promise<void> {
-    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+  ): Promise<Result<string>> {
+    const [readErr, entries] = await to(
+      fs.readdir(dirPath, { withFileTypes: true })
+    );
+    if (readErr) {
+      return {
+        data: null,
+        error: `Failed to read directory: ${readErr.message}`,
+      };
+    }
 
     for (const entry of entries) {
       const fullPath = path.join(dirPath, entry.name);
@@ -113,7 +164,10 @@ export class StorageService {
       const key = path.join(baseKey, relativePath).replace(/\\/g, '/');
 
       if (entry.isDirectory()) {
-        await this.uploadDirectory(fullPath, key);
+        const uploadResult = await this.uploadDirectory(fullPath, key);
+        if (uploadResult.error) {
+          return uploadResult;
+        }
       } else {
         // Determine content type based on file extension
         const contentType = this.getContentType(entry.name);
@@ -123,9 +177,19 @@ export class StorageService {
 
         // Upload the file
         const fileStream = createReadStream(fullPath);
-        await this.uploadFile(fileStream, key, contentType, cacheControl);
+        const uploadResult = await this.uploadFile(
+          fileStream,
+          key,
+          contentType,
+          cacheControl
+        );
+        if (uploadResult.error) {
+          return uploadResult;
+        }
       }
     }
+
+    return { data: '', error: null };
   }
 
   /**
