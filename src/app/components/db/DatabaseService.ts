@@ -13,8 +13,10 @@ export class DatabaseService {
   readonly deploys: DeployService;
   readonly subscriptions: SubscriptionService;
   readonly auth: AuthService;
+  readonly supabase: SupabaseClient;
 
   constructor(supabase: SupabaseClient) {
+    this.supabase = supabase;
     this.projects = new ProjectService();
     this.deploys = new DeployService();
     this.subscriptions = new SubscriptionService();

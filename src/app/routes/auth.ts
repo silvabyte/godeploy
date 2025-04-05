@@ -27,11 +27,10 @@ export default async function (fastify: FastifyInstance) {
         email: request.body.email,
       });
 
-      const { email } = request.body;
-      const redirectUrl = 'http://localhost:38389/callback'; // cli will be listening on this port
+      const { email, redirect_uri } = request.body;
       const magicLinkUrl = `${
         process.env.APP_URL || 'https://api.godeploy.app'
-      }/magic-link?redirect_to=${encodeURIComponent(redirectUrl)}`;
+      }/magic-link?redirect_to=${encodeURIComponent(redirect_uri)}`;
 
       const result = await request.db.auth.sendMagicLink(email, magicLinkUrl);
 
@@ -123,25 +122,18 @@ export default async function (fastify: FastifyInstance) {
       request.measure.start('auth_verify');
 
       try {
-        // Extract token from authorization header
-        if (!request.headers.authorization) {
-          request.measure.failure('Missing authorization header');
+        // Extract token from authorization header using the utility function
+        const tokenResult = extractBearerToken(request.headers.authorization);
+
+        if (tokenResult.error) {
+          request.measure.failure(tokenResult.error);
           return reply.code(401).send({
             valid: false,
-            error: 'Missing authorization header',
+            error: tokenResult.error,
           });
         }
 
-        const parts = request.headers.authorization.split(' ');
-        if (parts.length !== 2 || parts[0] !== 'Bearer') {
-          request.measure.failure('Invalid authorization format');
-          return reply.code(401).send({
-            valid: false,
-            error: 'Invalid authorization format',
-          });
-        }
-
-        const token = parts[1];
+        const token = tokenResult.data!;
 
         // Use Supabase client directly for token verification
         request.measure.add('verify_token');

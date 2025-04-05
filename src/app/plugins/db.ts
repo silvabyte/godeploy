@@ -32,4 +32,11 @@ const dbPlugin: FastifyPluginAsync = async (fastify) => {
   });
 };
 
-export default fp(dbPlugin);
+export default fp(dbPlugin, {
+  name: 'db',
+  fastify: '5.x',
+  dependencies: ['supabaseAuth'],
+  decorators: {
+    fastify: ['supabase'],
+  },
+});
