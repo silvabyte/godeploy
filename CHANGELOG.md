@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.2] - 2025-04-08
+
+* fix: deploy response (#5)
+* chore: add ci badges to readme
+* chore: release v0.2.1
+
 ## [0.2.1] - 2025-03-29
 
 * chore: remove dated architecture doc
