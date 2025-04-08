@@ -283,12 +283,7 @@ func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte
 	// Decode the response
 	var deployResp DeployResponse
 	if err := json.Unmarshal(respBody, &deployResp); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	// Check for errors
-	if !deployResp.Success {
-		return nil, fmt.Errorf("deployment failed: %s", deployResp.Error)
+		return nil, fmt.Errorf("failed to decode response: %w, body: %s", err, string(respBody))
 	}
 
 	return &deployResp, nil
