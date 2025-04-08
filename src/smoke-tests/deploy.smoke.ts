@@ -77,31 +77,12 @@ const main = async () => {
     );
   }
 
-  const projectText = chalk.bold.magenta('Project');
-
-  console.log(`${projectText}: creating`);
   // Get project name from env or use default
   const projectName =
     process.env.TEST_PROJECT_NAME || 'godeploy-smoke-test-' + nanoid(8);
-
-  // Create a test project for deploying
-  let response = await request(`${API_URL}/api/projects`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${authToken}`,
-    },
-    body: JSON.stringify({
-      name: projectName,
-      description: 'Test project for deploy smoke test',
-    }),
-  });
-
-  assert.equal(response.statusCode, 200);
-  const project = (await response.body.json()) as { id: string };
-  projectId = project.id;
-
-  console.log(`${projectText}: ${projectName}, id: ${projectId}`);
+  console.log(
+    `${chalk.bold.magenta('Starting test for project')} ${projectName}`
+  );
 
   const deploymentText = chalk.bold.magenta('Deployment');
 
@@ -127,14 +108,17 @@ const main = async () => {
   form.append('file', fs.createReadStream(zipPath));
 
   console.log(`${deploymentText}: uploading zip`);
-  response = await request(`${API_URL}/api/deploy?project=${projectName}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${authToken}`,
-      ...form.getHeaders(),
-    },
-    body: form,
-  });
+  const response = await request(
+    `${API_URL}/api/deploy?project=${projectName}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        ...form.getHeaders(),
+      },
+      body: form,
+    }
+  );
 
   if (!assert.equal(response.statusCode, 200)) {
     console.debug(response.statusCode);

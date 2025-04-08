@@ -8,6 +8,7 @@ import {
   routeSchemas,
   type DeployQuerystring,
 } from '../components/deploys/deploys.types';
+import { validateAndTransformProjectName } from '../components/projects/project-utils';
 
 export default async function (fastify: FastifyInstance) {
   // Register multipart support
@@ -95,17 +96,65 @@ export default async function (fastify: FastifyInstance) {
       tenant_id
     );
 
-    if (projectResult.error || !projectResult.data) {
-      request.measure.failure(projectResult.error || 'Project not found');
-      return reply.code(projectResult.error ? 500 : 404).send({
-        error: projectResult.error
-          ? 'Failed to fetch project'
-          : 'Project not found',
-        message: projectResult.error,
-      });
-    }
+    let project;
+    if (!projectResult.data) {
+      // Project doesn't exist, let's create it
+      request.measure.add('validate_project_name');
+      const nameResult = validateAndTransformProjectName(projectName);
 
-    const project = projectResult.data;
+      if (nameResult.error || !nameResult.data) {
+        request.measure.failure(nameResult.error || 'Invalid project name');
+        return reply
+          .code(400)
+          .send({ error: nameResult.error || 'Invalid project name' });
+      }
+
+      const { name, subdomain } = nameResult.data;
+      request.measure.add('check_subdomain');
+
+      // Check if project with this subdomain already exists
+      const existingProjectResult =
+        await request.db.projects.getProjectBySubdomain(subdomain);
+
+      if (existingProjectResult.data) {
+        request.measure.failure('Project with this name already exists');
+        return reply.code(400).send({
+          error: 'Project with this name already exists',
+        });
+      }
+
+      if (existingProjectResult.error) {
+        request.measure.failure(existingProjectResult.error);
+        return reply.code(500).send({
+          error: 'Failed to check project existence',
+          message: existingProjectResult.error,
+        });
+      }
+
+      // Create the project
+      request.measure.add('create_project');
+      const createResult = await request.db.projects.createProject({
+        tenant_id,
+        owner_id: user_id,
+        name,
+        subdomain,
+        description: null,
+      });
+
+      if (createResult.error || !createResult.data) {
+        request.measure.failure(
+          createResult.error || 'Failed to create project'
+        );
+        return reply.code(500).send({
+          error: 'Failed to create project',
+          message: createResult.error,
+        });
+      }
+
+      project = createResult.data;
+    } else {
+      project = projectResult.data;
+    }
 
     // Record the deployment in the database
     request.measure.add('record_deploy');
