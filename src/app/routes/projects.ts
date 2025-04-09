@@ -36,7 +36,7 @@ export default async function (fastify: FastifyInstance) {
       }
 
       // Add URL to each project
-      const projectsWithUrl = addUrlToProject(projectsResult.data, tenant_id);
+      const projectsWithUrl = addUrlToProject(projectsResult.data);
 
       request.measure.success();
       return reply.code(200).send(projectsWithUrl);
@@ -112,7 +112,7 @@ export default async function (fastify: FastifyInstance) {
       }
 
       // Add URL to project
-      const projectWithUrl = addUrlToProject(projectResult.data, tenant_id);
+      const projectWithUrl = addUrlToProject(projectResult.data);
 
       request.measure.success();
       return reply.code(201).send(projectWithUrl);

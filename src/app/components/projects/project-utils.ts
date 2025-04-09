@@ -1,6 +1,6 @@
 import type { Result } from '../../types/result.types';
-import slugify from 'slugify';
-import { constructCdnUrl } from '../../utils/urlUtils';
+import { constructCdnUrl, generateUniqueSubdomain } from '../../utils/url';
+import { StringFormatter } from '../../utils/stringFormatter';
 import type { Project } from './projects.types';
 
 export interface ProjectNameValidation {
@@ -12,7 +12,7 @@ export interface ProjectNameValidation {
  * Validates and transforms a project name
  * - Removes trailing dashes
  * - Checks minimum length
- * - Generates subdomain
+ * - Generates a unique subdomain using nanoid + random word
  */
 export function validateAndTransformProjectName(
   rawName: string
@@ -24,11 +24,10 @@ export function validateAndTransformProjectName(
     };
   }
 
-  // Remove trailing dashes
-  let name = rawName;
-  while (name.endsWith('-')) {
-    name = name.slice(0, -1);
-  }
+  const name = StringFormatter.from(rawName)
+    .remove.trailing('-')
+    .remove.leading('-')
+    .toString();
 
   // Check minimum length
   if (name.length < 3) {
@@ -38,11 +37,8 @@ export function validateAndTransformProjectName(
     };
   }
 
-  // Generate subdomain
-  const subdomain = slugify(name, {
-    lower: true,
-    strict: true,
-  });
+  // Generate unique subdomain
+  const subdomain = generateUniqueSubdomain();
 
   return {
     error: null,
@@ -56,27 +52,22 @@ export function validateAndTransformProjectName(
 /**
  * Adds CDN URL to a project or list of projects
  */
+export function addUrlToProject(project: Project): Project & { url: string };
 export function addUrlToProject(
-  project: Project,
-  tenantId: string
-): Project & { url: string };
-export function addUrlToProject(
-  projects: Project[],
-  tenantId: string
+  projects: Project[]
 ): (Project & { url: string })[];
 export function addUrlToProject(
-  projectOrProjects: Project | Project[],
-  tenantId: string
+  projectOrProjects: Project | Project[]
 ): (Project & { url: string }) | (Project & { url: string })[] {
   if (Array.isArray(projectOrProjects)) {
     return projectOrProjects.map((project) => ({
       ...project,
-      url: constructCdnUrl(project.subdomain, tenantId),
+      url: constructCdnUrl(project.subdomain),
     }));
   }
 
   return {
     ...projectOrProjects,
-    url: constructCdnUrl(projectOrProjects.subdomain, tenantId),
+    url: constructCdnUrl(projectOrProjects.subdomain),
   };
 }

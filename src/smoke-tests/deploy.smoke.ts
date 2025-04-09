@@ -99,7 +99,6 @@ const main = async () => {
   // Create a zip file with the HTML file
   const zipPath = path.join(tempDir, 'deploy.zip');
 
-  // Note: In a real test, you would create an actual zip file
   // For this smoke test, we'll just create a simple file to simulate the upload
   await Zip.create(tempDir, zipPath);
 

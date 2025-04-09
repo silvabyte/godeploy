@@ -6,6 +6,6 @@ export class Zip {
   }
 
   static async create(dir: string, zipFile: string) {
-    return execa('zip', ['-r', zipFile, dir]);
+    return execa('zip', ['-r', zipFile, dir], { cwd: dir });
   }
 }

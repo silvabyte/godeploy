@@ -6,7 +6,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
 import { to } from 'await-to-js';
-import { constructCdnUrl } from '../../utils/urlUtils';
+import { constructCdnUrl, constructStorageKey } from '../../utils/url';
 import { Zip } from './Zip';
 //TODO: ensure we use streams for all file operations to avoid inevitable nodejs memory issues
 // couple the above with plimit library to limit the number of concurrent file operations our server does at a time to avoid overloading the server
@@ -86,14 +86,12 @@ export class StorageService {
   /**
    * Process and upload a SPA archive to DigitalOcean Spaces
    * @param archivePath Path to the SPA zip archive
-   * @param tenantId Tenant ID
-   * @param projectName Project name for the subdomain
+   * @param subdomain The unique subdomain for the project
    * @returns Result containing the CDN URL or error message
    */
   async processSpaArchive(
     archivePath: string,
-    tenantId: string,
-    projectName: string
+    subdomain: string
   ): Promise<Result<string>> {
     // Create a temporary directory to extract the archive
     const [mkdirErr, tempDir] = await to(
@@ -121,9 +119,9 @@ export class StorageService {
         };
       }
 
-      // Upload all files with appropriate cache headers
-      const baseKey = `spa-projects/${tenantId}/${projectName}`;
-      const cdnUrl = constructCdnUrl(projectName, tenantId);
+      // Use the new storage key format
+      const baseKey = constructStorageKey(subdomain);
+      const cdnUrl = constructCdnUrl(subdomain);
 
       // Process all files recursively
       const uploadResult = await this.uploadDirectory(tempDir, baseKey);

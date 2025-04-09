@@ -63,202 +63,113 @@ const assert = {
  * Note: This test requires an API server running on the configured API_URL
  */
 
-const main = async () => {
-  // Get auth token from env
+const runValidTokenTest = async () => {
   const validToken = process.env.TEST_AUTH_TOKEN || '';
-  if (!validToken) {
-    throw new Error(
-      'TEST_AUTH_TOKEN environment variable is required for auth smoke tests'
+  if (!validToken) throw new Error('TEST_AUTH_TOKEN is required');
+
+  const spinner = assert.spinner('Verifying valid token');
+  try {
+    const res = await request(`${API_URL}/api/auth/verify`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${validToken}` },
+    });
+    const data = await res.body.json();
+    spinner.succeed(`Response received with status ${res.statusCode}`);
+    verifyAuthResponse(res.statusCode, data, true);
+  } catch (err) {
+    spinner.fail('Error verifying valid token');
+    console.error(err);
+  }
+};
+
+const runInvalidTokenTest = async () => {
+  const token = process.env.INVALID_AUTH_TOKEN || 'invalid-token';
+  const spinner = assert.spinner('Verifying invalid token');
+  try {
+    const res = await request(`${API_URL}/api/auth/verify`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.body.json();
+    spinner.succeed(`Response received with status ${res.statusCode}`);
+    verifyAuthResponse(res.statusCode, data, false);
+  } catch (err) {
+    spinner.fail('Error verifying invalid token');
+    console.error(err);
+  }
+};
+
+const runMissingTokenTest = async () => {
+  const spinner = assert.spinner('Testing request with no token');
+  try {
+    const res = await request(`${API_URL}/api/auth/verify`, { method: 'GET' });
+    const data = await res.body.json();
+    spinner.succeed(`Response received with status ${res.statusCode}`);
+    verifyAuthResponse(res.statusCode, data, false);
+  } catch (err) {
+    spinner.fail('Error testing missing token');
+    console.error(err);
+  }
+};
+
+const verifyAuthResponse = (
+  statusCode: number,
+  data: any,
+  shouldBeValid: boolean
+) => {
+  const expectedStatus = shouldBeValid ? 200 : 401;
+  const expectedValidity = shouldBeValid ? true : false;
+  const statusOK = assert.equal(statusCode, expectedStatus);
+  const hasValid = assert.hasProperty(data, 'valid');
+  const isValid = data.valid === expectedValidity;
+
+  if (hasValid && isValid) {
+    console.log(chalk.bold.green(`Success: valid property is ${data.valid}`));
+  } else {
+    console.log(chalk.bold.red(`Failed: valid property is ${data.valid}`));
+  }
+
+  const hasError = !shouldBeValid && assert.hasProperty(data, 'error');
+  if (hasError) console.log(chalk.bold.green(`Error message: ${data.error}`));
+
+  const hasUser =
+    shouldBeValid &&
+    assert.hasProperty(data, 'user') &&
+    assert.hasProperty(data.user, 'id') &&
+    assert.hasProperty(data.user, 'email') &&
+    assert.hasProperty(data.user, 'tenant_id');
+
+  if (shouldBeValid && hasUser) {
+    console.log(
+      chalk.bold.green(`Success: user object has all required properties`)
     );
   }
 
-  const invalidToken = process.env.INVALID_AUTH_TOKEN || 'invalid-token';
+  const passed = shouldBeValid
+    ? statusOK && hasValid && isValid && hasUser
+    : statusOK && hasValid && isValid && hasError;
 
+  const summary = shouldBeValid
+    ? 'Valid token verification'
+    : statusCode === 401
+    ? 'Invalid token verification'
+    : 'Missing token test';
+
+  console.log(
+    passed
+      ? assert.text.success(`${summary} passed all checks`)
+      : assert.text.failed(`${summary} failed some checks`)
+  );
+};
+
+const main = async () => {
   const authText = chalk.bold.magenta('Auth');
-
-  // Test 1: Verify a valid token
   console.log(`${authText}: verifying valid token`);
-  let spinner = assert.spinner('Verifying valid token');
-
-  try {
-    const response = await request(`${API_URL}/api/auth/verify`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${validToken}`,
-      },
-    });
-
-    const statusCode = response.statusCode;
-    const data = (await response.body.json()) as any;
-
-    spinner.succeed(`Response received with status ${statusCode}`);
-
-    // Assert response status code is 200
-    const validStatus = assert.equal(statusCode, 200);
-
-    // Assert response has valid: true
-    const hasValidProperty = assert.hasProperty(data, 'valid');
-    const validPropertyValue = data.valid === true;
-
-    if (hasValidProperty && !validPropertyValue) {
-      console.log(
-        chalk.bold.red(`Failed: valid property is ${data.valid}, expected true`)
-      );
-    } else if (hasValidProperty && validPropertyValue) {
-      console.log(chalk.bold.green(`Success: valid property is true`));
-    }
-
-    // Assert response has user object with required properties
-    const hasUserProperty = assert.hasProperty(data, 'user');
-
-    if (hasUserProperty) {
-      const user = data.user;
-      const hasIdProperty = assert.hasProperty(user, 'id');
-      const hasEmailProperty = assert.hasProperty(user, 'email');
-      const hasTenantIdProperty = assert.hasProperty(user, 'tenant_id');
-
-      if (hasIdProperty && hasEmailProperty && hasTenantIdProperty) {
-        console.log(
-          chalk.bold.green(`Success: user object has all required properties`)
-        );
-        console.log(`User ID: ${user.id}`);
-        console.log(`User Email: ${user.email}`);
-        console.log(`User Tenant ID: ${user.tenant_id}`);
-      }
-    }
-
-    if (
-      validStatus &&
-      hasValidProperty &&
-      validPropertyValue &&
-      hasUserProperty
-    ) {
-      console.log(
-        assert.text.success('Valid token verification passed all checks')
-      );
-    } else {
-      console.log(
-        assert.text.failed('Valid token verification failed some checks')
-      );
-    }
-  } catch (error) {
-    spinner.fail('Error verifying valid token');
-    console.error(error);
-  }
-
-  // Test 2: Verify an invalid token
+  await runValidTokenTest();
   console.log(`\n${authText}: verifying invalid token`);
-  spinner = assert.spinner('Verifying invalid token');
-
-  try {
-    const response = await request(`${API_URL}/api/auth/verify`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${invalidToken}`,
-      },
-    });
-
-    const statusCode = response.statusCode;
-    const data = (await response.body.json()) as any;
-
-    spinner.succeed(`Response received with status ${statusCode}`);
-
-    // For invalid token, we expect 401 Unauthorized
-    const validStatus = assert.equal(statusCode, 401);
-
-    // Assert response has valid: false
-    const hasValidProperty = assert.hasProperty(data, 'valid');
-    const validPropertyValue = data.valid === false;
-
-    if (hasValidProperty && !validPropertyValue) {
-      console.log(
-        chalk.bold.red(
-          `Failed: valid property is ${data.valid}, expected false`
-        )
-      );
-    } else if (hasValidProperty && validPropertyValue) {
-      console.log(chalk.bold.green(`Success: valid property is false`));
-    }
-
-    // Assert response has error message
-    const hasErrorProperty = assert.hasProperty(data, 'error');
-
-    if (hasErrorProperty) {
-      console.log(chalk.bold.green(`Error message: ${data.error}`));
-    }
-
-    if (
-      validStatus &&
-      hasValidProperty &&
-      validPropertyValue &&
-      hasErrorProperty
-    ) {
-      console.log(
-        assert.text.success('Invalid token verification passed all checks')
-      );
-    } else {
-      console.log(
-        assert.text.failed('Invalid token verification failed some checks')
-      );
-    }
-  } catch (error) {
-    spinner.fail('Error verifying invalid token');
-    console.error(error);
-  }
-
-  // Test 3: Test missing token
+  await runInvalidTokenTest();
   console.log(`\n${authText}: testing missing token`);
-  spinner = assert.spinner('Testing request with no token');
-
-  try {
-    const response = await request(`${API_URL}/api/auth/verify`, {
-      method: 'GET',
-    });
-
-    const statusCode = response.statusCode;
-    const data = (await response.body.json()) as any;
-
-    spinner.succeed(`Response received with status ${statusCode}`);
-
-    // For missing token, we expect 401 Unauthorized
-    const validStatus = assert.equal(statusCode, 401);
-
-    // Assert response has valid: false
-    const hasValidProperty = assert.hasProperty(data, 'valid');
-    const validPropertyValue = data.valid === false;
-
-    if (hasValidProperty && !validPropertyValue) {
-      console.log(
-        chalk.bold.red(
-          `Failed: valid property is ${data.valid}, expected false`
-        )
-      );
-    } else if (hasValidProperty && validPropertyValue) {
-      console.log(chalk.bold.green(`Success: valid property is false`));
-    }
-
-    // Assert response has error message
-    const hasErrorProperty = assert.hasProperty(data, 'error');
-
-    if (hasErrorProperty) {
-      console.log(chalk.bold.green(`Error message: ${data.error}`));
-    }
-
-    if (
-      validStatus &&
-      hasValidProperty &&
-      validPropertyValue &&
-      hasErrorProperty
-    ) {
-      console.log(assert.text.success('Missing token test passed all checks'));
-    } else {
-      console.log(assert.text.failed('Missing token test failed some checks'));
-    }
-  } catch (error) {
-    spinner.fail('Error testing missing token');
-    console.error(error);
-  }
-
+  await runMissingTokenTest();
   console.log(`\n${authText}: smoke tests completed`);
 };
 

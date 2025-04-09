@@ -3,7 +3,7 @@ import { StorageService } from '../components/storage/StorageService';
 import { FileProcessor } from '../components/storage/FileProcessor';
 import { v4 as uuidv4 } from 'uuid';
 import fastifyMultipart, { type MultipartFile } from '@fastify/multipart';
-import { constructCdnUrl } from '../utils/urlUtils';
+import { constructCdnUrl } from '../utils/url';
 import {
   routeSchemas,
   type DeployQuerystring,
@@ -162,7 +162,7 @@ export default async function (fastify: FastifyInstance) {
       tenant_id,
       project_id: project.id,
       user_id,
-      url: constructCdnUrl(project.subdomain, tenant_id),
+      url: constructCdnUrl(project.subdomain),
       status: 'pending',
     });
 
@@ -182,7 +182,6 @@ export default async function (fastify: FastifyInstance) {
     request.measure.add('upload_files');
     const uploadResult = await storageService.processSpaArchive(
       archivePath,
-      tenant_id,
       project.subdomain
     );
 
