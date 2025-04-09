@@ -1,3 +1,7 @@
+-- ================================================
+-- billing_table.sql
+-- ================================================
+
 -- Table: public.subscriptions
 CREATE TABLE public.subscriptions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

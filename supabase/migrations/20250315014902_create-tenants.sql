@@ -1,5 +1,5 @@
 -- ================================================
--- 002-create-tenants.sql
+-- create-tenants.sql
 -- ================================================
 -- Create Tenants table
 create table public.tenants (

@@ -1,5 +1,5 @@
 -- ================================================
--- 006-enable-rls.sql
+-- enable-rls.sql
 -- ================================================
 -- Enable Row Level Security for all tables
 alter table public.projects enable row level security;

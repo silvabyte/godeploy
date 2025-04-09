@@ -1,5 +1,5 @@
 -- ================================================
--- 005-create-deploys.sql
+-- create-deploys.sql
 -- ================================================
 -- Create Deploys table for tracking deploy events
 create table public.deploys (

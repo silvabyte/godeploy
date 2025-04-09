@@ -1,5 +1,5 @@
 -- ================================================
--- 007-rls-policies.sql
+-- rls-policies.sql
 -- ================================================
 -- Add RLS Policies for users, tenants, projects, deploys
 

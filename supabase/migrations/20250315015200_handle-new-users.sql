@@ -1,5 +1,5 @@
 -- ================================================
--- 008-handle-new-user.sql
+-- handle-new-user.sql
 -- ================================================
 -- Function and Trigger to auto-create a Tenant when new user signs up
 

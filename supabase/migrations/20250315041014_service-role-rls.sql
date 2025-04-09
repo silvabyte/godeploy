@@ -1,5 +1,5 @@
 -- ================================================
--- 009-rls-bypass-for-service-role.sql
+-- rls-bypass-for-service-role.sql
 -- ================================================
 
 -- For tenants

@@ -1,5 +1,5 @@
 -- ================================================
--- 003-create-users.sql
+-- create-users.sql
 -- ================================================
 -- Create Users table, linked to Tenants
 create table public.users (

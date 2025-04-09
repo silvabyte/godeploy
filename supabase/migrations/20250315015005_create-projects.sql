@@ -1,5 +1,5 @@
 -- ================================================
--- 004-create-projects.sql
+-- create-projects.sql
 -- ================================================
 -- Create Projects table
 create table public.projects (
