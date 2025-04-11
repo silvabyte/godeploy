@@ -4,6 +4,7 @@
 import { nanoid } from 'nanoid';
 import randomWord from 'random-word';
 import { StringFormatter } from './stringFormatter';
+import type { Project } from '../components/projects/projects.types';
 
 /**
  * Generates a unique, human-readable subdomain
@@ -37,11 +38,61 @@ export function constructCdnUrl(subdomain: string): string {
   return `https://${subdomain}.spa.godeploy.app`;
 }
 
-/**
- * Constructs the storage key for a subdomain
- * @param subdomain The unique subdomain
- * @returns The storage key path
- */
-export function constructStorageKey(subdomain: string): string {
-  return `spa-projects/${subdomain}.spa.godeploy.app`;
+export class UrlFormatter extends URL {
+  constructor(url: string, base?: string) {
+    super(url, base);
+  }
+  static from(uncleanUrl: string) {
+    return new UrlFormatter(UrlFormatter.normalize.protocol(uncleanUrl));
+  }
+  static normalize = {
+    protocol(url: string) {
+      if (!url.startsWith('http')) return `https://${url}`;
+      return url;
+    },
+  };
+}
+
+export class ProjectDomain {
+  private project: Project;
+  constructor(project: Project) {
+    this.project = project;
+  }
+
+  static from = (project: Project) => new ProjectDomain(project);
+
+  /*
+   * determine() will determine which full origin url to use for the deployment based on if a custom domain has been configured
+   */
+  determine = () =>
+    this.project.domain ? this.domain.origin : this.subdomain.origin;
+
+  static SUBDOMAIN_HOST_AFFIX = 'spa.godeploy.app';
+
+  static STORAGE_BUCKET = 'spa-projects';
+
+  formatters = {
+    subdomain: () =>
+      `${this.project.subdomain}.${ProjectDomain.SUBDOMAIN_HOST_AFFIX}`,
+  };
+  get subdomain(): UrlFormatter {
+    return UrlFormatter.from(this.formatters.subdomain());
+  }
+
+  get domain(): UrlFormatter {
+    return UrlFormatter.from(this.project.domain as string);
+  }
+
+  get storage(): { key: string } {
+    return {
+      key: this.project.domain
+        ? `${ProjectDomain.STORAGE_BUCKET}/${this.domain.host}`
+        : `${ProjectDomain.STORAGE_BUCKET}/${this.subdomain.host}`,
+    };
+  }
+
+  //static creation utils for projects
+  static generate = {
+    subdomain: () => generateUniqueSubdomain(),
+  };
 }

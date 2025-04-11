@@ -10,7 +10,16 @@ const projectSchema = z.object({
   name: z.string(),
   subdomain: z.string(),
   description: z.string().nullable(),
-  url: z.string().optional(),
+  domain: z
+    .string({ description: 'Custom domain for the given project' })
+    .nullable()
+    .optional(), // if this is prov
+  url: z
+    .string({
+      description:
+        'Final project url, computed from the domain if it exists and falls back to using the subdomain',
+    })
+    .optional(),
   created_at: z.string(),
   updated_at: z.string(),
 });

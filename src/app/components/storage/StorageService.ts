@@ -6,8 +6,9 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
 import { to } from 'await-to-js';
-import { constructCdnUrl, constructStorageKey } from '../../utils/url';
+import { ProjectDomain } from '../../utils/url';
 import { Zip } from './Zip';
+import type { Project } from '../projects/projects.types';
 //TODO: ensure we use streams for all file operations to avoid inevitable nodejs memory issues
 // couple the above with plimit library to limit the number of concurrent file operations our server does at a time to avoid overloading the server
 
@@ -91,7 +92,7 @@ export class StorageService {
    */
   async processSpaArchive(
     archivePath: string,
-    subdomain: string
+    project: Project
   ): Promise<Result<string>> {
     // Create a temporary directory to extract the archive
     const [mkdirErr, tempDir] = await to(
@@ -120,8 +121,9 @@ export class StorageService {
       }
 
       // Use the new storage key format
-      const baseKey = constructStorageKey(subdomain);
-      const cdnUrl = constructCdnUrl(subdomain);
+      const d = ProjectDomain.from(project);
+      const baseKey = d.storage.key;
+      const cdnUrl = d.subdomain.origin;
 
       // Process all files recursively
       const uploadResult = await this.uploadDirectory(tempDir, baseKey);

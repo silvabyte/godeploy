@@ -2,7 +2,6 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import {
   routeSchemas,
   type CreateProjectBody,
-  type Project,
 } from '../components/projects/projects.types';
 import {
   validateAndTransformProjectName,

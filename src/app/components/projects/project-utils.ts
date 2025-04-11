@@ -1,5 +1,5 @@
 import type { Result } from '../../types/result.types';
-import { constructCdnUrl, generateUniqueSubdomain } from '../../utils/url';
+import { ProjectDomain } from '../../utils/url';
 import { StringFormatter } from '../../utils/stringFormatter';
 import type { Project } from './projects.types';
 
@@ -38,7 +38,7 @@ export function validateAndTransformProjectName(
   }
 
   // Generate unique subdomain
-  const subdomain = generateUniqueSubdomain();
+  const subdomain = ProjectDomain.generate.subdomain();
 
   return {
     error: null,
@@ -53,21 +53,23 @@ export function validateAndTransformProjectName(
  * Adds CDN URL to a project or list of projects
  */
 export function addUrlToProject(project: Project): Project & { url: string };
+
 export function addUrlToProject(
   projects: Project[]
 ): (Project & { url: string })[];
+
 export function addUrlToProject(
   projectOrProjects: Project | Project[]
 ): (Project & { url: string }) | (Project & { url: string })[] {
   if (Array.isArray(projectOrProjects)) {
     return projectOrProjects.map((project) => ({
       ...project,
-      url: constructCdnUrl(project.subdomain),
+      url: ProjectDomain.from(project).determine(),
     }));
   }
 
   return {
     ...projectOrProjects,
-    url: constructCdnUrl(projectOrProjects.subdomain),
+    url: ProjectDomain.from(projectOrProjects).determine(),
   };
 }

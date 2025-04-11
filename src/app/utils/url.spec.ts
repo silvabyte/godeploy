@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import * as urlUtils from './url';
-import { nanoid } from 'nanoid';
-import randomWord from 'random-word';
+import { ProjectDomain } from './url';
+import type { Project } from '../components/projects/projects.types';
 
 vi.mock('nanoid', () => ({
   nanoid: vi.fn().mockReturnValue('-abc123---'),
@@ -11,25 +10,63 @@ vi.mock('random-word', () => ({
   default: vi.fn().mockReturnValue('--sunshine--'),
 }));
 
-describe('generateUniqueSubdomain', () => {
-  it('should generate a subdomain with nanoid and random word', () => {
-    const result = urlUtils.generateUniqueSubdomain();
-    expect(result).toBe('abc123-sunshine');
-  });
-});
+describe('ProjectDomain', () => {
+  const subdomain = 'abc123-sunshine';
+  const domain = 'mycompany.org';
 
-describe('constructCdnUrl', () => {
-  it('should construct a CDN URL from subdomain', () => {
-    const subdomain = 'abc123-sunshine';
-    const result = urlUtils.constructCdnUrl(subdomain);
-    expect(result).toBe('https://abc123-sunshine.spa.godeploy.app');
+  describe('ProjectDomain.determine', () => {
+    it('should use the subdomain if the domain is not present', () => {
+      const pd = ProjectDomain.from({
+        name: 'test-proj',
+        subdomain,
+      } as Project);
+      expect(pd.determine()).toBe(pd.subdomain.origin);
+    });
+    it('should use the domain over subdomain if the domain is present', () => {
+      const pd = ProjectDomain.from({
+        name: 'test-proj',
+        subdomain,
+        domain,
+      } as Project);
+      expect(pd.determine()).toBe(pd.domain.origin);
+    });
   });
-});
 
-describe('constructStorageKey', () => {
-  it('should construct a storage key from subdomain', () => {
-    const subdomain = 'abc123-sunshine';
-    const result = urlUtils.constructStorageKey(subdomain);
-    expect(result).toBe('spa-projects/abc123-sunshine.spa.godeploy.app');
+  describe('ProjectDomain.domain', () => {
+    it('should construct a url from the domain', () => {
+      const result = ProjectDomain.from({
+        name: 'test-proj',
+        subdomain,
+        domain,
+      } as Project).domain.origin;
+      expect(result).toBe('https://' + domain);
+    });
+  });
+
+  describe('ProjectDomain.subdomain', () => {
+    it('should construct a url from subdomain', () => {
+      const result = ProjectDomain.from({
+        name: 'test-proj',
+        subdomain,
+      } as Project).subdomain.origin;
+      expect(result).toBe('https://abc123-sunshine.spa.godeploy.app');
+    });
+  });
+
+  describe('ProjectDomain.storage', () => {
+    it('should construct a storage key from subdomain', () => {
+      const result = ProjectDomain.from({
+        name: 'test-proj',
+        subdomain,
+      } as Project).storage.key;
+      expect(result).toBe('spa-projects/abc123-sunshine.spa.godeploy.app');
+    });
+  });
+
+  describe('ProjectDomain.generate', () => {
+    it('should generate a subdomain', () => {
+      const result = ProjectDomain.generate.subdomain();
+      expect(result).toBe('abc123-sunshine');
+    });
   });
 });

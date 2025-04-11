@@ -3,7 +3,7 @@ import { StorageService } from '../components/storage/StorageService';
 import { FileProcessor } from '../components/storage/FileProcessor';
 import { v4 as uuidv4 } from 'uuid';
 import fastifyMultipart, { type MultipartFile } from '@fastify/multipart';
-import { constructCdnUrl } from '../utils/url';
+import { ProjectDomain } from '../utils/url';
 import {
   routeSchemas,
   type DeployQuerystring,
@@ -89,6 +89,7 @@ export default async function (fastify: FastifyInstance) {
         .send({ error: validateResult.error || 'Archive validation failed' });
     }
 
+    //TODO: abstract this to a getOrCreateProject function
     // Get project from database
     request.measure.add('get_project');
     const projectResult = await request.db.projects.getProjectByName(
@@ -138,6 +139,7 @@ export default async function (fastify: FastifyInstance) {
         owner_id: user_id,
         name,
         subdomain,
+        domain: null, //we do not set the custom domain for projects created via the deploy endpoint
         description: null,
       });
 
@@ -162,7 +164,7 @@ export default async function (fastify: FastifyInstance) {
       tenant_id,
       project_id: project.id,
       user_id,
-      url: constructCdnUrl(project.subdomain),
+      url: ProjectDomain.from(project).determine(),
       status: 'pending',
     });
 
@@ -178,11 +180,11 @@ export default async function (fastify: FastifyInstance) {
 
     const deploy = deployResult.data;
 
-    // Upload files to storage
     request.measure.add('upload_files');
+    // Upload files to storage
     const uploadResult = await storageService.processSpaArchive(
       archivePath,
-      project.subdomain
+      project
     );
 
     if (uploadResult.error) {
