@@ -15,6 +15,7 @@ import (
 	"github.com/audetic/godeploy/internal/config"
 	"github.com/audetic/godeploy/internal/docker"
 	"github.com/audetic/godeploy/internal/nginx"
+	"github.com/audetic/godeploy/internal/version"
 	"github.com/yarlson/pin"
 )
 
@@ -29,6 +30,7 @@ var CLI struct {
 	Init    InitCmd    `cmd:"" help:"Initialize a new godeploy.config.json file"`
 	Auth    AuthCmd    `cmd:"" help:"Authentication commands"`
 	Deploy  DeployCmd  `cmd:"" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
+	Version VersionCmd `cmd:"" help:"Display the version of godeploy"`
 }
 
 // ServeCmd represents the serve command
@@ -72,6 +74,23 @@ type StatusCmd struct {
 type DeployCmd struct {
 	Project string `help:"Project name for deployment" default:""`
 	Output  string `help:"Output directory for spa build files" default:"dist"`
+}
+
+// VersionCmd represents the version command
+type VersionCmd struct {
+}
+
+// Run executes the version command
+func (v *VersionCmd) Run() error {
+	// Get the version from package.json
+	ver, err := version.GetVersion()
+	if err != nil {
+		return fmt.Errorf("error retrieving version: %w", err)
+	}
+
+	// Display the version
+	fmt.Printf("godeploy version %s\n", ver)
+	return nil
 }
 
 // defaultConfig is the default configuration template

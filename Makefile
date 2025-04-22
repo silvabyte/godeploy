@@ -14,20 +14,24 @@ BINARY_WIN=$(BINARY_NAME).exe
 BINARY_ARM64=$(BINARY_NAME)_arm64
 OUT_DIR=out
 
+# Version information
+VERSION=$(shell grep '"version":' package.json | sed -E 's/.*"version": "([^"]+)".*/\1/')
+LDFLAGS=-ldflags "-X github.com/audetic/godeploy/internal/version.Version=$(VERSION)"
+
 
 # Run all
 all: test build
 
 # Run tests
-test: 
+test:
 	$(GOTEST) -v ./...
 
 # Build the project
-build: 
-	$(GOBUILD) -o $(OUT_DIR)/$(BINARY_NAME) ./cmd/${BINARY_NAME} 
+build:
+	$(GOBUILD) $(LDFLAGS) -o $(OUT_DIR)/$(BINARY_NAME) ./cmd/${BINARY_NAME}
 
 # Clean build files
-clean: 
+clean:
 	$(GOCLEAN)
 	rm -f $(OUT_DIR)/$(BINARY_NAME)
 	rm -f $(OUT_DIR)/$(BINARY_UNIX)
@@ -42,40 +46,40 @@ run: build
 
 # Install dependencies
 deps:
-	$(GOGET) 
+	$(GOGET)
 
 # Cross-compilation for Linux
 build-linux:
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(OUT_DIR)/$(BINARY_UNIX) ./cmd/${BINARY_NAME}
+	GOOS=linux GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(OUT_DIR)/$(BINARY_UNIX) ./cmd/${BINARY_NAME}
 
 # Cross-compilation for Raspberry Pi (ARM64)
 build-arm64:
-	GOOS=linux GOARCH=arm64 $(GOBUILD) -o $(OUT_DIR)/$(BINARY_ARM64) ./cmd/${BINARY_NAME}
+	GOOS=linux GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(OUT_DIR)/$(BINARY_ARM64) ./cmd/${BINARY_NAME}
 
 # Cross-compilation for all platforms
 build-all:
 	mkdir -p dist
 	# macOS (Intel)
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
 	tar -czf dist/godeploy-darwin-amd64.tar.gz $(BINARY_NAME)
 	rm $(BINARY_NAME)
-	
+
 	# macOS (Apple Silicon)
-	GOOS=darwin GOARCH=arm64 $(GOBUILD) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
 	tar -czf dist/godeploy-darwin-arm64.tar.gz $(BINARY_NAME)
 	rm $(BINARY_NAME)
-	
+
 	# Linux (x86_64)
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
+	GOOS=linux GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
 	tar -czf dist/godeploy-linux-amd64.tar.gz $(BINARY_NAME)
 	rm $(BINARY_NAME)
-	
+
 	# Linux (ARM64)
-	GOOS=linux GOARCH=arm64 $(GOBUILD) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
+	GOOS=linux GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(BINARY_NAME) ./cmd/${BINARY_NAME}
 	tar -czf dist/godeploy-linux-arm64.tar.gz $(BINARY_NAME)
 	rm $(BINARY_NAME)
-	
+
 	# Windows (x86_64)
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(BINARY_NAME).exe ./cmd/${BINARY_NAME}
+	GOOS=windows GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BINARY_NAME).exe ./cmd/${BINARY_NAME}
 	zip dist/godeploy-windows-amd64.zip $(BINARY_NAME).exe
 	rm $(BINARY_NAME).exe
