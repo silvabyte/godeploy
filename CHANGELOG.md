@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.0] - 2025-04-22
+
+* feat: add version cmd (#7)
+* chore: release v0.2.2
+
 ## [0.2.2] - 2025-04-08
 
 * fix: deploy response (#5)
