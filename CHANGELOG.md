@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.1] - 2025-08-31
+
+* refactor: migrate installer to silvabyte org and fix formatting (#8)
+* chore: release v0.3.0
+
 ## [0.3.0] - 2025-04-22
 
 * feat: add version cmd (#7)
