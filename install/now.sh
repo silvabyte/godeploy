@@ -113,7 +113,7 @@ install_godeploy() {
     log_info "Fetching latest version information..."
 
     # Debug the GitHub API response
-    GITHUB_API_RESPONSE=$(curl -s https://api.github.com/repos/silvabyte/godeploy/releases/latest)
+    GITHUB_API_RESPONSE=$(curl -s https://api.github.com/repos/audetic/godeploy/releases/latest)
     if [ -z "$GITHUB_API_RESPONSE" ]; then
       log_crit "Empty response from GitHub API"
       exit 1
@@ -144,7 +144,7 @@ install_godeploy() {
   log_info "Using extraction directory: $EXTRACT_DIR"
 
   # Construct the correct download URL for the asset
-  DOWNLOAD_URL="https://github.com/silvabyte/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+  DOWNLOAD_URL="https://github.com/audetic/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
   if [ "$OS" == "windows" ]; then
     DOWNLOAD_URL="${DOWNLOAD_URL}.zip"
     ARCHIVE_TYPE="zip"
@@ -199,7 +199,7 @@ install_godeploy() {
 
     # Try direct binary download as fallback
     log_info "Attempting direct binary download as fallback..."
-    DIRECT_URL="https://github.com/silvabyte/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+    DIRECT_URL="https://github.com/audetic/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
     if [ "$OS" == "windows" ]; then
       DIRECT_URL="${DIRECT_URL}.exe"
     fi
@@ -255,8 +255,19 @@ install_godeploy() {
   # Verify installation
   log_info "Testing installation..."
   if is_command "$INSTALL_DIR/godeploy"; then
-    "$INSTALL_DIR/godeploy" --help
-    log_info "Installation complete!"
+    "$INSTALL_DIR/godeploy" version
+    echo ""
+    log_info "✅ Installation complete!"
+    echo ""
+    echo "  🚀 Welcome to GoDeploy - Deploy your SPAs to the cloud instantly!"
+    echo ""
+    echo "  Get started:"
+    echo "    1. Create your account:  godeploy auth signup"
+    echo "    2. Initialize project:   godeploy init"
+    echo "    3. Build your app:       npm run build"
+    echo "    4. Deploy to cloud:      godeploy deploy"
+    echo ""
+    echo "  Need help? Visit https://docs.godeploy.app"
   else
     log_crit "Installation verification failed. Please check your PATH."
     exit 1
