@@ -22,16 +22,6 @@ export function generateUniqueSubdomain(): string {
   return `${idWithoutDash}-${word}`
 }
 
-/**
- * Constructs the CDN URL for a subdomain
- * This is the new implementation that uses the short subdomain only
- * @param subdomain The unique subdomain
- * @returns The full CDN URL
- */
-export function constructCdnUrl(subdomain: string): string {
-  return `https://${subdomain}.spa.godeploy.app`
-}
-
 export class UrlFormatter extends URL {
   constructor(url: string, base?: string) {
     super(url, base)

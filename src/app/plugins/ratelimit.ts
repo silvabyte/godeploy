@@ -2,11 +2,6 @@ import rateLimit from '@fastify/rate-limit'
 import type { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
 
-// Keep only the most critical suspicious paths
-export const SUSPICIOUS_PATHS = ['/.env', '/.git/config', '/.ssh/id_rsa', '/wp-admin', '/phpmyadmin']
-
-export const blockedIPs = new Set<string>()
-
 /**
  * This plugins adds minimal rate limit support
  *

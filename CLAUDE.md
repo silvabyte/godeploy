@@ -15,6 +15,7 @@ This project uses **Bun** as the JavaScript runtime and package manager.
 - Lint: `bun run lint` (check), `bun run lint:fix` (fix issues)
 - Check: `bun run check` (lint + format check), `bun run check:fix` (fix all)
 - Type Check: `bun run typecheck`
+- Dead Code: `bun run knip` (find unused code), `bun run knip:fix` (remove unused files)
 - Database: `bun run db:new` (create migration), `bun run db:up` (apply), `bun run db:push` (to Supabase)
 - Install: `bun install` (install dependencies)
 
