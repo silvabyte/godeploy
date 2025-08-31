@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.2] - 2025-08-31
+
+* feat: Add password-based authentication alongside magic link (#8)
+* fix: correct bun lockfile name in Dockerfile (#7)
+* chore: release v0.1.1
+
 ## [0.1.1] - 2025-08-31
 
 * feat: Migrate from Node.js to Bun runtime and test runner (#6)
