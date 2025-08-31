@@ -139,6 +139,6 @@ ISC - Use it however you want.
 
 ---
 
-Built by [@silvabyte](https://github.com/silvabyte) - [Twitter](https://twitter.com/silvabyte)
+Built by [@matsilva](https://github.com/matsilva) - [X](https://x.com/matsilva) - [silvabyte.com](https://silvabyte.com)
 
 Part of the indie hacker toolkit. Ship fast, iterate faster.
