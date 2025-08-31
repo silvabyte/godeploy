@@ -39,7 +39,7 @@ describe('ProjectDomain', () => {
         subdomain,
         domain,
       } as Project).domain.origin
-      expect(result).toBe('https://' + domain)
+      expect(result).toBe(`https://${domain}`)
     })
   })
 

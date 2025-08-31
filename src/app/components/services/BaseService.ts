@@ -157,7 +157,6 @@ export abstract class BaseService {
       pagination = DEFAULT_PAGINATION,
       tableReferences = {},
       search,
-      userId,
       tenantId,
     } = options
 

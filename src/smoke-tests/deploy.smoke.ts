@@ -1,14 +1,14 @@
 import 'dotenv/config'
+import fs from 'node:fs'
+import os from 'node:os'
+import path, { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import chalk from 'chalk'
 import FormData from 'form-data'
-import fs from 'fs'
 import { nanoid } from 'nanoid'
 import ora from 'ora'
-import os from 'os'
-import path, { dirname } from 'path'
 import { request } from 'undici'
-import { fileURLToPath } from 'url'
-import { Zip } from '../app/components/storage/Zip'
+import { createZip } from '../app/components/storage/Zip'
 
 const Filename = fileURLToPath(import.meta.url)
 const Dirname = dirname(Filename)
@@ -34,12 +34,9 @@ const assert = {
     }).start()
   },
   equal: (a: any, b: any) => {
-    console.log(chalk.bold.cyan(`Asserting: ${a} === ${b}`))
     if (a !== b) {
-      console.log(chalk.bold.red(`Failed: ${a} !== ${b}`))
       return false
     } else {
-      console.log(chalk.bold.green(`Success: ${a} === ${b}`))
       return true
     }
   },
@@ -66,7 +63,7 @@ const assert = {
 
 const main = async () => {
   let authToken: string
-  let projectId: string
+  let _projectId: string
 
   // Get auth token from env or hardcode a test token
   authToken = process.env.TEST_AUTH_TOKEN || ''
@@ -75,12 +72,9 @@ const main = async () => {
   }
 
   // Get project name from env or use default
-  const projectName = process.env.TEST_PROJECT_NAME || 'godeploy-smoke-test-' + nanoid(8)
-  console.log(`${chalk.bold.magenta('Starting test for project')} ${projectName}`)
+  const projectName = process.env.TEST_PROJECT_NAME || `godeploy-smoke-test-${nanoid(8)}`
 
-  const deploymentText = chalk.bold.magenta('Deployment')
-
-  console.log(`${deploymentText}: creating zip`)
+  const _deploymentText = chalk.bold.magenta('Deployment')
 
   // Create a temporary directory for our test files
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'deploy-test-'))
@@ -94,13 +88,11 @@ const main = async () => {
   const zipPath = path.join(tempDir, 'deploy.zip')
 
   // For this smoke test, we'll just create a simple file to simulate the upload
-  await Zip.create(tempDir, zipPath)
+  await createZip(tempDir, zipPath)
 
   // Create form data for file upload
   const form = new FormData()
   form.append('file', fs.createReadStream(zipPath))
-
-  console.log(`${deploymentText}: uploading zip`)
   const response = await request(`${API_URL}/api/deploy?project=${projectName}`, {
     method: 'POST',
     headers: {
@@ -111,16 +103,9 @@ const main = async () => {
   })
 
   if (!assert.equal(response.statusCode, 200)) {
-    console.debug(response.statusCode)
-    console.debug(await response.body.text())
     return
   }
-
-  console.log(`${deploymentText}: uploaded zip`)
   const deploy = (await response.body.json()) as { id: string }
-  console.log(deploy)
-
-  console.log(`${deploymentText}: getting deployments`)
 
   // Verify the deploy was created correctly
   const getDeployResponse = await request(`${API_URL}/api/deploys/${deploy.id}`, {
@@ -131,23 +116,14 @@ const main = async () => {
   })
 
   if (!assert.equal(getDeployResponse.statusCode, 200)) {
-    console.debug(getDeployResponse.statusCode)
-    console.debug(await getDeployResponse.body.text())
     return
   }
-
-  console.log(`${deploymentText}: got deployments`)
   const deployDetails = (await getDeployResponse.body.json()) as { id: string }
-  console.log(deployDetails)
   assert.equal(deployDetails.id, deploy.id)
-  console.log(`${deploymentText}: got deployment details`)
-
-  console.log(`${deploymentText}: cleaning up`)
   // Clean up temp files
   fs.unlinkSync(indexPath)
   fs.unlinkSync(zipPath)
   fs.rmdirSync(tempDir)
-  console.log(`${deploymentText}: cleaned up`)
 }
 
 main()

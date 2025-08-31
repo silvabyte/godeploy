@@ -3,6 +3,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { v4 as uuidv4 } from 'uuid'
 import { type DeployQuerystring, routeSchemas } from '../components/deploys/deploys.types'
 import { validateAndTransformProjectName } from '../components/projects/project-utils'
+import type { Project } from '../components/projects/projects.types'
 import { FileProcessor } from '../components/storage/FileProcessor'
 import { StorageService } from '../components/storage/StorageService'
 import { ProjectDomain } from '../utils/url'
@@ -84,7 +85,7 @@ export default async function (fastify: FastifyInstance) {
     request.measure.add('get_project')
     const projectResult = await request.db.projects.getProjectByName(projectName, tenant_id)
 
-    let project
+    let project: Project | null = null
     if (!projectResult.data) {
       // Project doesn't exist, let's create it
       request.measure.add('validate_project_name')

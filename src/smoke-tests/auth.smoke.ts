@@ -24,22 +24,16 @@ const assert = {
     }).start()
   },
   equal: (a: any, b: any) => {
-    console.log(chalk.bold.cyan(`Asserting: ${a} === ${b}`))
     if (a !== b) {
-      console.log(chalk.bold.red(`Failed: ${a} !== ${b}`))
       return false
     } else {
-      console.log(chalk.bold.green(`Success: ${a} === ${b}`))
       return true
     }
   },
   hasProperty: (obj: any, prop: string) => {
-    console.log(chalk.bold.cyan(`Asserting: object has property "${prop}"`))
     if (obj && Object.hasOwn(obj, prop)) {
-      console.log(chalk.bold.green(`Success: object has property "${prop}"`))
       return true
     } else {
-      console.log(chalk.bold.red(`Failed: object is missing property "${prop}"`))
       return false
     }
   },
@@ -74,9 +68,8 @@ const runValidTokenTest = async () => {
     const data = await res.body.json()
     spinner.succeed(`Response received with status ${res.statusCode}`)
     verifyAuthResponse(res.statusCode, data, true)
-  } catch (err) {
+  } catch (_err) {
     spinner.fail('Error verifying valid token')
-    console.error(err)
   }
 }
 
@@ -91,9 +84,8 @@ const runInvalidTokenTest = async () => {
     const data = await res.body.json()
     spinner.succeed(`Response received with status ${res.statusCode}`)
     verifyAuthResponse(res.statusCode, data, false)
-  } catch (err) {
+  } catch (_err) {
     spinner.fail('Error verifying invalid token')
-    console.error(err)
   }
 }
 
@@ -104,27 +96,24 @@ const runMissingTokenTest = async () => {
     const data = await res.body.json()
     spinner.succeed(`Response received with status ${res.statusCode}`)
     verifyAuthResponse(res.statusCode, data, false)
-  } catch (err) {
+  } catch (_err) {
     spinner.fail('Error testing missing token')
-    console.error(err)
   }
 }
 
 const verifyAuthResponse = (statusCode: number, data: any, shouldBeValid: boolean) => {
   const expectedStatus = shouldBeValid ? 200 : 401
-  const expectedValidity = shouldBeValid ? true : false
+  const expectedValidity = !!shouldBeValid
   const statusOK = assert.equal(statusCode, expectedStatus)
   const hasValid = assert.hasProperty(data, 'valid')
   const isValid = data.valid === expectedValidity
 
   if (hasValid && isValid) {
-    console.log(chalk.bold.green(`Success: valid property is ${data.valid}`))
   } else {
-    console.log(chalk.bold.red(`Failed: valid property is ${data.valid}`))
   }
 
   const hasError = !shouldBeValid && assert.hasProperty(data, 'error')
-  if (hasError) console.log(chalk.bold.green(`Error message: ${data.error}`))
+  if (hasError) 
 
   const hasUser =
     shouldBeValid &&
@@ -134,36 +123,26 @@ const verifyAuthResponse = (statusCode: number, data: any, shouldBeValid: boolea
     assert.hasProperty(data.user, 'tenant_id')
 
   if (shouldBeValid && hasUser) {
-    console.log(chalk.bold.green(`Success: user object has all required properties`))
   }
 
-  const passed = shouldBeValid
+  const _passed = shouldBeValid
     ? statusOK && hasValid && isValid && hasUser
     : statusOK && hasValid && isValid && hasError
 
-  const summary = shouldBeValid
+  const _summary = shouldBeValid
     ? 'Valid token verification'
     : statusCode === 401
       ? 'Invalid token verification'
       : 'Missing token test'
-
-  console.log(
-    passed ? assert.text.success(`${summary} passed all checks`) : assert.text.failed(`${summary} failed some checks`),
-  )
 }
 
 const main = async () => {
-  const authText = chalk.bold.magenta('Auth')
-  console.log(`${authText}: verifying valid token`)
+  const _authText = chalk.bold.magenta('Auth')
   await runValidTokenTest()
-  console.log(`\n${authText}: verifying invalid token`)
   await runInvalidTokenTest()
-  console.log(`\n${authText}: testing missing token`)
   await runMissingTokenTest()
-  console.log(`\n${authText}: smoke tests completed`)
 }
 
-main().catch((error) => {
-  console.error('An unexpected error occurred:', error)
+main().catch((_error) => {
   process.exit(1)
 })

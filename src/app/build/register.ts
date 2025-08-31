@@ -13,9 +13,14 @@ import projectsRoutes from '../routes/projects.js'
 import rootRoutes from '../routes/root.js'
 import subscriptionsRoutes from '../routes/subscriptions.js'
 
-export type AppOptions = {}
+export interface AppOptions {
+  // Add options here if needed in the future
+}
 
-export async function registerPluginsAndRoutes(fastify: FastifyInstance<any, any, any, Logger>, opts: AppOptions) {
+export async function registerPluginsAndRoutes(
+  fastify: FastifyInstance<any, any, any, Logger>, // eslint-disable-line @typescript-eslint/no-explicit-any
+  opts: AppOptions,
+) {
   // Register plugins in dependency order
   // 1. Sensible must be first (error handling)
   await fastify.register(sensiblePlugin, opts)

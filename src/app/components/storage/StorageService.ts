@@ -1,14 +1,14 @@
+import { createReadStream, type ReadStream } from 'node:fs'
+import * as fs from 'node:fs/promises'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import { join } from 'node:path'
 import { S3Client } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { to } from 'await-to-js'
-import { createReadStream, type ReadStream } from 'fs'
-import * as fs from 'fs/promises'
-import * as os from 'os'
-import * as path from 'path'
-import { join } from 'path'
 import { ProjectDomain } from '../../utils/url'
 import type { Project } from '../projects/projects.types'
-import { Zip } from './Zip'
+import { extractZip } from './Zip'
 
 //TODO: ensure we use streams for all file operations to avoid inevitable nodejs memory issues
 // couple the above with plimit library to limit the number of concurrent file operations our server does at a time to avoid overloading the server
@@ -102,7 +102,7 @@ export class StorageService {
     try {
       // Extract the archive
       try {
-        await Zip.extract(archivePath, tempDir)
+        await extractZip(archivePath, tempDir)
       } catch (extractErr) {
         return {
           data: null,

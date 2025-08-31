@@ -1,7 +1,7 @@
 import type { MultipartFile } from '@fastify/multipart'
 import { to } from 'await-to-js'
 import type { ActionTelemetry } from '../../../logging/ActionTelemetry'
-import { SpaArchiveProcessor } from './SpaArchiveProcessor'
+import { saveBufferToTemp, validateSpaArchive } from './SpaArchiveProcessor'
 
 interface Result<T> {
   data: T | null
@@ -49,7 +49,7 @@ export class FileProcessor {
 
           if (part.fieldname === 'archive' || part.filename.includes('.zip')) {
             this.measure.add('save_archive')
-            const result = await SpaArchiveProcessor.saveBufferToTemp(buffer, 'archive.zip')
+            const result = await saveBufferToTemp(buffer, 'archive.zip')
             if (result.error) {
               return {
                 archivePath: null,
@@ -61,7 +61,7 @@ export class FileProcessor {
             this.measure.add('archive_saved', { path: archivePath })
           } else if (part.fieldname === 'spa_config') {
             this.measure.add('save_config')
-            const result = await SpaArchiveProcessor.saveBufferToTemp(buffer, 'spa-config.json')
+            const result = await saveBufferToTemp(buffer, 'spa-config.json')
             if (result.error) {
               return {
                 archivePath,
@@ -98,7 +98,7 @@ export class FileProcessor {
       }
     }
 
-    const result = await SpaArchiveProcessor.validateSpaArchive(archivePath)
+    const result = await validateSpaArchive(archivePath)
     return result
   }
 }

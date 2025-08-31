@@ -23,9 +23,6 @@ export function generateUniqueSubdomain(): string {
 }
 
 export class UrlFormatter extends URL {
-  constructor(url: string, base?: string) {
-    super(url, base)
-  }
   static from(uncleanUrl: string) {
     return new UrlFormatter(UrlFormatter.normalize.protocol(uncleanUrl))
   }

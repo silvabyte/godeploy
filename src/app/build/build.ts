@@ -90,7 +90,7 @@ export async function buildApp() {
     this._measure = new ActionTelemetry(this.telemetry)
   })
 
-  server.addHook('onRequest', (request, reply, done) => {
+  server.addHook('onRequest', (request, _reply, done) => {
     request.measure.start('request', {
       requestId: request.headers['x-request-id'] ?? request.id,
       url: request.url,

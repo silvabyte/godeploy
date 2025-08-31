@@ -1,10 +1,8 @@
 import 'dotenv/config'
-import { createServer } from 'node:http'
+import http, { createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
 import chalk from 'chalk'
-import { randomUUID } from 'crypto'
-import http from 'http'
 import { nanoid } from 'nanoid'
-import type { AddressInfo } from 'net'
 import ora from 'ora'
 import { request } from 'undici'
 
@@ -49,22 +47,16 @@ const assert = {
     }).start()
   },
   equal: (a: any, b: any) => {
-    console.log(chalk.bold.cyan(`Asserting: ${a} === ${b}`))
     if (a !== b) {
-      console.log(chalk.bold.red(`Failed: ${a} !== ${b}`))
       return false
     } else {
-      console.log(chalk.bold.green(`Success: ${a} === ${b}`))
       return true
     }
   },
   hasProperty: (obj: any, prop: string) => {
-    console.log(chalk.bold.cyan(`Asserting: object has property "${prop}"`))
     if (obj && Object.hasOwn(obj, prop)) {
-      console.log(chalk.bold.green(`Success: object has property "${prop}"`))
       return true
     } else {
-      console.log(chalk.bold.red(`Failed: object is missing property "${prop}"`))
       return false
     }
   },
@@ -84,8 +76,7 @@ async function startMockApiServer(): Promise<http.Server> {
         // Handle different routes
         if (req.url === '/api/auth/init' && req.method === 'POST') {
           try {
-            const data = JSON.parse(body) as AuthInitRequest
-            console.log(`Mock API received auth init request for ${data.email}`)
+            const _data = JSON.parse(body) as AuthInitRequest
 
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(
@@ -94,7 +85,7 @@ async function startMockApiServer(): Promise<http.Server> {
                 message: 'Check your email for the login link.',
               }),
             )
-          } catch (error) {
+          } catch (_error) {
             res.writeHead(400, { 'Content-Type': 'application/json' })
             res.end(
               JSON.stringify({
@@ -154,7 +145,6 @@ async function startMockApiServer(): Promise<http.Server> {
     })
 
     server.listen(MOCK_API_PORT, () => {
-      console.log(`Mock API server running at http://localhost:${MOCK_API_PORT}`)
       resolve(server)
     })
   })
@@ -171,7 +161,6 @@ class CallbackServer {
 
   private handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
     const url = new URL(req.url || '/', `http://localhost:${CLI_CALLBACK_PORT}`)
-    console.log(assert.text.info(`Callback received: ${url.pathname}`))
 
     // Extract token from query params (as the CLI would)
     const token = url.searchParams.get('access_token')
@@ -209,9 +198,7 @@ class CallbackServer {
  * Step 1: Simulate InitAuth flow
  * This function tests the auth initialization endpoint that the CLI uses
  */
-async function testAuthInitialization(email: string, authText: string): Promise<boolean> {
-  console.log(`${authText}: simulating auth initialization`)
-  console.log(`Using email: ${email}`)
+async function testAuthInitialization(email: string, _authText: string): Promise<boolean> {
   const spinner = assert.spinner('Initializing auth flow')
 
   try {
@@ -223,9 +210,6 @@ async function testAuthInitialization(email: string, authText: string): Promise<
       email,
       redirect_uri: redirectUri,
     }
-
-    // Debug log the request
-    console.log('Request body:', JSON.stringify(reqBody, null, 2))
 
     // Send auth init request
     const response = await request(`${API_URL}/api/auth/init`, {
@@ -239,10 +223,6 @@ async function testAuthInitialization(email: string, authText: string): Promise<
     const statusCode = response.statusCode
     const data = (await response.body.json()) as AuthInitResponse
 
-    // Debug log the response
-    console.log('Response status:', statusCode)
-    console.log('Response data:', JSON.stringify(data, null, 2))
-
     spinner.succeed(`Auth init response received with status ${statusCode}`)
 
     // Validate response
@@ -251,33 +231,25 @@ async function testAuthInitialization(email: string, authText: string): Promise<
     const successValue = data.success === true
 
     if (hasSuccessProperty && !successValue) {
-      console.log(chalk.bold.red(`Failed: success property is ${data.success}, expected true`))
     } else if (hasSuccessProperty && successValue) {
-      console.log(chalk.bold.green(`Success: success property is true`))
     }
 
     const hasMessageProperty = assert.hasProperty(data, 'message')
     if (hasMessageProperty) {
-      console.log(chalk.bold.green(`Message: ${data.message}`))
     }
 
     const allChecksPass = validStatus && hasSuccessProperty && successValue && hasMessageProperty
 
     if (allChecksPass) {
-      console.log(assert.text.success('Auth initialization passed all checks'))
-      console.log(assert.text.info(`A magic link would be sent to: ${email}`))
-      console.log(assert.text.info(`Redirect URL: ${redirectUri}`))
     } else {
-      console.log(assert.text.failed('Auth initialization failed some checks'))
     }
 
     // Explain the CLI flow for context
     explainAuthFlow()
 
     return allChecksPass
-  } catch (error) {
+  } catch (_error) {
     spinner.fail('Error initializing auth')
-    console.error(error)
     return false
   }
 }
@@ -285,20 +257,13 @@ async function testAuthInitialization(email: string, authText: string): Promise<
 /**
  * Explains the CLI auth flow in the console
  */
-function explainAuthFlow(): void {
-  console.log('\nIn a real CLI flow:')
-  console.log('1. The user would receive an email with a magic link')
-  console.log('2. Clicking the link would redirect to API with auth hash parameters')
-  console.log('3. API would redirect to CLI callback URL with the token')
-  console.log('4. CLI would extract and store the token for future requests')
-}
+function explainAuthFlow(): void {}
 
 /**
  * Step 2: Simulate callback server
  * This function simulates the CLI's local callback server that receives tokens
  */
-async function testCallbackServer(authText: string): Promise<string | null> {
-  console.log(`\n${authText}: simulating callback server`)
+async function testCallbackServer(_authText: string): Promise<string | null> {
   const callbackSpinner = assert.spinner('Starting callback server')
 
   try {
@@ -306,7 +271,6 @@ async function testCallbackServer(authText: string): Promise<string | null> {
     const port = await callbackServer.start()
 
     callbackSpinner.succeed(`Callback server started on port ${port}`)
-    console.log(assert.text.info('Waiting for token (would normally come from magic link click)...'))
 
     // Generate a simulated token (for testing only)
     const simulatedToken = nanoid(64)
@@ -315,24 +279,19 @@ async function testCallbackServer(authText: string): Promise<string | null> {
     setTimeout(async () => {
       try {
         await request(`http://localhost:${port}/callback?access_token=${simulatedToken}`, { method: 'GET' })
-      } catch (e) {
-        console.error('Error simulating callback:', e)
-      }
+      } catch (_e) {}
     }, 1000)
 
     // Wait for the token to be received
     const receivedToken = await callbackServer.waitForToken()
 
     if (receivedToken) {
-      console.log(assert.text.success(`Token received: ${receivedToken.substring(0, 10)}...`))
       return receivedToken
     } else {
-      console.log(assert.text.failed('No token received'))
       return null
     }
-  } catch (error) {
+  } catch (_error) {
     callbackSpinner.fail('Error with callback server')
-    console.error(error)
     return null
   }
 }
@@ -341,8 +300,7 @@ async function testCallbackServer(authText: string): Promise<string | null> {
  * Step 3: Verify token
  * This function tests the token verification endpoint that the CLI uses
  */
-async function testTokenVerification(token: string, authText: string): Promise<boolean> {
-  console.log(`\n${authText}: verifying token (VerifyToken function)`)
+async function testTokenVerification(token: string, _authText: string): Promise<boolean> {
   const tokenSpinner = assert.spinner('Verifying token with API')
 
   try {
@@ -360,23 +318,17 @@ async function testTokenVerification(token: string, authText: string): Promise<b
 
     // Validate response
     if (data.valid) {
-      console.log(assert.text.success('Token is valid'))
       const hasUserProperty = assert.hasProperty(data, 'user')
 
       if (hasUserProperty && data.user) {
-        console.log(chalk.bold.green(`User ID: ${data.user.id}`))
-        console.log(chalk.bold.green(`User Email: ${data.user.email}`))
-        console.log(chalk.bold.green(`User Tenant ID: ${data.user.tenant_id}`))
       }
 
       return true
     } else {
-      console.log(assert.text.failed(`Token verification failed: ${data.error}`))
       return false
     }
-  } catch (error) {
+  } catch (_error) {
     tokenSpinner.fail('Error verifying token')
-    console.error(error)
     return false
   }
 }
@@ -397,12 +349,10 @@ async function main(): Promise<void> {
 
   // Start mock API server if requested
   if (process.env.USE_MOCK_API === 'true') {
-    console.log(assert.text.info('Starting mock API server for testing'))
     mockServer = await startMockApiServer()
 
     // Override API_URL to point to our mock server
     API_URL = `http://localhost:${MOCK_API_PORT}`
-    console.log(assert.text.info(`Using mock API at ${API_URL}`))
   }
 
   try {
@@ -411,10 +361,10 @@ async function main(): Promise<void> {
 
     // Step 2: Test callback server (optional)
     const shouldRunCallbackDemo = process.env.RUN_CALLBACK_DEMO === 'true'
-    let receivedToken: string | null = null
+    let _receivedToken: string | null = null
 
     if (shouldRunCallbackDemo) {
-      receivedToken = await testCallbackServer(authText)
+      _receivedToken = await testCallbackServer(authText)
     }
 
     // Step 3: Test token verification
@@ -423,10 +373,7 @@ async function main(): Promise<void> {
     if (validToken) {
       await testTokenVerification(validToken, authText)
     } else {
-      console.log(assert.text.info('\nSkipping token verification - set TEST_AUTH_TOKEN to test this step'))
     }
-
-    console.log(`\n${authText}: smoke tests completed`)
   } finally {
     // Restore original API URL
     if (process.env.USE_MOCK_API === 'true') {
@@ -436,13 +383,11 @@ async function main(): Promise<void> {
     // Clean up mock server if it was started
     if (mockServer) {
       mockServer.close()
-      console.log(assert.text.info('Mock API server stopped'))
     }
   }
 }
 
 // Run the main function with error handling
-main().catch((error) => {
-  console.error('An unexpected error occurred:', error)
+main().catch((_error) => {
   process.exit(1)
 })

@@ -1,5 +1,5 @@
+import fs from 'node:fs'
 import type { FastifyInstance } from 'fastify'
-import fs from 'fs'
 
 export default async function (fastify: FastifyInstance) {
   //load version from package.json

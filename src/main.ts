@@ -18,14 +18,10 @@ async function startServer() {
       server.log.error(err)
       process.exit(1)
     } else {
-      console.log(`[ ready ] http://${host}:${port}`)
-      console.log(`[ docs  ] http://${host}:${port}/documentation`)
-      console.log(`[ mode  ] ${process.env.NODE_ENV}`)
     }
   })
 }
 
-startServer().catch((err) => {
-  console.error('Failed to start server:', err)
+startServer().catch((_err) => {
   process.exit(1)
 })

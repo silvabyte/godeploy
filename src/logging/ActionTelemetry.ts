@@ -86,7 +86,6 @@ export class ActionTelemetry {
 
   process() {
     if (!this.startEntry || !this.endEntry) {
-      console.warn('No telemetry data to process')
       return this
     }
 
@@ -111,7 +110,6 @@ export class ActionTelemetry {
   send() {
     const telemetry = this.telemetry
     if (!this.payload) {
-      console.warn('No telemetry data to send')
       return this
     }
     telemetry.info(this.payload, this.payload.operation)

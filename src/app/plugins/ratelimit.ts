@@ -23,8 +23,8 @@ export default fp(async function (fastify: FastifyInstance) {
         timeWindow: '1 minute',
       }),
     },
-    (_request, reply) => {
-      void reply.code(404).send({ message: 'Not Found' })
+    async (_request, reply) => {
+      await reply.code(404).send({ message: 'Not Found' })
     },
   )
 

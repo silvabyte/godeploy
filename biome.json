@@ -22,9 +22,10 @@
       "style": {
         "noNonNullAssertion": "off",
         "useNamingConvention": {
-          "level": "error",
+          "level": "warn",
           "options": {
             "strictCase": false,
+            "requireAscii": false,
             "conventions": [
               {
                 "selector": {
@@ -77,6 +78,12 @@
               {
                 "selector": {
                   "kind": "typeMember"
+                },
+                "formats": ["camelCase", "snake_case", "CONSTANT_CASE", "PascalCase"]
+              },
+              {
+                "selector": {
+                  "kind": "classMember"
                 },
                 "formats": ["camelCase", "snake_case", "CONSTANT_CASE"]
               }

@@ -20,14 +20,14 @@ const DeployQuerystringSchema = z.object({
 
 //TODO: have better generic filter query params
 //?filter[project]=projectId&sort[created_at]=desc&limit=10&offset=0
-const DeployFilterKeys = ['project']
-const DeploySortKeys = ['created_at']
+const _DeployFilterKeys = ['project']
+const _DeploySortKeys = ['created_at']
 
-const FilterSchema = z.object({
+const _FilterSchema = z.object({
   project: z.string().optional(),
 })
 
-const SortSchema = z.object({
+const _SortSchema = z.object({
   created_at: z.string().optional(),
 })
 
