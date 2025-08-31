@@ -49,6 +49,24 @@ type AuthInitResponse struct {
 	Error   string `json:"error,omitempty"`
 }
 
+// AuthLoginRequest represents a request to login with email and password
+type AuthLoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+// AuthLoginResponse represents a response from the login endpoint
+type AuthLoginResponse struct {
+	Success bool   `json:"success"`
+	Token   string `json:"token"`
+	User    struct {
+		ID       string `json:"id"`
+		Email    string `json:"email"`
+		TenantID string `json:"tenant_id"`
+	} `json:"user"`
+	Error string `json:"error,omitempty"`
+}
+
 // VerifyResponse represents a response from the token verification endpoint
 type VerifyResponse struct {
 	Valid bool `json:"valid"`
@@ -212,6 +230,66 @@ func (c *Client) DoAuthenticatedRequest(req *http.Request) (*http.Response, erro
 // GetAuthToken gets the auth token from the auth package
 func (c *Client) GetAuthToken() (string, error) {
 	return auth.GetAuthToken()
+}
+
+// Login authenticates a user with email and password
+func (c *Client) Login(email, password string) (*AuthLoginResponse, error) {
+	// Create the request body
+	reqBody := AuthLoginRequest{
+		Email:    email,
+		Password: password,
+	}
+
+	// Marshal the request body
+	reqData, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request body: %w", err)
+	}
+
+	// Create the request
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/auth/login", c.BaseURL), bytes.NewBuffer(reqData))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// Set the headers
+	req.Header.Set("Content-Type", "application/json")
+
+	// Send the request
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	// Check the status code
+	if resp.StatusCode != http.StatusOK {
+		// Try to parse the error response
+		var errResp ErrorResponse
+		if err := json.Unmarshal(body, &errResp); err == nil && errResp.Error != "" {
+			return nil, fmt.Errorf("API error: %s", errResp.Error)
+		}
+		return nil, fmt.Errorf("unexpected status code: %d, body: %s", resp.StatusCode, string(body))
+	}
+
+	// Decode the response
+	var loginResp AuthLoginResponse
+	if err := json.Unmarshal(body, &loginResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	// Check for errors
+	if !loginResp.Success {
+		return nil, fmt.Errorf("authentication failed: %s", loginResp.Error)
+	}
+
+	return &loginResp, nil
 }
 
 // Deploy deploys a SPA to the GoDeploy service

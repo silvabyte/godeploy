@@ -1,12 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
+	"syscall"
 
 	"github.com/alecthomas/kong"
 	"github.com/audetic/godeploy/internal/api"
@@ -17,6 +18,7 @@ import (
 	"github.com/audetic/godeploy/internal/nginx"
 	"github.com/audetic/godeploy/internal/version"
 	"github.com/yarlson/pin"
+	"golang.org/x/term"
 )
 
 // CLI represents the command-line interface structure
@@ -59,7 +61,8 @@ type AuthCmd struct {
 
 // LoginCmd represents the auth login command
 type LoginCmd struct {
-	Email string `help:"Email address to authenticate with" default:""`
+	Email    string `help:"Email address to authenticate with" default:""`
+	Password string `help:"Password for authentication" default:""`
 }
 
 // LogoutCmd represents the logout command
@@ -295,84 +298,66 @@ func (l *LoginCmd) Run() error {
 			email = savedEmail
 			fmt.Printf("Using saved email: %s\n", email)
 		} else {
-			return fmt.Errorf("email is required for authentication. Please provide it with --email flag")
+			// Prompt for email if not provided
+			fmt.Print("Email: ")
+			reader := bufio.NewReader(os.Stdin)
+			emailInput, err := reader.ReadString('\n')
+			if err != nil {
+				return fmt.Errorf("failed to read email: %w", err)
+			}
+			email = strings.TrimSpace(emailInput)
+			if email == "" {
+				return fmt.Errorf("email is required for authentication")
+			}
+		}
+	}
+
+	// Get password from argument or prompt
+	password := l.Password
+	if password == "" {
+		fmt.Print("Password: ")
+		passwordBytes, err := term.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return fmt.Errorf("failed to read password: %w", err)
+		}
+		fmt.Println() // Add newline after password input
+		password = string(passwordBytes)
+		if password == "" {
+			return fmt.Errorf("password is required for authentication")
 		}
 	}
 
 	// Create a context with a timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
-	defer cancel()
+	ctx := context.Background()
 
-	// Create a spinner for starting the local server
-	serverSpinner := pin.New("Starting local authentication server...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	serverCancel := serverSpinner.Start(ctx)
-
-	// Start the local server in a goroutine
-	serverDone := make(chan struct{})
-	var token string
-	var serverErr error
-
-	go func() {
-		token, serverErr = auth.StartLocalServer(ctx)
-		close(serverDone)
-	}()
-
-	// Wait a moment for the server to start
-	time.Sleep(500 * time.Millisecond)
-	serverCancel()
-	serverSpinner.Stop("Local server started")
-	fmt.Printf("Listening for authentication at http://localhost:%d/callback\n", auth.DefaultPort)
-
-	// Create a spinner for the authentication request
-	authSpinner := pin.New(fmt.Sprintf("Sending authentication request for %s...", email),
+	// Create a spinner for authentication
+	authSpinner := pin.New(fmt.Sprintf("Authenticating %s...", email),
 		pin.WithSpinnerColor(pin.ColorMagenta),
 		pin.WithTextColor(pin.ColorMagenta),
 	)
 	authCancel := authSpinner.Start(ctx)
 
-	// Initialize the authentication flow
-	redirectURI := auth.GetRedirectURI()
+	// Authenticate with email and password
 	apiClient := api.NewClient()
+	loginResp, err := apiClient.Login(email, password)
 
-	_, err = apiClient.InitAuth(email, redirectURI)
 	authCancel()
-	authSpinner.Stop("Authentication request sent")
 
 	if err != nil {
-		cancel() // Cancel the server context
-		<-serverDone
-		return fmt.Errorf("failed to initialize authentication: %w", err)
-	}
+		authSpinner.Fail("Authentication failed")
 
-	// Create a spinner for waiting for authentication
-	waitSpinner := pin.New("Waiting for you to complete authentication...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	waitCancel := waitSpinner.Start(ctx)
-	fmt.Println("Check your email for a login link and click it to authenticate.")
-
-	// Wait for the server to complete
-	<-serverDone
-	waitCancel()
-	waitSpinner.Stop("Authentication received")
-
-	if serverErr != nil {
-		// Check if the error contains a specific error message
-		if strings.Contains(serverErr.Error(), "access_denied") {
-			fmt.Println("❌ Authentication was denied.")
-		} else if strings.Contains(serverErr.Error(), "otp_expired") {
-			fmt.Println("❌ Authentication link has expired. Please try again.")
-		} else if strings.Contains(serverErr.Error(), "Email link is invalid") {
-			fmt.Println("❌ The authentication link is invalid. Please try again.")
+		// Check for specific error messages
+		if strings.Contains(err.Error(), "invalid credentials") || strings.Contains(err.Error(), "Invalid email or password") {
+			fmt.Println("❌ Invalid email or password. Please check your credentials and try again.")
+		} else if strings.Contains(err.Error(), "user not found") {
+			fmt.Println("❌ User not found. Please check your email address.")
 		} else {
-			fmt.Println("❌ Authentication failed:", serverErr)
+			fmt.Printf("❌ Authentication failed: %v\n", err)
 		}
-		return serverErr
+		return err
 	}
+
+	authSpinner.Stop("Authentication successful")
 
 	// Create a spinner for saving the token
 	saveSpinner := pin.New("Saving authentication token...",
@@ -381,8 +366,8 @@ func (l *LoginCmd) Run() error {
 	)
 	saveCancel := saveSpinner.Start(ctx)
 
-	// Save the token and email
-	if err := auth.SetAuthToken(token); err != nil {
+	// Save the token
+	if err := auth.SetAuthToken(loginResp.Token); err != nil {
 		saveCancel()
 		saveSpinner.Fail("Failed to save token")
 		return fmt.Errorf("failed to save authentication token: %w", err)
@@ -397,7 +382,12 @@ func (l *LoginCmd) Run() error {
 
 	saveCancel()
 	saveSpinner.Stop("Token saved")
+
 	fmt.Println("✅ Authentication successful! You are now logged in.")
+	if loginResp.User.Email != "" {
+		fmt.Printf("Logged in as: %s\n", loginResp.User.Email)
+	}
+
 	return nil
 }
 
@@ -475,7 +465,7 @@ func (s *StatusCmd) Run() error {
 		if savedEmail != "" {
 			fmt.Printf("Run 'godeploy auth login' to authenticate with saved email: %s\n", savedEmail)
 		} else {
-			fmt.Println("Run 'godeploy auth login --email=your@email.com' to authenticate.")
+			fmt.Println("Run 'godeploy auth login' to authenticate.")
 		}
 		return nil
 	}
@@ -510,7 +500,7 @@ func (s *StatusCmd) Run() error {
 		if savedEmail != "" {
 			fmt.Printf("Run 'godeploy auth login' to authenticate with saved email: %s\n", savedEmail)
 		} else {
-			fmt.Println("Run 'godeploy auth login --email=your@email.com' to authenticate.")
+			fmt.Println("Run 'godeploy auth login' to authenticate.")
 		}
 
 		// Clear the invalid token
@@ -547,24 +537,12 @@ func (d *DeployCmd) Run() error {
 		authCancel()
 		authSpinner.Fail("Not authenticated")
 
-		// Try to automatically login if we have a saved email
-		savedEmail, emailErr := auth.GetUserEmail()
-		if emailErr == nil && savedEmail != "" {
-			fmt.Printf("You must be authenticated to use this command.\nAttempting automatic login with saved email: %s\n", savedEmail)
-
-			// Create and run login command with saved email
-			loginCmd := &LoginCmd{Email: savedEmail}
-			if loginErr := loginCmd.Run(); loginErr != nil {
-				return fmt.Errorf("automatic login failed: %w", loginErr)
-			}
-
-			// Refresh token after login
-			token, err = auth.GetAuthToken()
-			if err != nil || token == "" {
-				return fmt.Errorf("failed to retrieve authentication token after login")
-			}
+		// Inform user they need to authenticate
+		savedEmail, _ := auth.GetUserEmail()
+		if savedEmail != "" {
+			return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login' to authenticate with saved email: %s", savedEmail)
 		} else {
-			return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login --email=your@email.com' to authenticate")
+			return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login' to authenticate")
 		}
 	}
 
@@ -577,35 +555,16 @@ func (d *DeployCmd) Run() error {
 		authCancel()
 		authSpinner.Fail("Failed to verify token")
 
-		// Try to automatically login if we have a saved email
-		savedEmail, emailErr := auth.GetUserEmail()
-		if emailErr == nil && savedEmail != "" {
-			fmt.Printf("Failed to verify authentication token: %v\nAttempting automatic login with saved email: %s\n", err, savedEmail)
+		// Clear invalid token and inform user to re-authenticate
+		if clearErr := auth.ClearAuthToken(); clearErr != nil {
+			fmt.Printf("Warning: Failed to clear invalid token: %v\n", clearErr)
+		}
 
-			// Clear the potentially invalid token
-			if clearErr := auth.ClearAuthToken(); clearErr != nil {
-				fmt.Printf("Warning: Failed to clear token: %v\n", clearErr)
-			}
-
-			// Create and run login command with saved email
-			loginCmd := &LoginCmd{Email: savedEmail}
-			if loginErr := loginCmd.Run(); loginErr != nil {
-				return fmt.Errorf("automatic login failed: %w", loginErr)
-			}
-
-			// Refresh token after login
-			token, err = auth.GetAuthToken()
-			if err != nil || token == "" {
-				return fmt.Errorf("failed to retrieve authentication token after login")
-			}
-
-			// Try to verify the new token
-			verifyResp, err = apiClient.VerifyToken(token)
-			if err != nil {
-				return fmt.Errorf("failed to verify new authentication token: %w", err)
-			}
+		savedEmail, _ := auth.GetUserEmail()
+		if savedEmail != "" {
+			return fmt.Errorf("authentication token verification failed. Run 'godeploy auth login' to re-authenticate with saved email: %s", savedEmail)
 		} else {
-			return fmt.Errorf("error verifying authentication: %w", err)
+			return fmt.Errorf("authentication token verification failed. Run 'godeploy auth login' to re-authenticate")
 		}
 	}
 
@@ -614,35 +573,16 @@ func (d *DeployCmd) Run() error {
 		authCancel()
 		authSpinner.Fail("Invalid authentication")
 
-		// Try to automatically login if we have a saved email
-		savedEmail, emailErr := auth.GetUserEmail()
-		if emailErr == nil && savedEmail != "" {
-			fmt.Printf("Your authentication token is invalid or expired.\nAttempting automatic login with saved email: %s\n", savedEmail)
+		// Clear invalid token and inform user to re-authenticate
+		if clearErr := auth.ClearAuthToken(); clearErr != nil {
+			fmt.Printf("Warning: Failed to clear invalid token: %v\n", clearErr)
+		}
 
-			// Clear the invalid token
-			if clearErr := auth.ClearAuthToken(); clearErr != nil {
-				fmt.Printf("Warning: Failed to clear invalid token: %v\n", clearErr)
-			}
-
-			// Create and run login command with saved email
-			loginCmd := &LoginCmd{Email: savedEmail}
-			if loginErr := loginCmd.Run(); loginErr != nil {
-				return fmt.Errorf("automatic login failed: %w", loginErr)
-			}
-
-			// Refresh token after login
-			token, err = auth.GetAuthToken()
-			if err != nil || token == "" {
-				return fmt.Errorf("failed to retrieve authentication token after login")
-			}
-
-			// Verify the new token
-			verifyResp, err = apiClient.VerifyToken(token)
-			if err != nil || !verifyResp.Valid {
-				return fmt.Errorf("new authentication token is invalid")
-			}
+		savedEmail, _ := auth.GetUserEmail()
+		if savedEmail != "" {
+			return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login' to re-authenticate with saved email: %s", savedEmail)
 		} else {
-			return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login --email=your@email.com' to authenticate")
+			return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login' to re-authenticate")
 		}
 	}
 
