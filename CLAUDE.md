@@ -2,13 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Runtime
+
+This project uses **Bun** as the JavaScript runtime and package manager.
+
 ## Commands
 
-- Build/Run: `npm run dev` (development with watch), `npm run start` (production)
-- Test: `npm test` (all tests), `npx vitest src/path/to/test.test.ts` (single test)
-- Smoke Tests: `npm run test:smoke`, `npm run test:auth`
-- Format: `npm run format`
-- Database: `npm run db:new` (create migration), `npm run db:up` (apply), `npm run db:push` (to Supabase)
+- Build/Run: `bun dev` (development with watch), `bun start` (production)
+- Test: `bun test` (all tests), `bun test src/path/to/test.test.ts` (single test)
+- Smoke Tests: `bun run test:smoke`, `bun run test:auth`
+- Format: `bun run format`
+- Database: `bun run db:new` (create migration), `bun run db:up` (apply), `bun run db:push` (to Supabase)
+- Install: `bun install` (install dependencies)
 
 ## Code Style
 
@@ -19,7 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Class-based services with descriptive method names
 - Use async/await for promises
 - Conventional commits (feat, fix, chore, etc.)
-- Fastify routes and plugins using autoload (src/app/build/autoload.ts)
+- Fastify routes and plugins using explicit registration (src/app/build/register.ts)
 - Use zod for type defintions
 - Use zodToJsonSchema to convert type definaitons to json schemas, for fastify
 - Fastify route handlers with explicit type definitions and schema validation
@@ -27,4 +32,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Prefer early returns for error conditions
 - Use nullable types with `!` assertion only when guaranteed
 - Use .prettierrc for formatting
-- Vitest for unit tests.
+- Bun test for unit tests (migrating from Vitest)

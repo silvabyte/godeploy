@@ -1,11 +1,11 @@
 import Fastify from 'fastify';
-import { autoloadRoutesAndPlugins } from './autoload';
+import { registerPluginsAndRoutes } from './register.js';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import cors from '@fastify/cors';
-import { Logger } from '../log';
+import { Logger } from '../log.js';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { ActionTelemetry } from '../../logging/ActionTelemetry';
+import { ActionTelemetry } from '../../logging/ActionTelemetry.js';
 
 // Extend FastifyRequest to include user property
 declare module 'fastify' {
@@ -166,8 +166,8 @@ export async function buildApp() {
     },
   });
 
-  // Register your application as a normal plugin.
-  server.register(autoloadRoutesAndPlugins);
+  // Register plugins and routes explicitly
+  await registerPluginsAndRoutes(server, {});
 
   await server.ready();
   server.swagger();

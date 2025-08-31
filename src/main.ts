@@ -1,5 +1,4 @@
-import 'dotenv/config';
-import { buildApp } from './app/build/build';
+import { buildApp } from './app/build/build.js';
 // Set NODE_ENV to development if not already set
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 

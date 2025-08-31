@@ -1,4 +1,4 @@
-FROM docker.io/node:lts-alpine
+FROM oven/bun:1-alpine
 
 ENV APP_URL=https://api.godeploy.app    
 ENV PORT=80
@@ -8,11 +8,11 @@ RUN apk add --no-cache bash zip unzip
 # Create and set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy package.json and bun lockfile
+COPY package.json bun.lockb ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with frozen lockfile for production
+RUN bun install --frozen-lockfile --production
 
 # Copy the rest of the application
 COPY . .
