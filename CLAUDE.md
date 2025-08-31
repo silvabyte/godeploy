@@ -11,7 +11,10 @@ This project uses **Bun** as the JavaScript runtime and package manager.
 - Build/Run: `bun dev` (development with watch), `bun start` (production)
 - Test: `bun test` (all tests), `bun test src/path/to/test.test.ts` (single test)
 - Smoke Tests: `bun run test:smoke`, `bun run test:auth`
-- Format: `bun run format`
+- Format: `bun run format` (format code with Biome)
+- Lint: `bun run lint` (check), `bun run lint:fix` (fix issues)
+- Check: `bun run check` (lint + format check), `bun run check:fix` (fix all)
+- Type Check: `bun run typecheck`
 - Database: `bun run db:new` (create migration), `bun run db:up` (apply), `bun run db:push` (to Supabase)
 - Install: `bun install` (install dependencies)
 
@@ -31,5 +34,5 @@ This project uses **Bun** as the JavaScript runtime and package manager.
 - Fastify plugins using fastify-plugin
 - Prefer early returns for error conditions
 - Use nullable types with `!` assertion only when guaranteed
-- Use .prettierrc for formatting
+- Use Biome for formatting and linting (biome.json configuration)
 - Bun test for unit tests (migrating from Vitest)

@@ -1,4 +1,4 @@
-import { mock } from 'bun:test';
+import { mock } from 'bun:test'
 
 // Mock Supabase client for tests
 mock.module('@supabase/supabase-js', () => ({
@@ -6,9 +6,7 @@ mock.module('@supabase/supabase-js', () => ({
     auth: {
       getUser: mock(() => Promise.resolve({ data: null, error: null })),
       getSession: mock(() => Promise.resolve({ data: null, error: null })),
-      signInWithPassword: mock(() =>
-        Promise.resolve({ data: null, error: null })
-      ),
+      signInWithPassword: mock(() => Promise.resolve({ data: null, error: null })),
       signOut: mock(() => Promise.resolve({ error: null })),
     },
     from: mock(() => ({
@@ -35,9 +33,9 @@ mock.module('@supabase/supabase-js', () => ({
       })),
     })),
   })),
-}));
+}))
 
 // Set up test environment variables
-process.env.NODE_ENV = 'test';
-process.env.SUPABASE_URL = 'https://test.supabase.co';
-process.env.SUPABASE_API_KEY = 'test-api-key';
+process.env.NODE_ENV = 'test'
+process.env.SUPABASE_URL = 'https://test.supabase.co'
+process.env.SUPABASE_API_KEY = 'test-api-key'

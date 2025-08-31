@@ -1,33 +1,31 @@
-import { z } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
+import { z } from 'zod'
+import { zodToJsonSchema } from 'zod-to-json-schema'
 
 // Common error response schema
 export const errorResponseSchema = z.object({
   error: z.string(),
   message: z.string().optional(),
-});
+})
 
 // Not found response schema
 export const notFoundResponseSchema = z.object({
   error: z.string(),
-});
+})
 
 // Success response schema
 export const successResponseSchema = z.object({
   success: z.boolean(),
-});
+})
 
 // Generate JSON schemas
-export const errorResponseJsonSchema = zodToJsonSchema(errorResponseSchema);
-export const notFoundResponseJsonSchema = zodToJsonSchema(
-  notFoundResponseSchema
-);
-export const successResponseJsonSchema = zodToJsonSchema(successResponseSchema);
+export const errorResponseJsonSchema = zodToJsonSchema(errorResponseSchema)
+export const notFoundResponseJsonSchema = zodToJsonSchema(notFoundResponseSchema)
+export const successResponseJsonSchema = zodToJsonSchema(successResponseSchema)
 
 // Define types from Zod schemas
-export type ErrorResponse = z.infer<typeof errorResponseSchema>;
-export type NotFoundResponse = z.infer<typeof notFoundResponseSchema>;
-export type SuccessResponse = z.infer<typeof successResponseSchema>;
+export type ErrorResponse = z.infer<typeof errorResponseSchema>
+export type NotFoundResponse = z.infer<typeof notFoundResponseSchema>
+export type SuccessResponse = z.infer<typeof successResponseSchema>
 
 // Common response schemas for Fastify
 export const commonResponseSchemas = {
@@ -50,4 +48,4 @@ export const commonResponseSchemas = {
       success: { type: 'boolean' },
     },
   },
-};
+}

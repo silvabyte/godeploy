@@ -1,36 +1,36 @@
-import Fastify from 'fastify';
-import { registerPluginsAndRoutes } from './register.js';
-import swagger from '@fastify/swagger';
-import swaggerUi from '@fastify/swagger-ui';
-import cors from '@fastify/cors';
-import { Logger } from '../log.js';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { ActionTelemetry } from '../../logging/ActionTelemetry.js';
+import cors from '@fastify/cors'
+import swagger from '@fastify/swagger'
+import swaggerUi from '@fastify/swagger-ui'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import Fastify from 'fastify'
+import { ActionTelemetry } from '../../logging/ActionTelemetry.js'
+import { Logger } from '../log.js'
+import { registerPluginsAndRoutes } from './register.js'
 
 // Extend FastifyRequest to include user property
 declare module 'fastify' {
   interface FastifyInstance {
-    supabase: SupabaseClient;
-    _telemetry: Logger;
-    telemetry: Logger;
-    _measure: ActionTelemetry;
-    measure: ActionTelemetry;
-    resetMeasure: () => void;
+    supabase: SupabaseClient
+    _telemetry: Logger
+    telemetry: Logger
+    _measure: ActionTelemetry
+    measure: ActionTelemetry
+    resetMeasure: () => void
   }
   interface FastifyRequest {
-    _telemetry: Logger;
-    telemetry: Logger;
-    _measure: ActionTelemetry;
-    measure: ActionTelemetry;
-    resetMeasure: () => void;
+    _telemetry: Logger
+    telemetry: Logger
+    _measure: ActionTelemetry
+    measure: ActionTelemetry
+    resetMeasure: () => void
     user: {
-      user_id: string;
-      tenant_id: string;
-    };
+      user_id: string
+      tenant_id: string
+    }
   }
 
   interface FastifyContextConfig {
-    auth?: boolean;
+    auth?: boolean
   }
 }
 
@@ -39,61 +39,56 @@ declare module 'fastify' {
  * @returns Configured Fastify instance
  */
 export async function buildApp() {
-  const logger = new Logger();
+  const logger = new Logger()
 
   // Instantiate Fastify with some config
   const server = Fastify({
     loggerInstance: logger,
-  });
+  })
 
-  const headerMasked = (
-    headers: Record<string, string | string[] | undefined>
-  ) => {
+  const headerMasked = (headers: Record<string, string | string[] | undefined>) => {
     return Object.fromEntries(
-      Object.entries(headers).map(([key, value]) => [
-        key,
-        key === 'Authorization' ? 'REDACTED' : value,
-      ])
-    );
-  };
+      Object.entries(headers).map(([key, value]) => [key, key === 'Authorization' ? 'REDACTED' : value]),
+    )
+  }
 
-  server.decorate('_telemetry');
+  server.decorate('_telemetry')
   server.decorate('telemetry', {
     getter() {
-      this._telemetry ??= logger;
-      return this._telemetry;
+      this._telemetry ??= logger
+      return this._telemetry
     },
-  });
+  })
 
-  server.decorate('_measure');
+  server.decorate('_measure')
   server.decorate('measure', {
     getter() {
-      this._measure ??= new ActionTelemetry(this.telemetry);
-      return this._measure;
+      this._measure ??= new ActionTelemetry(this.telemetry)
+      return this._measure
     },
-  });
+  })
   server.decorate('resetMeasure', function () {
-    this._measure = new ActionTelemetry(this.telemetry);
-  });
+    this._measure = new ActionTelemetry(this.telemetry)
+  })
 
-  server.decorateRequest('_telemetry');
+  server.decorateRequest('_telemetry')
   server.decorateRequest('telemetry', {
     getter() {
-      this._telemetry ??= logger;
-      return this._telemetry;
+      this._telemetry ??= logger
+      return this._telemetry
     },
-  });
+  })
 
-  server.decorateRequest('_measure');
+  server.decorateRequest('_measure')
   server.decorateRequest('measure', {
     getter() {
-      this._measure ??= new ActionTelemetry(this.telemetry);
-      return this._measure;
+      this._measure ??= new ActionTelemetry(this.telemetry)
+      return this._measure
     },
-  });
+  })
   server.decorateRequest('resetMeasure', function () {
-    this._measure = new ActionTelemetry(this.telemetry);
-  });
+    this._measure = new ActionTelemetry(this.telemetry)
+  })
 
   server.addHook('onRequest', (request, reply, done) => {
     request.measure.start('request', {
@@ -103,24 +98,24 @@ export async function buildApp() {
       headers: headerMasked(request.headers),
       ...(request.user?.user_id && { user_id: request.user.user_id }),
       ...(request.user?.tenant_id && { tenant_id: request.user.tenant_id }),
-    });
-    done();
-  });
+    })
+    done()
+  })
 
   server.addHook('onResponse', (request, reply, done) => {
-    const statusCode = reply.statusCode;
+    const statusCode = reply.statusCode
     if (statusCode >= 400) {
       request.measure.failure('request', {
         statusCode,
-      });
+      })
     } else {
       request.measure.success({
         statusCode,
-      });
+      })
     }
-    request.resetMeasure();
-    done();
-  });
+    request.resetMeasure()
+    done()
+  })
 
   // Register CORS
   await server.register(cors, {
@@ -128,7 +123,7 @@ export async function buildApp() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
-  });
+  })
 
   // Register Swagger
   await server.register(swagger, {
@@ -143,8 +138,7 @@ export async function buildApp() {
         description: 'Find more info here',
       },
       host: new URL(process.env.APP_URL ?? 'https://api.godeploy.app').host,
-      schemes:
-        process.env.NODE_ENV === 'production' ? ['https'] : ['http', 'https'],
+      schemes: process.env.NODE_ENV === 'production' ? ['https'] : ['http', 'https'],
       consumes: ['application/json', 'multipart/form-data'],
       produces: ['application/json'],
       securityDefinitions: {
@@ -155,7 +149,7 @@ export async function buildApp() {
         },
       },
     },
-  });
+  })
 
   // Register Swagger UI
   await server.register(swaggerUi, {
@@ -164,13 +158,13 @@ export async function buildApp() {
       docExpansion: 'list',
       deepLinking: false,
     },
-  });
+  })
 
   // Register plugins and routes explicitly
-  await registerPluginsAndRoutes(server, {});
+  await registerPluginsAndRoutes(server, {})
 
-  await server.ready();
-  server.swagger();
+  await server.ready()
+  server.swagger()
 
-  return server;
+  return server
 }

@@ -1,25 +1,26 @@
-import { S3Client } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
-import { createReadStream, ReadStream } from 'fs';
-import { join } from 'path';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import * as os from 'os';
-import { to } from 'await-to-js';
-import { ProjectDomain } from '../../utils/url';
-import { Zip } from './Zip';
-import type { Project } from '../projects/projects.types';
+import { S3Client } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
+import { to } from 'await-to-js'
+import { createReadStream, type ReadStream } from 'fs'
+import * as fs from 'fs/promises'
+import * as os from 'os'
+import * as path from 'path'
+import { join } from 'path'
+import { ProjectDomain } from '../../utils/url'
+import type { Project } from '../projects/projects.types'
+import { Zip } from './Zip'
+
 //TODO: ensure we use streams for all file operations to avoid inevitable nodejs memory issues
 // couple the above with plimit library to limit the number of concurrent file operations our server does at a time to avoid overloading the server
 
 interface Result<T> {
-  data: T | null;
-  error: string | null;
+  data: T | null
+  error: string | null
 }
 
 // DigitalOcean Spaces configuration
-const spacesEndpoint = process.env.DIGITAL_OCEAN_SPACES_ENDPOINT || '';
-const bucketName = process.env.DIGITAL_OCEAN_SPACES_BUCKET || '';
+const spacesEndpoint = process.env.DIGITAL_OCEAN_SPACES_ENDPOINT || ''
+const bucketName = process.env.DIGITAL_OCEAN_SPACES_BUCKET || ''
 
 // Create S3 client for DigitalOcean Spaces
 const s3Client = new S3Client({
@@ -29,7 +30,7 @@ const s3Client = new S3Client({
     accessKeyId: process.env.DIGITAL_OCEAN_SPACES_KEY || '',
     secretAccessKey: process.env.DIGITAL_OCEAN_SPACES_SECRET || '',
   },
-});
+})
 
 /**
  * Storage service for handling file uploads to DigitalOcean Spaces
@@ -47,7 +48,7 @@ export class StorageService {
     fileStream: ReadStream,
     key: string,
     contentType: string,
-    cacheControl: string
+    cacheControl: string,
   ): Promise<Result<string>> {
     try {
       const upload = new Upload({
@@ -60,27 +61,25 @@ export class StorageService {
           CacheControl: cacheControl,
           ACL: 'public-read',
         },
-      });
+      })
 
-      const [uploadErr] = await to(upload.done());
+      const [uploadErr] = await to(upload.done())
       if (uploadErr) {
         return {
           data: null,
           error: `Failed to upload file: ${uploadErr.message}`,
-        };
+        }
       }
 
       return {
         data: `https://${bucketName}.${spacesEndpoint}/${key}`,
         error: null,
-      };
+      }
     } catch (err) {
       return {
         data: null,
-        error: `Failed to upload file: ${
-          err instanceof Error ? err.message : 'Unknown error'
-        }`,
-      };
+        error: `Failed to upload file: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      }
     }
   }
 
@@ -90,51 +89,42 @@ export class StorageService {
    * @param subdomain The unique subdomain for the project
    * @returns Result containing the CDN URL or error message
    */
-  async processSpaArchive(
-    archivePath: string,
-    project: Project
-  ): Promise<Result<string>> {
+  async processSpaArchive(archivePath: string, project: Project): Promise<Result<string>> {
     // Create a temporary directory to extract the archive
-    const [mkdirErr, tempDir] = await to(
-      fs.mkdtemp(join(os.tmpdir(), 'godeploy-'))
-    );
+    const [mkdirErr, tempDir] = await to(fs.mkdtemp(join(os.tmpdir(), 'godeploy-')))
     if (mkdirErr) {
       return {
         data: null,
         error: `Failed to create temp directory: ${mkdirErr.message}`,
-      };
+      }
     }
 
     try {
       // Extract the archive
       try {
-        await Zip.extract(archivePath, tempDir);
+        await Zip.extract(archivePath, tempDir)
       } catch (extractErr) {
         return {
           data: null,
-          error: `Failed to extract archive: ${
-            extractErr instanceof Error
-              ? extractErr.message
-              : 'Unknown zip error'
-          }`,
-        };
+          error: `Failed to extract archive: ${extractErr instanceof Error ? extractErr.message : 'Unknown zip error'}`,
+        }
       }
 
       // Use the new storage key format
-      const d = ProjectDomain.from(project);
-      const baseKey = d.storage.key;
-      const cdnUrl = d.subdomain.origin;
+      const d = ProjectDomain.from(project)
+      const baseKey = d.storage.key
+      const cdnUrl = d.subdomain.origin
 
       // Process all files recursively
-      const uploadResult = await this.uploadDirectory(tempDir, baseKey);
+      const uploadResult = await this.uploadDirectory(tempDir, baseKey)
       if (uploadResult.error) {
-        return uploadResult;
+        return uploadResult
       }
 
-      return { data: cdnUrl, error: null };
+      return { data: cdnUrl, error: null }
     } finally {
       // Clean up temporary directory
-      await to(fs.rm(tempDir, { recursive: true, force: true }));
+      await to(fs.rm(tempDir, { recursive: true, force: true }))
     }
   }
 
@@ -144,52 +134,42 @@ export class StorageService {
    * @param baseKey Base key (path) in the bucket
    * @returns Result indicating success or error
    */
-  private async uploadDirectory(
-    dirPath: string,
-    baseKey: string
-  ): Promise<Result<string>> {
-    const [readErr, entries] = await to(
-      fs.readdir(dirPath, { withFileTypes: true })
-    );
+  private async uploadDirectory(dirPath: string, baseKey: string): Promise<Result<string>> {
+    const [readErr, entries] = await to(fs.readdir(dirPath, { withFileTypes: true }))
     if (readErr) {
       return {
         data: null,
         error: `Failed to read directory: ${readErr.message}`,
-      };
+      }
     }
 
     for (const entry of entries) {
-      const fullPath = path.join(dirPath, entry.name);
-      const relativePath = path.relative(dirPath, fullPath);
-      const key = path.join(baseKey, relativePath).replace(/\\/g, '/');
+      const fullPath = path.join(dirPath, entry.name)
+      const relativePath = path.relative(dirPath, fullPath)
+      const key = path.join(baseKey, relativePath).replace(/\\/g, '/')
 
       if (entry.isDirectory()) {
-        const uploadResult = await this.uploadDirectory(fullPath, key);
+        const uploadResult = await this.uploadDirectory(fullPath, key)
         if (uploadResult.error) {
-          return uploadResult;
+          return uploadResult
         }
       } else {
         // Determine content type based on file extension
-        const contentType = this.getContentType(entry.name);
+        const contentType = this.getContentType(entry.name)
 
         // Set cache control based on file type
-        const cacheControl = this.getCacheControl(entry.name);
+        const cacheControl = this.getCacheControl(entry.name)
 
         // Upload the file
-        const fileStream = createReadStream(fullPath);
-        const uploadResult = await this.uploadFile(
-          fileStream,
-          key,
-          contentType,
-          cacheControl
-        );
+        const fileStream = createReadStream(fullPath)
+        const uploadResult = await this.uploadFile(fileStream, key, contentType, cacheControl)
         if (uploadResult.error) {
-          return uploadResult;
+          return uploadResult
         }
       }
     }
 
-    return { data: '', error: null };
+    return { data: '', error: null }
   }
 
   /**
@@ -197,7 +177,7 @@ export class StorageService {
    * @param filename Filename
    */
   private getContentType(filename: string): string {
-    const ext = path.extname(filename).toLowerCase();
+    const ext = path.extname(filename).toLowerCase()
 
     const contentTypes: Record<string, string> = {
       // HTML
@@ -236,14 +216,11 @@ export class StorageService {
       // Documents
       '.pdf': 'application/pdf',
       '.doc': 'application/msword',
-      '.docx':
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       '.xls': 'application/vnd.ms-excel',
-      '.xlsx':
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       '.ppt': 'application/vnd.ms-powerpoint',
-      '.pptx':
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 
       // Text
       '.txt': 'text/plain',
@@ -286,9 +263,9 @@ export class StorageService {
       '.yaml': 'application/yaml',
       '.yml': 'application/yaml',
       '.toml': 'application/toml',
-    };
+    }
 
-    return contentTypes[ext] || 'application/octet-stream';
+    return contentTypes[ext] || 'application/octet-stream'
   }
 
   /**
@@ -296,8 +273,8 @@ export class StorageService {
    * @param filename Filename
    */
   private getCacheControl(filename: string): string {
-    const ext = path.extname(filename).toLowerCase();
-    const basename = path.basename(filename).toLowerCase();
+    const ext = path.extname(filename).toLowerCase()
+    const basename = path.basename(filename).toLowerCase()
 
     // No cache for HTML files, config files, and executable scripts
     // This ensures users always get the latest version of these critical files
@@ -316,15 +293,12 @@ export class StorageService {
       basename === 'setup' ||
       basename.startsWith('run-')
     ) {
-      return 'no-cache';
+      return 'no-cache'
     }
 
     // Long-term caching for hashed assets (containing a hash in the filename)
-    if (
-      /\.[a-f0-9]{8,}\./.test(filename) ||
-      /[-_][a-f0-9]{8,}\./.test(filename)
-    ) {
-      return 'max-age=31536000, immutable';
+    if (/\.[a-f0-9]{8,}\./.test(filename) || /[-_][a-f0-9]{8,}\./.test(filename)) {
+      return 'max-age=31536000, immutable'
     }
 
     // Medium-term caching for static assets
@@ -346,12 +320,12 @@ export class StorageService {
       '.mp3',
       '.mp4',
       '.webm',
-    ];
+    ]
     if (staticAssets.includes(ext)) {
-      return 'max-age=604800'; // 7 days
+      return 'max-age=604800' // 7 days
     }
 
     // Default cache control for other assets
-    return 'max-age=86400'; // 1 day
+    return 'max-age=86400' // 1 day
   }
 }

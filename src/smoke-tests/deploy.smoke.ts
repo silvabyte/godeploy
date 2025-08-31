@@ -1,50 +1,49 @@
-import 'dotenv/config';
-import chalk from 'chalk';
-import ora from 'ora';
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { nanoid } from 'nanoid';
-import FormData from 'form-data';
-import { request } from 'undici';
-import { Zip } from '../app/components/storage/Zip';
+import 'dotenv/config'
+import chalk from 'chalk'
+import FormData from 'form-data'
+import fs from 'fs'
+import { nanoid } from 'nanoid'
+import ora from 'ora'
+import os from 'os'
+import path, { dirname } from 'path'
+import { request } from 'undici'
+import { fileURLToPath } from 'url'
+import { Zip } from '../app/components/storage/Zip'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const Filename = fileURLToPath(import.meta.url)
+const Dirname = dirname(Filename)
 
-const API_URL = 'http://localhost:38444';
+const API_URL = 'http://localhost:38444'
 
 const assert = {
   text: {
     success: (text: string) => {
-      return chalk.bold.green(`Success: `) + text;
+      return chalk.bold.green(`Success: `) + text
     },
     failed: (text: string) => {
-      return chalk.bold.red(`Failed: `) + text;
+      return chalk.bold.red(`Failed: `) + text
     },
     assert: (text: string) => {
-      return chalk.bold.cyan(`Assert: `) + text;
+      return chalk.bold.cyan(`Assert: `) + text
     },
   },
   spinner: (text: string) => {
     return ora({
       text: chalk.bold.cyan(text),
       color: 'cyan',
-    }).start();
+    }).start()
   },
   equal: (a: any, b: any) => {
-    console.log(chalk.bold.cyan(`Asserting: ${a} === ${b}`));
+    console.log(chalk.bold.cyan(`Asserting: ${a} === ${b}`))
     if (a !== b) {
-      console.log(chalk.bold.red(`Failed: ${a} !== ${b}`));
-      return false;
+      console.log(chalk.bold.red(`Failed: ${a} !== ${b}`))
+      return false
     } else {
-      console.log(chalk.bold.green(`Success: ${a} === ${b}`));
-      return true;
+      console.log(chalk.bold.green(`Success: ${a} === ${b}`))
+      return true
     }
   },
-};
+}
 
 /**
  * Deploy API Smoke Test
@@ -66,100 +65,89 @@ const assert = {
  */
 
 const main = async () => {
-  let authToken: string;
-  let projectId: string;
+  let authToken: string
+  let projectId: string
 
   // Get auth token from env or hardcode a test token
-  authToken = process.env.TEST_AUTH_TOKEN || '';
+  authToken = process.env.TEST_AUTH_TOKEN || ''
   if (!authToken) {
-    throw new Error(
-      'TEST_AUTH_TOKEN environment variable is required for smoke tests'
-    );
+    throw new Error('TEST_AUTH_TOKEN environment variable is required for smoke tests')
   }
 
   // Get project name from env or use default
-  const projectName =
-    process.env.TEST_PROJECT_NAME || 'godeploy-smoke-test-' + nanoid(8);
-  console.log(
-    `${chalk.bold.magenta('Starting test for project')} ${projectName}`
-  );
+  const projectName = process.env.TEST_PROJECT_NAME || 'godeploy-smoke-test-' + nanoid(8)
+  console.log(`${chalk.bold.magenta('Starting test for project')} ${projectName}`)
 
-  const deploymentText = chalk.bold.magenta('Deployment');
+  const deploymentText = chalk.bold.magenta('Deployment')
 
-  console.log(`${deploymentText}: creating zip`);
+  console.log(`${deploymentText}: creating zip`)
 
   // Create a temporary directory for our test files
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'deploy-test-'));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'deploy-test-'))
 
-  const indexPath = path.join(tempDir, 'index.html');
+  const indexPath = path.join(tempDir, 'index.html')
 
   // Copy the test index.html file
-  fs.copyFileSync(path.join(__dirname, 'dist', 'index.html'), indexPath);
+  fs.copyFileSync(path.join(Dirname, 'dist', 'index.html'), indexPath)
 
   // Create a zip file with the HTML file
-  const zipPath = path.join(tempDir, 'deploy.zip');
+  const zipPath = path.join(tempDir, 'deploy.zip')
 
   // For this smoke test, we'll just create a simple file to simulate the upload
-  await Zip.create(tempDir, zipPath);
+  await Zip.create(tempDir, zipPath)
 
   // Create form data for file upload
-  const form = new FormData();
-  form.append('file', fs.createReadStream(zipPath));
+  const form = new FormData()
+  form.append('file', fs.createReadStream(zipPath))
 
-  console.log(`${deploymentText}: uploading zip`);
-  const response = await request(
-    `${API_URL}/api/deploy?project=${projectName}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        ...form.getHeaders(),
-      },
-      body: form,
-    }
-  );
+  console.log(`${deploymentText}: uploading zip`)
+  const response = await request(`${API_URL}/api/deploy?project=${projectName}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+      ...form.getHeaders(),
+    },
+    body: form,
+  })
 
   if (!assert.equal(response.statusCode, 200)) {
-    console.debug(response.statusCode);
-    console.debug(await response.body.text());
-    return;
+    console.debug(response.statusCode)
+    console.debug(await response.body.text())
+    return
   }
 
-  console.log(`${deploymentText}: uploaded zip`);
-  const deploy = (await response.body.json()) as { id: string };
-  console.log(deploy);
+  console.log(`${deploymentText}: uploaded zip`)
+  const deploy = (await response.body.json()) as { id: string }
+  console.log(deploy)
 
-  console.log(`${deploymentText}: getting deployments`);
+  console.log(`${deploymentText}: getting deployments`)
 
   // Verify the deploy was created correctly
-  const getDeployResponse = await request(
-    `${API_URL}/api/deploys/${deploy.id}`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    }
-  );
+  const getDeployResponse = await request(`${API_URL}/api/deploys/${deploy.id}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  })
 
   if (!assert.equal(getDeployResponse.statusCode, 200)) {
-    console.debug(getDeployResponse.statusCode);
-    console.debug(await getDeployResponse.body.text());
-    return;
+    console.debug(getDeployResponse.statusCode)
+    console.debug(await getDeployResponse.body.text())
+    return
   }
 
-  console.log(`${deploymentText}: got deployments`);
-  const deployDetails = (await getDeployResponse.body.json()) as { id: string };
-  console.log(deployDetails);
-  assert.equal(deployDetails.id, deploy.id);
-  console.log(`${deploymentText}: got deployment details`);
+  console.log(`${deploymentText}: got deployments`)
+  const deployDetails = (await getDeployResponse.body.json()) as { id: string }
+  console.log(deployDetails)
+  assert.equal(deployDetails.id, deploy.id)
+  console.log(`${deploymentText}: got deployment details`)
 
-  console.log(`${deploymentText}: cleaning up`);
+  console.log(`${deploymentText}: cleaning up`)
   // Clean up temp files
-  fs.unlinkSync(indexPath);
-  fs.unlinkSync(zipPath);
-  fs.rmdirSync(tempDir);
-  console.log(`${deploymentText}: cleaned up`);
-};
+  fs.unlinkSync(indexPath)
+  fs.unlinkSync(zipPath)
+  fs.rmdirSync(tempDir)
+  console.log(`${deploymentText}: cleaned up`)
+}
 
-main();
+main()

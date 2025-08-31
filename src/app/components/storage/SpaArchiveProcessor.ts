@@ -1,11 +1,12 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import * as os from 'os';
-import { to } from 'await-to-js';
-import { Zip } from './Zip';
+import { to } from 'await-to-js'
+import * as fs from 'fs/promises'
+import * as os from 'os'
+import * as path from 'path'
+import { Zip } from './Zip'
+
 interface Result<T> {
-  data: T | null;
-  error: string | null;
+  data: T | null
+  error: string | null
 }
 
 /**
@@ -19,30 +20,25 @@ export class SpaArchiveProcessor {
    * @param filename Filename
    * @returns Result containing the file path or error message
    */
-  static async saveBufferToTemp(
-    buffer: Buffer,
-    filename: string
-  ): Promise<Result<string>> {
-    const [mkdirErr, tempDir] = await to(
-      fs.mkdtemp(path.join(os.tmpdir(), 'godeploy-'))
-    );
+  static async saveBufferToTemp(buffer: Buffer, filename: string): Promise<Result<string>> {
+    const [mkdirErr, tempDir] = await to(fs.mkdtemp(path.join(os.tmpdir(), 'godeploy-')))
     if (mkdirErr) {
       return {
         data: null,
         error: `Failed to create temp directory: ${mkdirErr.message}`,
-      };
+      }
     }
 
-    const filePath = path.join(tempDir, filename);
-    const [writeErr] = await to(fs.writeFile(filePath, buffer));
+    const filePath = path.join(tempDir, filename)
+    const [writeErr] = await to(fs.writeFile(filePath, buffer))
     if (writeErr) {
       return {
         data: null,
         error: `Failed to write file: ${writeErr.message}`,
-      };
+      }
     }
 
-    return { data: filePath, error: null };
+    return { data: filePath, error: null }
   }
 
   /**
@@ -50,70 +46,58 @@ export class SpaArchiveProcessor {
    * @param archivePath Path to the SPA archive
    * @returns Result containing validation status and any error message
    */
-  static async validateSpaArchive(
-    archivePath: string
-  ): Promise<Result<boolean>> {
-    const [mkdirErr, tempDir] = await to(
-      fs.mkdtemp(path.join(os.tmpdir(), 'godeploy-validate-'))
-    );
+  static async validateSpaArchive(archivePath: string): Promise<Result<boolean>> {
+    const [mkdirErr, tempDir] = await to(fs.mkdtemp(path.join(os.tmpdir(), 'godeploy-validate-')))
     if (mkdirErr) {
       return {
         data: false,
         error: `Failed to create validation directory: ${mkdirErr.message}`,
-      };
+      }
     }
 
     try {
       // Extract the archive
       try {
-        await Zip.extract(archivePath, tempDir);
+        await Zip.extract(archivePath, tempDir)
       } catch (extractErr) {
         return {
           data: false,
-          error: `Failed to extract archive: ${
-            extractErr instanceof Error
-              ? extractErr.message
-              : 'Unknown zip error'
-          }`,
-        };
+          error: `Failed to extract archive: ${extractErr instanceof Error ? extractErr.message : 'Unknown zip error'}`,
+        }
       }
 
       // Check if the archive contains any files
-      const [readErr, files] = await to(fs.readdir(tempDir));
+      const [readErr, files] = await to(fs.readdir(tempDir))
       if (readErr) {
         return {
           data: false,
           error: `Failed to read archive contents: ${readErr.message}`,
-        };
+        }
       }
 
       if (files.length === 0) {
         return {
           data: false,
           error: 'Archive is empty',
-        };
+        }
       }
 
       // Check if there are any valid static files
-      const validResult = await SpaArchiveProcessor.hasValidStaticFiles(
-        tempDir
-      );
+      const validResult = await SpaArchiveProcessor.hasValidStaticFiles(tempDir)
       if (validResult.error) {
         return {
           data: false,
           error: validResult.error,
-        };
+        }
       }
 
       return {
         data: validResult.data ?? false,
-        error: validResult.data
-          ? null
-          : 'No valid static files found in archive',
-      };
+        error: validResult.data ? null : 'No valid static files found in archive',
+      }
     } finally {
       // Clean up
-      await to(fs.rm(tempDir, { recursive: true, force: true }));
+      await to(fs.rm(tempDir, { recursive: true, force: true }))
     }
   }
 
@@ -122,43 +106,37 @@ export class SpaArchiveProcessor {
    * @param dirPath Path to the directory
    * @returns Result containing validation status and any error message
    */
-  private static async hasValidStaticFiles(
-    dirPath: string
-  ): Promise<Result<boolean>> {
-    const [readErr, entries] = await to(
-      fs.readdir(dirPath, { withFileTypes: true })
-    );
+  private static async hasValidStaticFiles(dirPath: string): Promise<Result<boolean>> {
+    const [readErr, entries] = await to(fs.readdir(dirPath, { withFileTypes: true }))
     if (readErr) {
       return {
         data: false,
         error: `Failed to read directory: ${readErr.message}`,
-      };
+      }
     }
 
     if (entries.length === 0) {
       return {
         data: false,
         error: 'Directory is empty',
-      };
+      }
     }
 
     // Check for valid files
     for (const entry of entries) {
       if (entry.isDirectory()) {
         // Recursively check subdirectories
-        const subdirResult = await SpaArchiveProcessor.hasValidStaticFiles(
-          path.join(dirPath, entry.name)
-        );
+        const subdirResult = await SpaArchiveProcessor.hasValidStaticFiles(path.join(dirPath, entry.name))
         if (!subdirResult.error && subdirResult.data) {
-          return { data: true, error: null };
+          return { data: true, error: null }
         }
       } else if (entry.isFile()) {
         // Any file is considered valid
-        return { data: true, error: null };
+        return { data: true, error: null }
       }
     }
 
-    return { data: false, error: 'No valid files found' };
+    return { data: false, error: 'No valid files found' }
   }
 
   /**
@@ -167,23 +145,21 @@ export class SpaArchiveProcessor {
    * @returns Result containing parsed config or error message
    */
   static async readConfigFile<T>(filePath: string): Promise<Result<T>> {
-    const [readErr, content] = await to(fs.readFile(filePath, 'utf-8'));
+    const [readErr, content] = await to(fs.readFile(filePath, 'utf-8'))
     if (readErr) {
       return {
         data: null,
         error: `Failed to read config file: ${readErr.message}`,
-      };
+      }
     }
 
     try {
-      return { data: JSON.parse(content) as T, error: null };
+      return { data: JSON.parse(content) as T, error: null }
     } catch (parseErr) {
       return {
         data: null,
-        error: `Failed to parse config file: ${
-          parseErr instanceof Error ? parseErr.message : 'Invalid JSON'
-        }`,
-      };
+        error: `Failed to parse config file: ${parseErr instanceof Error ? parseErr.message : 'Invalid JSON'}`,
+      }
     }
   }
 
@@ -194,36 +170,36 @@ export class SpaArchiveProcessor {
    */
   static async cleanupTempFile(filePath: string): Promise<Result<void>> {
     // If it's a file, remove it
-    const [unlinkErr] = await to(fs.unlink(filePath));
+    const [unlinkErr] = await to(fs.unlink(filePath))
     if (unlinkErr) {
       return {
         data: null,
         error: `Failed to remove file: ${unlinkErr.message}`,
-      };
+      }
     }
 
     // Try to remove the parent directory if it's empty
-    const dirPath = path.dirname(filePath);
+    const dirPath = path.dirname(filePath)
     if (dirPath.includes('godeploy-')) {
-      const [readErr, files] = await to(fs.readdir(dirPath));
+      const [readErr, files] = await to(fs.readdir(dirPath))
       if (readErr) {
         return {
           data: null,
           error: `Failed to read directory: ${readErr.message}`,
-        };
+        }
       }
 
       if (files.length === 0) {
-        const [rmdirErr] = await to(fs.rmdir(dirPath));
+        const [rmdirErr] = await to(fs.rmdir(dirPath))
         if (rmdirErr) {
           return {
             data: null,
             error: `Failed to remove directory: ${rmdirErr.message}`,
-          };
+          }
         }
       }
     }
 
-    return { data: null, error: null };
+    return { data: null, error: null }
   }
 }

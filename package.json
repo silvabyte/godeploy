@@ -11,7 +11,12 @@
     "test:auth": "bun run src/smoke-tests/auth.smoke.ts",
     "start": "bun run src/main.ts",
     "dev": "bun --watch src/main.ts",
-    "format": "bunx prettier . --write",
+    "format": "bunx biome format --write .",
+    "lint": "bunx biome lint .",
+    "lint:fix": "bunx biome lint --write .",
+    "check": "bunx biome check .",
+    "check:fix": "bunx biome check --write .",
+    "typecheck": "tsc --noEmit",
     "db:new": "bunx supabase migration new",
     "db:up": "bunx supabase migration up",
     "db:push": "bunx supabase db push",
@@ -63,21 +68,17 @@
     "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.2.2",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
+    "@types/bun": "latest",
     "@types/node": "~18.16.9",
     "@types/node-fetch": "^2.6.12",
     "@types/random-word": "^2.0.2",
     "chalk": "^5.4.1",
     "husky": "^9.1.7",
-    "prettier": "^2.6.2",
-    "typescript": "~5.7.2",
-    "@types/bun": "latest"
+    "typescript": "~5.7.2"
   },
-  "lint-staged": {
-    "**/*": [
-      "prettier --write --ignore-unknown"
-    ]
-  },
+
   "private": true
 }

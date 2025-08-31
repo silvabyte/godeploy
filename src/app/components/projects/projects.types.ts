@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
-import { commonResponseSchemas } from '../http/response.types';
+import { z } from 'zod'
+import { zodToJsonSchema } from 'zod-to-json-schema'
+import { commonResponseSchemas } from '../http/response.types'
 
 // Base project schema
 const projectSchema = z.object({
@@ -10,34 +10,30 @@ const projectSchema = z.object({
   name: z.string(),
   subdomain: z.string(),
   description: z.string().nullable(),
-  domain: z
-    .string({ description: 'Custom domain for the given project' })
-    .nullable()
-    .optional(), // if this is prov
+  domain: z.string({ description: 'Custom domain for the given project' }).nullable().optional(), // if this is prov
   url: z
     .string({
-      description:
-        'Final project url, computed from the domain if it exists and falls back to using the subdomain',
+      description: 'Final project url, computed from the domain if it exists and falls back to using the subdomain',
     })
     .optional(),
   created_at: z.string(),
   updated_at: z.string(),
-});
+})
 
 // Request schemas
 export const createProjectSchema = z.object({
   name: z.string().min(3, 'Project name must be at least 3 characters'),
   description: z.string().optional(),
-});
+})
 
 // Response schemas
-export const projectResponseSchema = projectSchema;
-export const projectsResponseSchema = z.array(projectSchema);
+export const projectResponseSchema = projectSchema
+export const projectsResponseSchema = z.array(projectSchema)
 
 // Generate JSON schemas
-export const projectJsonSchema = zodToJsonSchema(projectSchema);
-export const projectsJsonSchema = zodToJsonSchema(projectsResponseSchema);
-export const createProjectJsonSchema = zodToJsonSchema(createProjectSchema);
+export const projectJsonSchema = zodToJsonSchema(projectSchema)
+export const projectsJsonSchema = zodToJsonSchema(projectsResponseSchema)
+export const createProjectJsonSchema = zodToJsonSchema(createProjectSchema)
 
 // Route schemas
 export const routeSchemas = {
@@ -61,10 +57,10 @@ export const routeSchemas = {
       },
     },
   },
-};
+}
 
 // Type exports
-export type Project = z.infer<typeof projectSchema>;
-export type CreateProjectBody = z.infer<typeof createProjectSchema>;
-export type ProjectResponse = z.infer<typeof projectResponseSchema>;
-export type ProjectsResponse = z.infer<typeof projectsResponseSchema>;
+export type Project = z.infer<typeof projectSchema>
+export type CreateProjectBody = z.infer<typeof createProjectSchema>
+export type ProjectResponse = z.infer<typeof projectResponseSchema>
+export type ProjectsResponse = z.infer<typeof projectsResponseSchema>
