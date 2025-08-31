@@ -17,3 +17,4 @@ frozenLockfile = false
 [run]
 # Auto-install missing packages
 autoInstall = true
+
