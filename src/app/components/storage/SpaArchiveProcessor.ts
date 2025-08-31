@@ -26,7 +26,7 @@ export async function saveBufferToTemp(buffer: Buffer, filename: string): Promis
   }
 
   const filePath = path.join(tempDir, filename)
-  const [writeErr] = await to(fs.writeFile(filePath, buffer))
+  const [writeErr] = await to(fs.writeFile(filePath, new Uint8Array(buffer)))
   if (writeErr) {
     return {
       data: null,
@@ -80,7 +80,7 @@ export async function validateSpaArchive(archivePath: string): Promise<Result<bo
       // Also check if the first directory in the archive contains index.html
       // (common when archiving a built directory)
       const entries = await fs.readdir(tempDir)
-      if (entries.length === 1) {
+      if (entries.length === 1 && entries[0]) {
         const firstEntry = path.join(tempDir, entries[0])
         const stats = await fs.stat(firstEntry)
         if (stats.isDirectory()) {

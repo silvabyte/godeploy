@@ -1,4 +1,4 @@
-import * as HyperDX from '@hyperdx/node-opentelemetry'
+import * as HyperDx from '@hyperdx/node-opentelemetry'
 import type { FastifyRequest } from 'fastify'
 import pino from 'pino'
 
@@ -20,10 +20,9 @@ const defaultLogger =
   process.env.NODE_ENV !== 'development'
     ? pino(
         pino.transport({
-          // @ts-expect-error
-          mixin: HyperDX.getPinoMixinFunction,
+          mixin: HyperDx.getPinoMixinFunction,
           targets: [
-            HyperDX.getPinoTransport('info', {
+            HyperDx.getPinoTransport('info', {
               // Send logs info and above to HyperDX
               detectResources: true,
             }),
@@ -31,6 +30,7 @@ const defaultLogger =
               // Also log to console/stdout in production
               target: 'pino/file',
               options: {
+                // @ts-expect-error destination is a valid option
                 destination: 1, // 1 = stdout
               },
             },

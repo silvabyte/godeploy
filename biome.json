@@ -24,68 +24,25 @@
         "useNamingConvention": {
           "level": "warn",
           "options": {
-            "strictCase": false,
-            "requireAscii": false,
             "conventions": [
               {
                 "selector": {
-                  "kind": "interface"
+                  "kind": "any"
                 },
-                "formats": ["PascalCase"]
+                "formats": ["camelCase", "snake_case", "PascalCase", "CONSTANT_CASE"]
               },
-              {
-                "selector": {
-                  "kind": "typeAlias"
-                },
-                "formats": ["PascalCase"]
-              },
-              {
-                "selector": {
-                  "kind": "enum"
-                },
-                "formats": ["PascalCase"]
-              },
-              {
-                "selector": {
-                  "kind": "enumMember"
-                },
-                "formats": ["CONSTANT_CASE", "PascalCase"]
-              },
-              {
-                "selector": {
-                  "kind": "class"
-                },
-                "formats": ["PascalCase"]
-              },
-              {
-                "selector": {
-                  "kind": "function"
-                },
-                "formats": ["camelCase"]
-              },
-              {
-                "selector": {
-                  "kind": "variable"
-                },
-                "formats": ["camelCase", "CONSTANT_CASE", "PascalCase"]
-              },
+
               {
                 "selector": {
                   "kind": "objectLiteralMember"
                 },
-                "formats": ["camelCase", "snake_case", "CONSTANT_CASE"]
+                "formats": ["camelCase", "snake_case", "PascalCase", "CONSTANT_CASE"]
               },
               {
                 "selector": {
-                  "kind": "typeMember"
+                  "kind": "classMethod"
                 },
-                "formats": ["camelCase", "snake_case", "CONSTANT_CASE", "PascalCase"]
-              },
-              {
-                "selector": {
-                  "kind": "classMember"
-                },
-                "formats": ["camelCase", "snake_case", "CONSTANT_CASE"]
+                "formats": ["camelCase", "PascalCase"]
               }
             ]
           }
