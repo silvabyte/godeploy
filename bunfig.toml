@@ -1,0 +1,19 @@
+# Bun configuration
+
+[test]
+# Preload test setup
+preload = ["./src/test/setup.ts"]
+
+# Enable coverage reporting
+coverage = false # Set to true when needed
+
+# Test file patterns
+# Bun automatically finds *.test.ts, *.spec.ts files
+
+[install]
+# Lockfile settings
+frozenLockfile = false
+
+[run]
+# Auto-install missing packages
+autoInstall = true
