@@ -35,7 +35,7 @@ Download the latest binary from our [releases page](https://github.com/silvabyte
 Create your GoDeploy account:
 
 ```bash
-godeploy auth signup
+godeploy auth sign-up
 ```
 
 ### 2. Initialize
@@ -144,7 +144,7 @@ godeploy auth logout
 | Command                            | Description                         |
 | ---------------------------------- | ----------------------------------- |
 | `godeploy init`                    | Initialize a new configuration file |
-| `godeploy auth signup`             | Create a new GoDeploy account       |
+| `godeploy auth sign-up` | Create a new GoDeploy account |
 | `godeploy auth login`              | Authenticate with your account      |
 | `godeploy auth status`             | Check authentication status         |
 | `godeploy auth logout`             | Log out from your account           |

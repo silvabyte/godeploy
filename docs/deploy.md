@@ -21,7 +21,7 @@ curl -sSL https://install.godeploy.app/now.sh | bash
 Sign up for GoDeploy:
 
 ```bash
-godeploy auth signup
+godeploy auth sign-up
 ```
 
 Or if you already have an account:
@@ -140,7 +140,7 @@ Deploy multiple SPAs from one project:
 
 | Command | Description |
 |---------|-------------|
-| `godeploy auth signup` | Create a new account |
+| `godeploy auth sign-up` | Create a new account |
 | `godeploy auth login` | Log in to your account |
 | `godeploy auth status` | Check if you're logged in |
 | `godeploy auth logout` | Log out |

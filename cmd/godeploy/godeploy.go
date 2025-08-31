@@ -50,7 +50,7 @@ type LoginCmd struct {
 	Password string `help:"Password for authentication" default:""`
 }
 
-// SignUpCmd represents the auth signup command
+// SignUpCmd represents the auth sign-up command
 type SignUpCmd struct {
 	Email    string `help:"Email address for the new account" default:""`
 	Password string `help:"Password for the new account" default:""`

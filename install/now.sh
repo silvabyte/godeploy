@@ -262,7 +262,7 @@ install_godeploy() {
     echo "  🚀 Welcome to GoDeploy - Deploy your SPAs to the cloud instantly!"
     echo ""
     echo "  Get started:"
-    echo "    1. Create your account:  godeploy auth signup"
+    echo "    1. Create your account:  godeploy auth sign-up"
     echo "    2. Initialize project:   godeploy init"
     echo "    3. Build your app:       npm run build"
     echo "    4. Deploy to cloud:      godeploy deploy"
