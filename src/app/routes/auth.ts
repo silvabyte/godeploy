@@ -3,12 +3,17 @@ import {
   routeSchemas,
   type AuthInitBody,
   type MagicLinkQuerystring,
-} from '../components/auth/auth.types';
+  type SignUpBody,
+  type SignInBody,
+  type ChangePasswordBody,
+  type ResetPasswordRequestBody,
+  type ResetPasswordConfirmBody,
+} from '../components/auth/auth.types.js';
 import {
   parseUrlHash,
   addTokenToUrl,
   extractBearerToken,
-} from '../components/auth/token-utils';
+} from '../components/auth/token-utils.js';
 
 export default async function (fastify: FastifyInstance) {
   // Initialize authentication flow
@@ -113,6 +118,220 @@ export default async function (fastify: FastifyInstance) {
           error: 'Internal server error',
         });
       }
+    },
+  });
+
+  // Sign up with email and password
+  fastify.post('/api/auth/signup', {
+    ...routeSchemas.signUp,
+    config: {
+      auth: false, // Skip auth for this route
+    },
+    handler: async (
+      request: FastifyRequest<{
+        Body: SignUpBody;
+      }>,
+      reply: FastifyReply
+    ) => {
+      request.measure.start('auth_signup', {
+        email: request.body.email,
+      });
+
+      const { email, password } = request.body;
+      const result = await request.db.auth.signUp(email, password);
+
+      if (result.error) {
+        request.measure.failure(result.error);
+        return reply.code(400).send({
+          success: false,
+          error: result.error,
+        });
+      }
+
+      request.measure.success();
+      return reply.code(201).send({
+        success: true,
+        token: result.data!.token,
+        user: result.data!.user,
+      });
+    },
+  });
+
+  // Sign in with email and password
+  fastify.post('/api/auth/signin', {
+    ...routeSchemas.signIn,
+    config: {
+      auth: false, // Skip auth for this route
+    },
+    handler: async (
+      request: FastifyRequest<{
+        Body: SignInBody;
+      }>,
+      reply: FastifyReply
+    ) => {
+      request.measure.start('auth_signin', {
+        email: request.body.email,
+      });
+
+      const { email, password } = request.body;
+      const result = await request.db.auth.signIn(email, password);
+
+      if (result.error) {
+        request.measure.failure(result.error);
+        return reply.code(401).send({
+          success: false,
+          error: result.error,
+        });
+      }
+
+      request.measure.success();
+      return reply.code(200).send({
+        success: true,
+        token: result.data!.token,
+        user: result.data!.user,
+      });
+    },
+  });
+
+  // Change password for authenticated user
+  fastify.post('/api/auth/change-password', {
+    ...routeSchemas.changePassword,
+    handler: async (
+      request: FastifyRequest<{
+        Body: ChangePasswordBody;
+      }>,
+      reply: FastifyReply
+    ) => {
+      request.measure.start('auth_change_password');
+
+      const { currentPassword, newPassword } = request.body;
+
+      // Extract token from authorization header
+      const tokenResult = extractBearerToken(request.headers.authorization);
+      if (tokenResult.error) {
+        request.measure.failure(tokenResult.error);
+        return reply.code(401).send({
+          success: false,
+          error: tokenResult.error,
+        });
+      }
+
+      const result = await request.db.auth.changePassword(
+        tokenResult.data!,
+        currentPassword,
+        newPassword
+      );
+
+      if (result.error) {
+        request.measure.failure(result.error);
+        return reply.code(401).send({
+          success: false,
+          error: result.error,
+        });
+      }
+
+      request.measure.success();
+      return reply.code(200).send({
+        success: true,
+        message: 'Password changed successfully',
+      });
+    },
+  });
+
+  // Request password reset
+  fastify.post('/api/auth/reset-password', {
+    ...routeSchemas.resetPasswordRequest,
+    config: {
+      auth: false, // Skip auth for this route
+    },
+    handler: async (
+      request: FastifyRequest<{
+        Body: ResetPasswordRequestBody;
+      }>,
+      reply: FastifyReply
+    ) => {
+      request.measure.start('auth_reset_password_request', {
+        email: request.body.email,
+      });
+
+      const { email, redirect_uri } = request.body;
+      const result = await request.db.auth.requestPasswordReset(
+        email,
+        redirect_uri
+      );
+
+      if (result.error) {
+        request.measure.failure(result.error);
+        return reply.code(400).send({
+          success: false,
+          error: result.error,
+        });
+      }
+
+      request.measure.success();
+      return reply.code(200).send({
+        success: true,
+        message: 'Password reset email sent',
+      });
+    },
+  });
+
+  // Confirm password reset with token
+  fastify.post('/api/auth/reset-password/confirm', {
+    ...routeSchemas.resetPasswordConfirm,
+    config: {
+      auth: false, // Skip auth for this route
+    },
+    handler: async (
+      request: FastifyRequest<{
+        Body: ResetPasswordConfirmBody;
+      }>,
+      reply: FastifyReply
+    ) => {
+      request.measure.start('auth_reset_password_confirm');
+
+      const { token, newPassword } = request.body;
+      const result = await request.db.auth.confirmPasswordReset(
+        token,
+        newPassword
+      );
+
+      if (result.error) {
+        request.measure.failure(result.error);
+        return reply.code(400).send({
+          success: false,
+          error: result.error,
+        });
+      }
+
+      request.measure.success();
+      return reply.code(200).send({
+        success: true,
+        message: 'Password reset successfully',
+      });
+    },
+  });
+
+  // Sign out
+  fastify.post('/api/auth/signout', {
+    handler: async (request: FastifyRequest, reply: FastifyReply) => {
+      request.measure.start('auth_signout');
+
+      const result = await request.db.auth.signOut();
+
+      if (result.error) {
+        request.measure.failure(result.error);
+        return reply.code(500).send({
+          success: false,
+          error: result.error,
+        });
+      }
+
+      request.measure.success();
+      return reply.code(200).send({
+        success: true,
+        message: 'Signed out successfully',
+      });
     },
   });
 
