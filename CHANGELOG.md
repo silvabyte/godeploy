@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.0] - 2025-08-31
+
+* feat: Add password-based authentication (#9)
+* chore: release v0.3.1
+
 ## [0.3.1] - 2025-08-31
 
 * refactor: migrate installer to silvabyte org and fix formatting (#8)
