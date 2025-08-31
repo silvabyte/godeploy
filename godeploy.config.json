@@ -1,10 +1,9 @@
 {
   "apps": [
     {
-      "name": "install",
-      "source_dir": "./install",
-      "path": "/",
-      "description": "Hosts the install script for godeploy using, godeploy awwww ya boiiiiiii",
+      "name": "yourAppName",
+      "source_dir": "dist",
+      "description": "Your application description",
       "enabled": true
     }
   ]

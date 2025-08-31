@@ -14,8 +14,6 @@ import (
 	"github.com/audetic/godeploy/internal/archive"
 	"github.com/audetic/godeploy/internal/auth"
 	"github.com/audetic/godeploy/internal/config"
-	"github.com/audetic/godeploy/internal/docker"
-	"github.com/audetic/godeploy/internal/nginx"
 	"github.com/audetic/godeploy/internal/version"
 	"github.com/yarlson/pin"
 	"golang.org/x/term"
@@ -27,24 +25,10 @@ var CLI struct {
 	Config string `help:"Path to the SPA configuration file" default:"godeploy.config.json"`
 
 	// Commands
-	Serve   ServeCmd   `cmd:"" help:"Start a local server for testing"`
-	Package PackageCmd `cmd:"" help:"Generate container files for deployment"`
 	Init    InitCmd    `cmd:"" help:"Initialize a new godeploy.config.json file"`
 	Auth    AuthCmd    `cmd:"" help:"Authentication commands"`
 	Deploy  DeployCmd  `cmd:"" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
 	Version VersionCmd `cmd:"" help:"Display the version of godeploy"`
-}
-
-// ServeCmd represents the serve command
-type ServeCmd struct {
-	Output    string `help:"Output directory for container files" default:"deploy"`
-	Port      int    `help:"Port to run the server on" default:"8082"`
-	ImageName string `help:"Docker image name" default:"godeploy-spa-server"`
-}
-
-// PackageCmd represents the package command
-type PackageCmd struct {
-	Output string `help:"Output directory for container files" default:"deploy"`
 }
 
 // InitCmd represents the init command
@@ -106,113 +90,12 @@ const defaultConfig = `{
     {
       "name": "yourAppName",
       "source_dir": "dist",
-      "path": "/",
       "description": "Your application description",
       "enabled": true
     }
   ]
 }
 `
-
-// Run executes the serve command
-func (s *ServeCmd) Run() error {
-	// Create a context
-	ctx := context.Background()
-
-	// Create a spinner for loading configuration
-	configSpinner := pin.New("Loading SPA configuration...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	configCancel := configSpinner.Start(ctx)
-
-	// Load the SPA configuration
-	spaConfig, err := config.LoadConfig(CLI.Config)
-	if err != nil {
-		configCancel()
-		configSpinner.Fail("Failed to load configuration")
-		return fmt.Errorf("error loading configuration: %w", err)
-	}
-	configCancel()
-	configSpinner.Stop("Config loaded: " + CLI.Config)
-
-	// Create a spinner for generating container files
-	genSpinner := pin.New("Generating container files...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	genCancel := genSpinner.Start(ctx)
-
-	// Generate container files
-	if err := generateContainerFiles(spaConfig, s.Output); err != nil {
-		genCancel()
-		genSpinner.Fail("Failed to generate container files")
-		return fmt.Errorf("error generating container files: %w", err)
-	}
-	genCancel()
-	genSpinner.Stop("Container files generated")
-
-	// Create a spinner for starting Docker
-	dockerSpinner := pin.New("Starting server with Docker...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	dockerCancel := dockerSpinner.Start(ctx)
-	defer dockerCancel()
-
-	// Run the server locally
-	if err := docker.RunLocalDocker(dockerSpinner, s.Output, s.Port, s.ImageName); err != nil {
-		dockerSpinner.Fail("Failed to start Docker")
-		// TODO: log the error to the ~/.config/godeploy/logs/docker.log file
-		return fmt.Errorf("error running Docker: %w", err)
-	}
-	dockerSpinner.Stop("Docker server stopped")
-	return nil
-}
-
-// Run executes the package command
-func (d *PackageCmd) Run() error {
-	// Create a context
-	ctx := context.Background()
-
-	// Create a spinner for loading configuration
-	configSpinner := pin.New("Loading SPA configuration...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	configCancel := configSpinner.Start(ctx)
-
-	// Load the SPA configuration
-	spaConfig, err := config.LoadConfig(CLI.Config)
-	if err != nil {
-		configCancel()
-		configSpinner.Fail("Failed to load configuration")
-		return fmt.Errorf("error loading configuration: %w", err)
-	}
-	configCancel()
-	configSpinner.Stop("Configuration loaded")
-
-	// Create a spinner for generating container files
-	genSpinner := pin.New("Generating container files...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	genCancel := genSpinner.Start(ctx)
-
-	// Generate container files
-	if err := generateContainerFiles(spaConfig, d.Output); err != nil {
-		genCancel()
-		genSpinner.Fail("Failed to generate container files")
-		return fmt.Errorf("error generating container files: %w", err)
-	}
-	genCancel()
-	genSpinner.Stop("Container files generated")
-
-	fmt.Printf("✅ Container files generated in %s\n", d.Output)
-	fmt.Println("You can now build and deploy this container to your cloud provider.")
-
-	return nil
-}
 
 // Run executes the init command
 func (i *InitCmd) Run() error {
@@ -868,7 +751,7 @@ func (d *DeployCmd) Run() error {
 func RunCLI() error {
 	ctx := kong.Parse(&CLI,
 		kong.Name("godeploy"),
-		kong.Description("A CLI tool for bootstrapping and configuring SPA deployments using Docker and Nginx"),
+		kong.Description("A CLI tool for deploying SPAs to the GoDeploy cloud service"),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact: true,
@@ -877,73 +760,4 @@ func RunCLI() error {
 	)
 
 	return ctx.Run()
-}
-
-// generateContainerFiles generates all the files needed for containerization
-func generateContainerFiles(spaConfig *config.SpaConfig, outputDir string) error {
-	// Create a context
-	ctx := context.Background()
-
-	spinner := pin.New("Cleaning deploy directory",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	spinnerCancel := spinner.Start(ctx)
-	defer spinnerCancel()
-	spinner.Start(ctx)
-
-	if err := nginx.CleanDeployDir(outputDir); err != nil {
-		spinner.Fail("Failed to clean deploy directory")
-		return fmt.Errorf("failed to clean deploy directory: %w", err)
-	}
-
-	// Create a spinner for creating the output directory
-	dirSpinner := pin.New(fmt.Sprintf("Creating output directory %s...", outputDir),
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	dirCancel := dirSpinner.Start(ctx)
-
-	// Create the output directory
-	if err := os.MkdirAll(outputDir, 0o755); err != nil {
-		dirCancel()
-		dirSpinner.Fail("Failed to create directory")
-		return fmt.Errorf("failed to create output directory: %w", err)
-	}
-	dirCancel()
-	dirSpinner.Stop("Directory created: " + outputDir)
-
-	// Create a spinner for generating Nginx configurations
-	nginxSpinner := pin.New("Generating Nginx configurations...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	nginxCancel := nginxSpinner.Start(ctx)
-
-	// Generate Nginx configurations
-	if err := nginx.GenerateNginxConfigs(ctx, spaConfig, outputDir); err != nil {
-		nginxCancel()
-		nginxSpinner.Fail("Failed to generate Nginx configs")
-		return fmt.Errorf("failed to generate Nginx configurations: %w", err)
-	}
-	nginxCancel()
-	nginxSpinner.Stop("Nginx configurations generated")
-
-	// Create a spinner for generating Docker files
-	dockerSpinner := pin.New("Generating Dockerfile...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	dockerCancel := dockerSpinner.Start(ctx)
-
-	// Generate Docker files
-	if err := docker.GenerateDockerfile(spaConfig, outputDir); err != nil {
-		dockerCancel()
-		dockerSpinner.Fail("Failed to generate Dockerfile")
-		return fmt.Errorf("failed to generate Docker files: %w", err)
-	}
-	dockerCancel()
-	dockerSpinner.Stop("Dockerfile generated")
-
-	return nil
 }

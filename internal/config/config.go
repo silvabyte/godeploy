@@ -19,7 +19,6 @@ type App struct {
 	Name        string `json:"name"`
 	Slug        string `json:"slug"`
 	SourceDir   string `json:"source_dir"`
-	Path        string `json:"path"`
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
 }
@@ -44,15 +43,6 @@ func LoadConfig(configPath string) (*SpaConfig, error) {
 	// Validate the configuration
 	if len(config.Apps) == 0 {
 		return nil, fmt.Errorf("at least one app must be defined in the configuration")
-	}
-
-	// Set default paths if not specified
-	for i, app := range config.Apps {
-		// If path is not specified, use the name as the default path
-		if app.Path == "" {
-			fmt.Printf("Setting default path for app %s to /%s\n", app.Name, app.Name)
-			config.Apps[i].Path = app.Name
-		}
 	}
 
 	return &config, nil

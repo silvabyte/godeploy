@@ -1,34 +1,40 @@
-# 🚀 **GoDeploy Quick Start — Your First Deploy (Required Setup)**
+# 🚀 GoDeploy Quick Start — Deploy Your App in Minutes
 
 > **Deploy your SPA with one command — fast, secure, and zero DevOps.**
 
-Welcome to GoDeploy! Let's get your app live — **start to finish in minutes**.
+Welcome to GoDeploy! Let's get your app live in just a few minutes.
 
 ---
 
-## ⚡ **Step 1. Install the GoDeploy CLI**
+## ⚡ Step 1: Install the GoDeploy CLI
 
 Run this in your terminal to install GoDeploy:
 
 ```bash
-curl -sSL https://install--7c574f3c-862a-4bc5-89d4-b1f11aaac65f.spa.godeploy.app/now.sh | bash
+curl -sSL https://install.godeploy.app/now.sh | bash
 ```
 
 ---
 
-## ✍️ **Step 2. Log in to Your GoDeploy Account**
+## ✍️ Step 2: Create Your Account
 
-Authenticate with your email:
+Sign up for GoDeploy:
 
 ```bash
-godeploy auth login --email=you@example.com
+godeploy auth signup
+```
+
+Or if you already have an account:
+
+```bash
+godeploy auth login
 ```
 
 ✅ You'll only need to do this once. GoDeploy remembers you for all future deploys.
 
 ---
 
-## ⚙️ **Step 3. Initialize Your Project (Required)**
+## ⚙️ Step 3: Initialize Your Project
 
 Run this command to create a `godeploy.config.json` for your app:
 
@@ -38,39 +44,35 @@ godeploy init
 
 ---
 
-## ✏️ **Step 4. Edit Your `godeploy.config.json` (Important!)**
+## ✏️ Step 4: Configure Your App
 
-Open `godeploy.config.json` in your editor and **customize it to match your app**.
+Open `godeploy.config.json` in your editor and customize it to match your app.
 
-Example template:
+Example configuration:
 
 ```json
 {
   "apps": [
     {
-      "name": "main", // Name your app (e.g., "main", "dashboard")
-      "source_dir": "./dist", // Path to your built files (e.g., "dist" or "build")
-      "path": "/", // URL path — "/" for root app
-      "description": "My awesome SPA", // Optional description for your app
-      "enabled": true // Enable the app for deployment
+      "name": "my-app",           // Your app name (used in URL)
+      "source_dir": "dist",        // Your build folder
+      "description": "My awesome SPA",
+      "enabled": true
     }
   ]
 }
 ```
 
-👉 **Be sure to:**
-
-- Set `"source_dir"` to **your build folder** (e.g., `./dist` or `./build`).
-- Set `"name"` and `"description"` to identify the app.
-- Keep `"enabled": true` for deployment.
-
-> ⚠️ **Important**: The default `"install"` app in the config is just a placeholder — **replace it with your app details**!
+👉 **Important settings:**
+- `name`: Your app identifier (alphanumeric and hyphens only)
+- `source_dir`: Your build folder (e.g., `dist`, `build`, `out`)
+- `description`: Brief description of your app
 
 ---
 
-## 🛠️ **Step 5. Build Your App**
+## 🛠️ Step 5: Build Your App
 
-If you haven’t already built your SPA:
+Build your SPA using your framework's build command:
 
 ```bash
 npm run build   # Or yarn build, pnpm build, etc.
@@ -78,29 +80,88 @@ npm run build   # Or yarn build, pnpm build, etc.
 
 ---
 
-## 🚀 **Step 6. Deploy Your App — Go Live!**
+## 🚀 Step 6: Deploy!
 
-Run this command to deploy:
+Deploy your app to the cloud:
 
 ```bash
 godeploy deploy
 ```
 
-🎉 **That's it!** Your app is now live with HTTPS and CDN.
+🎉 **That's it!** Your app is now live with HTTPS and global CDN.
 
 Example output:
-
 ```
-✅ Successfully deployed!
-🌍 URL: https://your-app.godeploy.app
+✅ Successfully deployed project 'my-app'!
+🌍 URL: https://my-app-12345.godeploy.app
 ```
 
 ---
 
-## 🔑 **Need Help?**
+## 📚 Advanced Usage
 
+### Deploy a Specific Project
+
+If you have multiple apps configured:
+
+```bash
+godeploy deploy --project admin-panel
+```
+
+### Multi-App Configuration
+
+Deploy multiple SPAs from one project:
+
+```json
+{
+  "apps": [
+    {
+      "name": "main-site",
+      "source_dir": "apps/main/dist",
+      "enabled": true
+    },
+    {
+      "name": "admin",
+      "source_dir": "apps/admin/dist",
+      "enabled": true
+    },
+    {
+      "name": "docs",
+      "source_dir": "apps/docs/dist",
+      "enabled": true
+    }
+  ]
+}
+```
+
+---
+
+## 🔑 Authentication Commands
+
+| Command | Description |
+|---------|-------------|
+| `godeploy auth signup` | Create a new account |
+| `godeploy auth login` | Log in to your account |
+| `godeploy auth status` | Check if you're logged in |
+| `godeploy auth logout` | Log out |
+
+---
+
+## 💡 Tips
+
+- **Framework Support**: Works with React, Vue, Angular, Svelte, and any static site generator
+- **Build First**: Always build your app before deploying
+- **Multiple Deploys**: Each deploy creates a new version - no downtime!
+- **Custom Domains**: Coming soon!
+
+---
+
+## 🤝 Need Help?
+
+- **Documentation**: [docs.godeploy.app](https://docs.godeploy.app)
 - **Email**: [support@godeploy.app](mailto:support@godeploy.app)
+- **GitHub**: [github.com/audetic/godeploy](https://github.com/audetic/godeploy)
 
 ---
 
-> **GoDeploy: From zero to live in minutes — no AWS, no Netlify, no headaches.**
+> **GoDeploy: Ship faster, worry less.**

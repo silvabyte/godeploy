@@ -2,7 +2,6 @@ package archive
 
 import (
 	"archive/zip"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -10,20 +9,17 @@ import (
 )
 
 // CreateZipFromDirectory creates a zip archive from a directory
-func CreateZipFromDirectory(sourceDir string, targetFile string) error {
-	// Create the target file
-	zipFile, err := os.Create(targetFile)
+func CreateZipFromDirectory(sourceDir, outputPath string) error {
+	zipFile, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("failed to create zip file: %w", err)
+		return err
 	}
 	defer zipFile.Close()
 
-	// Create a new zip writer
-	zipWriter := zip.NewWriter(zipFile)
-	defer zipWriter.Close()
+	archive := zip.NewWriter(zipFile)
+	defer archive.Close()
 
-	// Walk through the source directory
-	err = filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+	return filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -33,76 +29,43 @@ func CreateZipFromDirectory(sourceDir string, targetFile string) error {
 			return nil
 		}
 
-		// Create a relative path for the file
+		// Create relative path for the file in the zip
 		relPath, err := filepath.Rel(sourceDir, path)
 		if err != nil {
-			return fmt.Errorf("failed to get relative path: %w", err)
+			return err
 		}
 
-		// Convert Windows paths to Unix paths
-		relPath = strings.ReplaceAll(relPath, "\\", "/")
+		// Convert to forward slashes for zip compatibility
+		relPath = strings.ReplaceAll(relPath, string(filepath.Separator), "/")
 
-		// Create a new file header
+		// Create a zip file header
 		header, err := zip.FileInfoHeader(info)
 		if err != nil {
-			return fmt.Errorf("failed to create file header: %w", err)
+			return err
 		}
-
-		// Set the name to the relative path
 		header.Name = relPath
-
-		// Set the compression method
 		header.Method = zip.Deflate
 
-		// Create the file in the zip archive
-		writer, err := zipWriter.CreateHeader(header)
+		// Create the file in the zip
+		writer, err := archive.CreateHeader(header)
 		if err != nil {
-			return fmt.Errorf("failed to create file in zip: %w", err)
+			return err
 		}
 
 		// Open the source file
 		file, err := os.Open(path)
 		if err != nil {
-			return fmt.Errorf("failed to open source file: %w", err)
+			return err
 		}
 		defer file.Close()
 
-		// Copy the file contents to the zip archive
+		// Copy the file contents to the zip
 		_, err = io.Copy(writer, file)
-		if err != nil {
-			return fmt.Errorf("failed to copy file contents: %w", err)
-		}
-
-		return nil
+		return err
 	})
-	if err != nil {
-		return fmt.Errorf("failed to walk directory: %w", err)
-	}
-
-	return nil
 }
 
-// ReadZipFile reads a zip file and returns its contents as a byte slice
-func ReadZipFile(zipFile string) ([]byte, error) {
-	// Open the zip file
-	file, err := os.Open(zipFile)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open zip file: %w", err)
-	}
-	defer file.Close()
-
-	// Get the file info
-	info, err := file.Stat()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get file info: %w", err)
-	}
-
-	// Read the file contents
-	data := make([]byte, info.Size())
-	_, err = io.ReadFull(file, data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %w", err)
-	}
-
-	return data, nil
+// ReadZipFile reads a zip file and returns its contents as a byte array
+func ReadZipFile(path string) ([]byte, error) {
+	return os.ReadFile(path)
 }
