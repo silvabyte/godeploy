@@ -94,6 +94,3 @@ export const routeSchemas = {
 // Type exports
 export type Deploy = z.infer<typeof DeploySchema>
 export type DeployQuerystring = z.infer<typeof DeployQuerystringSchema>
-export type DeployResponse = z.infer<typeof DeployResponseSchema>
-export type ErrorResponse = z.infer<typeof ErrorResponseSchema>
-export type ErrorWithMessageResponse = z.infer<typeof ErrorWithMessageResponseSchema>

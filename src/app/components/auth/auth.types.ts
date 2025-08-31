@@ -184,10 +184,6 @@ export const routeSchemas = {
 // Type exports
 export type AuthInitBody = z.infer<typeof authInitSchema>
 export type MagicLinkQuerystring = z.infer<typeof magicLinkSchema>
-export type AuthInitSuccessResponse = z.infer<typeof authInitSuccessSchema>
-export type AuthInitErrorResponse = z.infer<typeof authInitErrorSchema>
-export type AuthVerifySuccessResponse = z.infer<typeof authVerifySuccessSchema>
-export type AuthVerifyErrorResponse = z.infer<typeof authVerifyErrorSchema>
 
 // Password auth type exports
 export type SignUpBody = z.infer<typeof signUpSchema>
@@ -195,5 +191,3 @@ export type SignInBody = z.infer<typeof signInSchema>
 export type ChangePasswordBody = z.infer<typeof changePasswordSchema>
 export type ResetPasswordRequestBody = z.infer<typeof resetPasswordRequestSchema>
 export type ResetPasswordConfirmBody = z.infer<typeof resetPasswordConfirmSchema>
-export type AuthTokenResponse = z.infer<typeof authTokenResponseSchema>
-export type AuthErrorResponse = z.infer<typeof authErrorResponseSchema>

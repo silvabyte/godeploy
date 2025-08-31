@@ -27,7 +27,6 @@ export const createProjectSchema = z.object({
 })
 
 // Response schemas
-export const projectResponseSchema = projectSchema
 export const projectsResponseSchema = z.array(projectSchema)
 
 // Generate JSON schemas
@@ -62,5 +61,3 @@ export const routeSchemas = {
 // Type exports
 export type Project = z.infer<typeof projectSchema>
 export type CreateProjectBody = z.infer<typeof createProjectSchema>
-export type ProjectResponse = z.infer<typeof projectResponseSchema>
-export type ProjectsResponse = z.infer<typeof projectsResponseSchema>

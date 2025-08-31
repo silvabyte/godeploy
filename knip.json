@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["src/**/*.test.ts", "src/**/*.spec.ts", "src/smoke-tests/**/*.ts"],
+  "entry": ["src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.smoke.ts"],
   "project": ["src/**/*.ts", "!src/**/*.d.ts"],
   "ignore": ["supabase/migrations/**", "docs/**"],
   "ignoreDependencies": ["husky", "@biomejs/biome"],

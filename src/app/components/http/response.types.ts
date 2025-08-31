@@ -22,11 +22,6 @@ export const errorResponseJsonSchema = zodToJsonSchema(errorResponseSchema)
 export const notFoundResponseJsonSchema = zodToJsonSchema(notFoundResponseSchema)
 export const successResponseJsonSchema = zodToJsonSchema(successResponseSchema)
 
-// Define types from Zod schemas
-export type ErrorResponse = z.infer<typeof errorResponseSchema>
-export type NotFoundResponse = z.infer<typeof notFoundResponseSchema>
-export type SuccessResponse = z.infer<typeof successResponseSchema>
-
 // Common response schemas for Fastify
 export const commonResponseSchemas = {
   error: {

@@ -7,8 +7,6 @@
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
-    "test:smoke": "bun run src/smoke-tests/deploy.smoke.ts",
-    "test:auth": "bun run src/smoke-tests/auth.smoke.ts",
     "start": "bun run src/main.ts",
     "dev": "bun --watch src/main.ts",
     "format": "bunx biome format --write .",
@@ -51,12 +49,9 @@
     "fastify": "~5.2.1",
     "fastify-plugin": "~5.0.1",
     "flat": "^6.0.1",
-    "form-data": "^4.0.2",
     "nanoid": "^5.1.5",
-    "ora": "^8.2.0",
     "pino": "^9.6.0",
     "random-word": "^3.0.0",
-    "undici": "^7.7.0",
     "uuid": "^11.1.0",
     "zod": "^3.25.76",
     "zod-to-json-schema": "^3.24.5"
@@ -70,9 +65,12 @@
     "@types/random-word": "^2.0.2",
     "chalk": "^5.4.1",
     "dotenv": "^17.2.1",
+    "form-data": "^4.0.4",
     "husky": "^9.1.7",
     "knip": "^5.63.0",
-    "typescript": "~5.7.2"
+    "ora": "^8.2.0",
+    "typescript": "~5.7.2",
+    "undici": "^7.15.0"
   },
   "private": true
 }
