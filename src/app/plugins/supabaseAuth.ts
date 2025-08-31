@@ -2,13 +2,15 @@ import { createClient } from '@supabase/supabase-js'
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import fp from 'fastify-plugin'
 
-// Create Supabase client
-const supabaseUrl = process.env.SUPABASE_URL || ''
-const supabaseKey = process.env.SUPABASE_API_KEY || ''
-const supabase = createClient(supabaseUrl, supabaseKey)
-
 export default fp(
   async (fastify) => {
+    // Get Supabase credentials
+    const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co'
+    const supabaseKey = process.env.SUPABASE_API_KEY || 'placeholder-key'
+
+    // Create client - will work with placeholder values for tests
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
     fastify.decorate('supabase', supabase)
 
     // Log auth related messages with consistent format

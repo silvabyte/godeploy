@@ -29,3 +29,6 @@ jobs:
 
       - name: Test
         run: bun test
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://test.supabase.co' }}
+          SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY || 'test-key' }}
