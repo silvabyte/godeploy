@@ -41,7 +41,9 @@ func TestAuthConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temporary directory: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		_ = os.RemoveAll(tempDir)
+	}()
 
 	// Create a test config
 	testConfig := &AuthConfig{

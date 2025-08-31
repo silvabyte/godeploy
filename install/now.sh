@@ -113,7 +113,7 @@ install_godeploy() {
     log_info "Fetching latest version information..."
 
     # Debug the GitHub API response
-    GITHUB_API_RESPONSE=$(curl -s https://api.github.com/repos/silvabyte/godeploy/releases/latest)
+    GITHUB_API_RESPONSE=$(curl -s https://api.github.com/repos/audetic/godeploy/releases/latest)
     if [ -z "$GITHUB_API_RESPONSE" ]; then
       log_crit "Empty response from GitHub API"
       exit 1
@@ -255,8 +255,17 @@ install_godeploy() {
   # Verify installation
   log_info "Testing installation..."
   if is_command "$INSTALL_DIR/godeploy"; then
-    "$INSTALL_DIR/godeploy" --help
-    log_info "Installation complete!"
+    "$INSTALL_DIR/godeploy" version
+    echo ""
+    log_info "✅ Installation complete!"
+    echo ""
+    echo "  🚀 Welcome to GoDeploy - Deploy your SPAs to the cloud instantly!"
+    echo ""
+    echo "  Get started:"
+    echo "    1. Create your account:  godeploy auth sign-up"
+    echo "    2. Initialize project:   godeploy init"
+    echo "    3. Build your app:       npm run build"
+    echo "    4. Deploy to cloud:      godeploy deploy"
   else
     log_crit "Installation verification failed. Please check your PATH."
     exit 1

@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/audetic/godeploy/internal/auth"
+	"github.com/silvabyte/godeploy/internal/auth"
 )
 
 const (
@@ -145,7 +145,9 @@ func (c *Client) InitAuth(email, redirectURI string) (*AuthInitResponse, error) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
@@ -193,7 +195,9 @@ func (c *Client) VerifyToken(token string) (*VerifyResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
@@ -278,7 +282,9 @@ func (c *Client) SignIn(email, password string) (*SignInResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
@@ -350,7 +356,9 @@ func (c *Client) SignUp(email, password string) (*SignUpResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
@@ -433,7 +441,9 @@ func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	// Read the response body
 	respBody, err := io.ReadAll(resp.Body)

@@ -86,7 +86,7 @@ func SaveAuthConfig(config *AuthConfig) error {
 	}
 
 	// Create the config directory if it doesn't exist
-	if err := os.MkdirAll(configDir, 0755); err != nil {
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
@@ -100,7 +100,7 @@ func SaveAuthConfig(config *AuthConfig) error {
 		return fmt.Errorf("failed to marshal auth config: %w", err)
 	}
 
-	if err := os.WriteFile(configPath, data, 0644); err != nil {
+	if err := os.WriteFile(configPath, data, 0o644); err != nil {
 		return fmt.Errorf("failed to write auth config file: %w", err)
 	}
 

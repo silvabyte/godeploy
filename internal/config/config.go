@@ -19,7 +19,6 @@ type App struct {
 	Name        string `json:"name"`
 	Slug        string `json:"slug"`
 	SourceDir   string `json:"source_dir"`
-	Path        string `json:"path"`
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
 }
@@ -46,15 +45,6 @@ func LoadConfig(configPath string) (*SpaConfig, error) {
 		return nil, fmt.Errorf("at least one app must be defined in the configuration")
 	}
 
-	// Set default paths if not specified
-	for i, app := range config.Apps {
-		// If path is not specified, use the name as the default path
-		if app.Path == "" {
-			fmt.Printf("Setting default path for app %s to /%s\n", app.Name, app.Name)
-			config.Apps[i].Path = app.Name
-		}
-	}
-
 	return &config, nil
 }
 
@@ -65,11 +55,11 @@ func SaveConfig(config *SpaConfig, configPath string) error {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
-	if err := os.MkdirAll(filepath.Dir(configPath), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(configPath), 0o755); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
-	if err := os.WriteFile(configPath, data, 0644); err != nil {
+	if err := os.WriteFile(configPath, data, 0o644); err != nil {
 		return fmt.Errorf("failed to write config file: %w", err)
 	}
 
