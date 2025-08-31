@@ -23,9 +23,11 @@ fi
 
 # Go vet
 echo -e "\n${YELLOW}Running go vet...${NC}"
-if go vet ./... 2>&1 | grep -v vendor; then
+VET_OUTPUT=$(go vet ./... 2>&1 | grep -v vendor || true)
+if [ -z "$VET_OUTPUT" ]; then
     echo -e "${GREEN}✓ No issues found with go vet${NC}"
 else
+    echo "$VET_OUTPUT"
     echo -e "${RED}✗ Issues found with go vet${NC}"
     FAILED=1
 fi

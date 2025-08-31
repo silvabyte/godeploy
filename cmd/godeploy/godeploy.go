@@ -666,7 +666,9 @@ func (d *DeployCmd) Run() error {
 	if err != nil {
 		return fmt.Errorf("failed to create temporary directory: %w", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		_ = os.RemoveAll(tempDir)
+	}()
 
 	// Create the zip file path
 	zipFilePath := filepath.Join(tempDir, projectName+".zip")
