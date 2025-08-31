@@ -144,7 +144,7 @@ install_godeploy() {
   log_info "Using extraction directory: $EXTRACT_DIR"
 
   # Construct the correct download URL for the asset
-  DOWNLOAD_URL="https://github.com/audetic/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+  DOWNLOAD_URL="https://github.com/silvabyte/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
   if [ "$OS" == "windows" ]; then
     DOWNLOAD_URL="${DOWNLOAD_URL}.zip"
     ARCHIVE_TYPE="zip"
@@ -199,7 +199,7 @@ install_godeploy() {
 
     # Try direct binary download as fallback
     log_info "Attempting direct binary download as fallback..."
-    DIRECT_URL="https://github.com/audetic/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+    DIRECT_URL="https://github.com/silvabyte/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
     if [ "$OS" == "windows" ]; then
       DIRECT_URL="${DIRECT_URL}.exe"
     fi
@@ -266,8 +266,6 @@ install_godeploy() {
     echo "    2. Initialize project:   godeploy init"
     echo "    3. Build your app:       npm run build"
     echo "    4. Deploy to cloud:      godeploy deploy"
-    echo ""
-    echo "  Need help? Visit https://docs.godeploy.app"
   else
     log_crit "Installation verification failed. Please check your PATH."
     exit 1

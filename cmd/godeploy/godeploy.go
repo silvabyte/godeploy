@@ -10,11 +10,11 @@ import (
 	"syscall"
 
 	"github.com/alecthomas/kong"
-	"github.com/audetic/godeploy/internal/api"
-	"github.com/audetic/godeploy/internal/archive"
-	"github.com/audetic/godeploy/internal/auth"
-	"github.com/audetic/godeploy/internal/config"
-	"github.com/audetic/godeploy/internal/version"
+	"github.com/silvabyte/godeploy/internal/api"
+	"github.com/silvabyte/godeploy/internal/archive"
+	"github.com/silvabyte/godeploy/internal/auth"
+	"github.com/silvabyte/godeploy/internal/config"
+	"github.com/silvabyte/godeploy/internal/version"
 	"github.com/yarlson/pin"
 	"golang.org/x/term"
 )

@@ -1,4 +1,4 @@
-module github.com/audetic/godeploy
+module github.com/silvabyte/godeploy
 
 go 1.23.0
 

@@ -16,7 +16,7 @@ OUT_DIR=out
 
 # Version information
 VERSION=$(shell grep '"version":' package.json | sed -E 's/.*"version": "([^"]+)".*/\1/')
-LDFLAGS=-ldflags "-X github.com/audetic/godeploy/internal/version.Version=$(VERSION)"
+LDFLAGS=-ldflags "-X github.com/silvabyte/godeploy/internal/version.Version=$(VERSION)"
 
 
 # Run all

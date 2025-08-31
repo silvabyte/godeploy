@@ -26,7 +26,7 @@ curl -sSL https://install.godeploy.app/now.sh | bash
 
 ### Manual Installation
 
-Download the latest binary from our [releases page](https://github.com/audetic/godeploy/releases) and add it to your PATH.
+Download the latest binary from our [releases page](https://github.com/silvabyte/godeploy/releases) and add it to your PATH.
 
 ## 🏃‍♂️ Quick Start
 
@@ -194,10 +194,8 @@ Enterprise-grade infrastructure with 99.9% uptime SLA.
 
 ## 🤝 Support
 
-- **Documentation**: [docs.godeploy.app](https://docs.godeploy.app)
-- **Email**: <support@godeploy.app>
-- **Issues**: [GitHub Issues](https://github.com/audetic/godeploy/issues)
-- **Discord**: [Join our community](https://discord.gg/godeploy)
+- **Email**: support@godeploy.app
+- **Issues**: [GitHub Issues](https://github.com/silvabyte/godeploy/issues)
 
 ## 🚧 Roadmap
 

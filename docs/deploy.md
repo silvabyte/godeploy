@@ -158,9 +158,8 @@ Deploy multiple SPAs from one project:
 
 ## 🤝 Need Help?
 
-- **Documentation**: [docs.godeploy.app](https://docs.godeploy.app)
 - **Email**: [support@godeploy.app](mailto:support@godeploy.app)
-- **GitHub**: [github.com/audetic/godeploy](https://github.com/audetic/godeploy)
+- **GitHub**: [github.com/silvabyte/godeploy](https://github.com/silvabyte/godeploy)
 
 ---
 
