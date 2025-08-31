@@ -139,3 +139,6 @@ dist
 .mcp/
 .DS_Store
 .aider*
+
+# Bun
+bun.lockb

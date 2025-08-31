@@ -4,22 +4,24 @@
   "main": "src/main.ts",
   "type": "module",
   "scripts": {
-    "test": "vitest run",
-    "test:smoke": "tsx src/smoke-tests/deploy.smoke.ts",
-    "test:auth": "tsx src/smoke-tests/auth.smoke.ts",
-    "start": "tsx src/main.ts",
-    "dev": "tsx watch src/main.ts",
-    "format": "npx -y prettier . --write",
-    "db:new": "supabase migration new",
-    "db:up": "supabase migration up",
-    "db:push": "supabase db push",
-    "db:pull": "supabase db pull",
-    "db:reset": "supabase db reset",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
+    "test:smoke": "bun run src/smoke-tests/deploy.smoke.ts",
+    "test:auth": "bun run src/smoke-tests/auth.smoke.ts",
+    "start": "bun run src/main.ts",
+    "dev": "bun --watch src/main.ts",
+    "format": "bunx prettier . --write",
+    "db:new": "bunx supabase migration new",
+    "db:up": "bunx supabase migration up",
+    "db:push": "bunx supabase db push",
+    "db:pull": "bunx supabase db pull",
+    "db:reset": "bunx supabase db reset",
     "docker:build": "docker build -t godeploy-api .",
     "docker:run": "docker run -p 38444:38444 godeploy-api",
     "docker:stop": "docker stop godeploy-api",
     "docker:remove": "docker rm godeploy-api",
-    "docker:start": "npm run docker:build && npm run docker:run",
+    "docker:start": "bun run docker:build && bun run docker:run",
     "docker:logs": "docker logs -f godeploy-api"
   },
   "author": "mat silva",
@@ -28,7 +30,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
     "@aws-sdk/lib-storage": "^3.758.0",
-    "@fastify/autoload": "~6.0.3",
     "@fastify/cors": "^11.0.0",
     "@fastify/multipart": "^9.0.3",
     "@fastify/rate-limit": "^10.2.2",
@@ -43,7 +44,6 @@
     "archiver": "^6.0.2",
     "await-to-js": "^3.0.0",
     "axios": "^1.8.3",
-    "dotenv": "^16.4.7",
     "execa": "^9.5.2",
     "fastify": "~5.2.1",
     "fastify-plugin": "~5.0.1",
@@ -57,7 +57,6 @@
     "rimraf": "^5.0.10",
     "slugify": "^1.6.6",
     "telemetry-sh": "^1.0.10",
-    "tsx": "^4.19.3",
     "undici": "^7.7.0",
     "uuid": "^11.1.0",
     "zod": "^3.24.2",
@@ -72,14 +71,13 @@
     "chalk": "^5.4.1",
     "husky": "^9.1.7",
     "prettier": "^2.6.2",
-    "tslib": "^2.3.0",
     "typescript": "~5.7.2",
-    "vitest": "^3.1.1",
-    "vitest-mock-extended": "^3.1.0"
+    "@types/bun": "latest"
   },
   "lint-staged": {
     "**/*": [
       "prettier --write --ignore-unknown"
     ]
-  }
+  },
+  "private": true
 }

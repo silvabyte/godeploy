@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'bun:test';
 import {
   validateAndTransformProjectName,
   addUrlToProject,
-} from './project-utils';
-import type { Project } from './projects.types';
+} from './project-utils.js';
+import type { Project } from './projects.types.js';
 
 describe('validateAndTransformProjectName', () => {
   it('returns error when no name is provided', () => {

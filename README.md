@@ -12,10 +12,47 @@ Backend API for GoDeploy, a service that lets users deploy static SPAs to Digita
 
 ## Tech Stack
 
-- Fastify (Node.js)
+- Bun (JavaScript runtime & package manager)
+- Fastify (Web framework)
 - Supabase (Auth & Database)
 - DigitalOcean Spaces (Storage)
 - DigitalOcean CDN (Content Delivery)
+
+## Prerequisites
+
+- [Bun](https://bun.sh) v1.0 or later
+- Supabase account
+- DigitalOcean account with Spaces configured
+
+## Installation
+
+```bash
+# Install Bun (if not already installed)
+curl -fsSL https://bun.sh/install | bash
+
+# Install dependencies
+bun install
+
+# Copy environment variables
+cp .env.example .env
+# Edit .env with your credentials
+```
+
+## Development
+
+```bash
+# Run in development mode with hot reload
+bun dev
+
+# Run in production mode
+bun start
+
+# Run tests
+bun test
+
+# Format code
+bun run format
+```
 
 ## API Endpoints
 

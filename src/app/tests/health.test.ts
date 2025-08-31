@@ -1,11 +1,13 @@
-import { expect, describe, it, beforeAll } from 'vitest';
-import { buildApp } from '../build/build';
+import { expect, describe, it, beforeAll } from 'bun:test';
+import { buildApp } from '../build/build.js';
 
-describe('Health check', async () => {
+describe('Health check', () => {
   let server: Awaited<ReturnType<typeof buildApp>>;
+
   beforeAll(async () => {
     server = await buildApp();
   });
+
   it('should return 200', async () => {
     const response = await server.inject({
       method: 'GET',
