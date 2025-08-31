@@ -24,11 +24,18 @@ const defaultLogger =
           mixin: HyperDX.getPinoMixinFunction,
           targets: [
             HyperDX.getPinoTransport('info', {
-              // Send logs info and above
+              // Send logs info and above to HyperDX
               detectResources: true,
             }),
+            {
+              // Also log to console/stdout in production
+              target: 'pino/file',
+              options: {
+                destination: 1, // 1 = stdout
+              },
+            },
           ],
-        })
+        }),
       )
     : pino();
 
@@ -87,7 +94,7 @@ export class Logger {
     if (!user) return 'no user';
     return `user_id: ${user.user_id.substring(
       0,
-      8
+      8,
     )}..., tenant_id: ${user.tenant_id.substring(0, 8)}...`;
   }
 
