@@ -99,13 +99,13 @@ func GenerateNginxConfigs(ctx context.Context, spaConfig *config.SpaConfig, outp
 
 	dirs := []string{nginxDir, confDir, appsDir}
 	for _, dir := range dirs {
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
 			return fmt.Errorf("failed to create directory %s: %w", dir, err)
 		}
 	}
 
 	// Generate main nginx.conf
-	if err := os.WriteFile(filepath.Join(nginxDir, "nginx.conf"), []byte(mainNginxConfTemplate), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(nginxDir, "nginx.conf"), []byte(mainNginxConfTemplate), 0o644); err != nil {
 		return fmt.Errorf("failed to write nginx.conf: %w", err)
 	}
 
@@ -178,7 +178,7 @@ func ProcessSpaAssets(app config.App, spaDir, outputDir string) error {
 	// Create app directories
 	dirs := []string{appDir, appConfigDir}
 	for _, dir := range dirs {
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
 			return fmt.Errorf("failed to create directory %s: %w", dir, err)
 		}
 	}
@@ -188,7 +188,7 @@ func ProcessSpaAssets(app config.App, spaDir, outputDir string) error {
 		return fmt.Errorf("failed to copy SPA files: %w", err)
 	}
 
-	//TODO: do this for all html files
+	// TODO: do this for all html files
 	// Fix base href in index.html
 	indexPath := filepath.Join(appDir, "index.html")
 	if _, err := os.Stat(indexPath); err == nil {
@@ -225,7 +225,7 @@ func CleanDeployDir(deployDir string) error {
 // copyDir copies a directory recursively
 func copyDir(src, dst string) error {
 	// Create destination directory
-	if err := os.MkdirAll(dst, 0755); err != nil {
+	if err := os.MkdirAll(dst, 0o755); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", dst, err)
 	}
 
@@ -264,7 +264,7 @@ func copyFile(src, dst string) error {
 	}
 
 	// Write destination file
-	if err := os.WriteFile(dst, data, 0644); err != nil {
+	if err := os.WriteFile(dst, data, 0o644); err != nil {
 		return fmt.Errorf("failed to write file %s: %w", dst, err)
 	}
 

@@ -28,7 +28,7 @@ func TestGenerateNginxLocations(t *testing.T) {
 
 	for _, file := range files {
 		filePath := filepath.Join(srcDir, file.path)
-		if err := os.WriteFile(filePath, []byte(file.content), 0644); err != nil {
+		if err := os.WriteFile(filePath, []byte(file.content), 0o644); err != nil {
 			t.Fatalf("Failed to create mock file %s: %v", file.path, err)
 		}
 	}

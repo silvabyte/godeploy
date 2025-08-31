@@ -75,7 +75,6 @@ func CreateZipFromDirectory(sourceDir string, targetFile string) error {
 
 		return nil
 	})
-
 	if err != nil {
 		return fmt.Errorf("failed to walk directory: %w", err)
 	}

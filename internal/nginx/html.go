@@ -27,7 +27,7 @@ func FixBaseHref(htmlFilePath, baseHrefValue string) error {
 		}
 	}
 
-	if err := os.WriteFile(htmlFilePath, []byte(contentStr), 0644); err != nil {
+	if err := os.WriteFile(htmlFilePath, []byte(contentStr), 0o644); err != nil {
 		return fmt.Errorf("failed to write %s: %w", htmlFilePath, err)
 	}
 

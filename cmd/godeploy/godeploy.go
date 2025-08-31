@@ -73,12 +73,10 @@ type SignUpCmd struct {
 }
 
 // LogoutCmd represents the logout command
-type LogoutCmd struct {
-}
+type LogoutCmd struct{}
 
 // StatusCmd represents the status command
-type StatusCmd struct {
-}
+type StatusCmd struct{}
 
 // DeployCmd represents the deploy command
 type DeployCmd struct {
@@ -87,8 +85,7 @@ type DeployCmd struct {
 }
 
 // VersionCmd represents the version command
-type VersionCmd struct {
-}
+type VersionCmd struct{}
 
 // Run executes the version command
 func (v *VersionCmd) Run() error {
@@ -166,7 +163,7 @@ func (s *ServeCmd) Run() error {
 	// Run the server locally
 	if err := docker.RunLocalDocker(dockerSpinner, s.Output, s.Port, s.ImageName); err != nil {
 		dockerSpinner.Fail("Failed to start Docker")
-		//TODO: log the error to the ~/.config/godeploy/logs/docker.log file
+		// TODO: log the error to the ~/.config/godeploy/logs/docker.log file
 		return fmt.Errorf("error running Docker: %w", err)
 	}
 	dockerSpinner.Stop("Docker server stopped")
@@ -247,7 +244,7 @@ func (i *InitCmd) Run() error {
 	createCancel := createSpinner.Start(ctx)
 
 	// Create the config file
-	if err := os.WriteFile(configPath, []byte(defaultConfig), 0644); err != nil {
+	if err := os.WriteFile(configPath, []byte(defaultConfig), 0o644); err != nil {
 		createCancel()
 		createSpinner.Fail("Failed to create config file")
 		return fmt.Errorf("failed to create config file: %w", err)
@@ -626,7 +623,6 @@ func (s *StatusCmd) Run() error {
 	// We have a token, now verify it with the API
 	apiClient := api.NewClient()
 	verifyResp, err := apiClient.VerifyToken(token)
-
 	// Handle API connection errors
 	if err != nil {
 		statusCancel()
@@ -702,7 +698,6 @@ func (d *DeployCmd) Run() error {
 	// We have a token, now verify it with the API
 	apiClient := api.NewClient()
 	verifyResp, err := apiClient.VerifyToken(token)
-
 	// Handle API connection errors
 	if err != nil {
 		authCancel()
@@ -910,7 +905,7 @@ func generateContainerFiles(spaConfig *config.SpaConfig, outputDir string) error
 	dirCancel := dirSpinner.Start(ctx)
 
 	// Create the output directory
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
+	if err := os.MkdirAll(outputDir, 0o755); err != nil {
 		dirCancel()
 		dirSpinner.Fail("Failed to create directory")
 		return fmt.Errorf("failed to create output directory: %w", err)

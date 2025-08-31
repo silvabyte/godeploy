@@ -39,13 +39,12 @@ func GenerateNginxLocations(app config.App, srcDir, nginxConfPath string) error 
 
 		return nil
 	})
-
 	if err != nil {
 		return err
 	}
 
 	// Write the generated locations to the Nginx config file
-	return os.WriteFile(nginxConfPath, []byte(strings.Join(locations, "\n")), 0644)
+	return os.WriteFile(nginxConfPath, []byte(strings.Join(locations, "\n")), 0o644)
 }
 
 // getPaths constructs the web path and alias path.

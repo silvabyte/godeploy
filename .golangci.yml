@@ -1,0 +1,57 @@
+run:
+  timeout: 5m
+  tests: true
+
+issues:
+  exclude-dirs:
+    - vendor
+    - examples
+
+linters:
+  enable:
+    - gofmt
+    - govet
+    - errcheck
+    - staticcheck
+    - gosimple
+    - ineffassign
+    - typecheck
+    - unused
+    - unparam
+    - gocritic
+    - gocyclo
+    - gosec
+    - misspell
+    - unconvert
+    - goconst
+    - goimports
+    - bodyclose
+    - nilerr
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - performance
+      - style
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gosec
+        - goconst
+    
+    - path: internal/api/mock_
+      linters:
+        - unused
+
+  max-issues-per-linter: 0
+  max-same-issues: 0

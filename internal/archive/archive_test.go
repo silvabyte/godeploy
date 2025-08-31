@@ -16,27 +16,27 @@ func TestCreateAndReadZipFile(t *testing.T) {
 
 	// Create a source directory
 	sourceDir := filepath.Join(tempDir, "source")
-	if err := os.Mkdir(sourceDir, 0755); err != nil {
+	if err := os.Mkdir(sourceDir, 0o755); err != nil {
 		t.Fatalf("Failed to create source directory: %v", err)
 	}
 
 	// Create a test file in the source directory
 	testFile := filepath.Join(sourceDir, "test.txt")
 	testContent := []byte("This is a test file for the zip archive")
-	if err := os.WriteFile(testFile, testContent, 0644); err != nil {
+	if err := os.WriteFile(testFile, testContent, 0o644); err != nil {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
 
 	// Create a subdirectory
 	subDir := filepath.Join(sourceDir, "subdir")
-	if err := os.Mkdir(subDir, 0755); err != nil {
+	if err := os.Mkdir(subDir, 0o755); err != nil {
 		t.Fatalf("Failed to create subdirectory: %v", err)
 	}
 
 	// Create a test file in the subdirectory
 	subTestFile := filepath.Join(subDir, "subtest.txt")
 	subTestContent := []byte("This is a test file in a subdirectory")
-	if err := os.WriteFile(subTestFile, subTestContent, 0644); err != nil {
+	if err := os.WriteFile(subTestFile, subTestContent, 0o644); err != nil {
 		t.Fatalf("Failed to create test file in subdirectory: %v", err)
 	}
 

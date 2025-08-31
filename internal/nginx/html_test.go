@@ -64,7 +64,7 @@ func TestFixBaseHref(t *testing.T) {
 			tmpDir := t.TempDir()
 			htmlFilePath := filepath.Join(tmpDir, "index.html")
 
-			if err := os.WriteFile(htmlFilePath, []byte(tt.initialHTML), 0644); err != nil {
+			if err := os.WriteFile(htmlFilePath, []byte(tt.initialHTML), 0o644); err != nil {
 				t.Fatalf("failed to write test file: %v", err)
 			}
 
