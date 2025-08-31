@@ -55,6 +55,7 @@ type InitCmd struct {
 // AuthCmd represents the auth command
 type AuthCmd struct {
 	Login  LoginCmd  `cmd:"" help:"Authenticate with the GoDeploy service" default:"1"`
+	SignUp SignUpCmd `cmd:"" help:"Create a new GoDeploy account"`
 	Status StatusCmd `cmd:"" help:"Check authentication status"`
 	Logout LogoutCmd `cmd:"" help:"Log out from the GoDeploy service"`
 }
@@ -63,6 +64,12 @@ type AuthCmd struct {
 type LoginCmd struct {
 	Email    string `help:"Email address to authenticate with" default:""`
 	Password string `help:"Password for authentication" default:""`
+}
+
+// SignUpCmd represents the auth signup command
+type SignUpCmd struct {
+	Email    string `help:"Email address for the new account" default:""`
+	Password string `help:"Password for the new account" default:""`
 }
 
 // LogoutCmd represents the logout command
@@ -339,7 +346,7 @@ func (l *LoginCmd) Run() error {
 
 	// Authenticate with email and password
 	apiClient := api.NewClient()
-	loginResp, err := apiClient.Login(email, password)
+	signInResp, err := apiClient.SignIn(email, password)
 
 	authCancel()
 
@@ -347,9 +354,9 @@ func (l *LoginCmd) Run() error {
 		authSpinner.Fail("Authentication failed")
 
 		// Check for specific error messages
-		if strings.Contains(err.Error(), "invalid credentials") || strings.Contains(err.Error(), "Invalid email or password") {
+		if strings.Contains(err.Error(), "Invalid credentials") || strings.Contains(err.Error(), "Invalid email or password") {
 			fmt.Println("❌ Invalid email or password. Please check your credentials and try again.")
-		} else if strings.Contains(err.Error(), "user not found") {
+		} else if strings.Contains(err.Error(), "User not found") {
 			fmt.Println("❌ User not found. Please check your email address.")
 		} else {
 			fmt.Printf("❌ Authentication failed: %v\n", err)
@@ -367,7 +374,7 @@ func (l *LoginCmd) Run() error {
 	saveCancel := saveSpinner.Start(ctx)
 
 	// Save the token
-	if err := auth.SetAuthToken(loginResp.Token); err != nil {
+	if err := auth.SetAuthToken(signInResp.Token); err != nil {
 		saveCancel()
 		saveSpinner.Fail("Failed to save token")
 		return fmt.Errorf("failed to save authentication token: %w", err)
@@ -384,8 +391,154 @@ func (l *LoginCmd) Run() error {
 	saveSpinner.Stop("Token saved")
 
 	fmt.Println("✅ Authentication successful! You are now logged in.")
-	if loginResp.User.Email != "" {
-		fmt.Printf("Logged in as: %s\n", loginResp.User.Email)
+	if signInResp.User.Email != "" {
+		fmt.Printf("Logged in as: %s\n", signInResp.User.Email)
+	}
+
+	return nil
+}
+
+// Run executes the signup command
+func (s *SignUpCmd) Run() error {
+	// Check if already authenticated
+	isAuth, err := auth.IsAuthenticated()
+	if err != nil {
+		return fmt.Errorf("error checking authentication: %w", err)
+	}
+
+	// Get token if it exists
+	existingToken, err := auth.GetAuthToken()
+	if err != nil {
+		return fmt.Errorf("error retrieving authentication token: %w", err)
+	}
+
+	// Only proceed with token verification if we have a token
+	if isAuth && existingToken != "" {
+		// Verify the token with the API
+		apiClient := api.NewClient()
+		verifyResp, err := apiClient.VerifyToken(existingToken)
+
+		// If token is valid, inform user and exit
+		if err == nil && verifyResp.Valid {
+			fmt.Println("You are already authenticated. To log out, run 'godeploy auth logout'.")
+			return nil
+		}
+
+		// If we get here, the token is invalid, so we should clear it and continue with signup
+		if err := auth.ClearAuthToken(); err != nil {
+			return fmt.Errorf("failed to clear invalid authentication token: %w", err)
+		}
+	}
+
+	// Get email
+	email := s.Email
+	if email == "" {
+		// Prompt for email if not provided
+		fmt.Print("Email: ")
+		reader := bufio.NewReader(os.Stdin)
+		emailInput, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read email: %w", err)
+		}
+		email = strings.TrimSpace(emailInput)
+		if email == "" {
+			return fmt.Errorf("email is required for registration")
+		}
+	}
+
+	// Get password from argument or prompt
+	password := s.Password
+	if password == "" {
+		fmt.Print("Password (min 8 characters): ")
+		passwordBytes, err := term.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return fmt.Errorf("failed to read password: %w", err)
+		}
+		fmt.Println() // Add newline after password input
+		password = string(passwordBytes)
+		if password == "" {
+			return fmt.Errorf("password is required for registration")
+		}
+
+		// Confirm password
+		fmt.Print("Confirm password: ")
+		confirmBytes, err := term.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return fmt.Errorf("failed to read password confirmation: %w", err)
+		}
+		fmt.Println() // Add newline after password input
+
+		if string(confirmBytes) != password {
+			return fmt.Errorf("passwords do not match")
+		}
+	}
+
+	// Validate password length
+	if len(password) < 8 {
+		return fmt.Errorf("password must be at least 8 characters long")
+	}
+
+	// Create a context
+	ctx := context.Background()
+
+	// Create a spinner for registration
+	signUpSpinner := pin.New(fmt.Sprintf("Creating account for %s...", email),
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	signUpCancel := signUpSpinner.Start(ctx)
+
+	// Create account with email and password
+	apiClient := api.NewClient()
+	signUpResp, err := apiClient.SignUp(email, password)
+
+	signUpCancel()
+
+	if err != nil {
+		signUpSpinner.Fail("Registration failed")
+
+		// Check for specific error messages
+		if strings.Contains(err.Error(), "already exists") || strings.Contains(err.Error(), "User already exists") {
+			fmt.Println("❌ An account with this email already exists. Use 'godeploy auth login' to sign in.")
+		} else if strings.Contains(err.Error(), "Invalid email") {
+			fmt.Println("❌ Invalid email address. Please provide a valid email.")
+		} else if strings.Contains(err.Error(), "Password must be at least") {
+			fmt.Println("❌ Password does not meet requirements. It must be at least 8 characters long.")
+		} else {
+			fmt.Printf("❌ Registration failed: %v\n", err)
+		}
+		return err
+	}
+
+	signUpSpinner.Stop("Account created successfully")
+
+	// Create a spinner for saving the token
+	saveSpinner := pin.New("Saving authentication token...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	saveCancel := saveSpinner.Start(ctx)
+
+	// Save the token
+	if err := auth.SetAuthToken(signUpResp.Token); err != nil {
+		saveCancel()
+		saveSpinner.Fail("Failed to save token")
+		return fmt.Errorf("failed to save authentication token: %w", err)
+	}
+
+	// Save email for future authentication
+	if err := auth.SetUserEmail(email); err != nil {
+		saveCancel()
+		saveSpinner.Fail("Failed to save email")
+		return fmt.Errorf("failed to save email: %w", err)
+	}
+
+	saveCancel()
+	saveSpinner.Stop("Token saved")
+
+	fmt.Println("✅ Account created successfully! You are now logged in.")
+	if signUpResp.User.Email != "" {
+		fmt.Printf("Logged in as: %s\n", signUpResp.User.Email)
 	}
 
 	return nil
