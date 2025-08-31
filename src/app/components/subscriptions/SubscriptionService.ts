@@ -1,13 +1,13 @@
-import { BaseService } from '../services/BaseService';
-import type { Subscription } from './subscription.types';
-import type { Result } from '../../types/result.types';
+import type { Result } from '../../types/result.types'
+import { BaseService } from '../services/BaseService'
+import type { Subscription } from './subscription.types'
 
 /**
  * Service for managing subscriptions
  */
 export class SubscriptionService extends BaseService {
   constructor() {
-    super('subscriptions');
+    super('subscriptions')
   }
 
   /**
@@ -19,7 +19,7 @@ export class SubscriptionService extends BaseService {
     return this.getOneByFilters<Subscription>({
       tenant_id: tenantId,
       status: 'active',
-    });
+    })
   }
 
   /**
@@ -28,9 +28,9 @@ export class SubscriptionService extends BaseService {
    * @returns Result containing the created subscription or error message
    */
   async createSubscription(
-    subscription: Omit<Subscription, 'id' | 'created_at' | 'updated_at'>
+    subscription: Omit<Subscription, 'id' | 'created_at' | 'updated_at'>,
   ): Promise<Result<Subscription>> {
-    return this.create<Subscription>(subscription);
+    return this.create<Subscription>(subscription)
   }
 
   /**
@@ -41,9 +41,9 @@ export class SubscriptionService extends BaseService {
    */
   async updateSubscription(
     subscriptionId: string,
-    updates: Partial<Omit<Subscription, 'id' | 'created_at' | 'updated_at'>>
+    updates: Partial<Omit<Subscription, 'id' | 'created_at' | 'updated_at'>>,
   ): Promise<Result<Subscription>> {
-    return this.update<Subscription>(subscriptionId, updates);
+    return this.update<Subscription>(subscriptionId, updates)
   }
 
   /**
@@ -54,10 +54,10 @@ export class SubscriptionService extends BaseService {
   async cancelSubscription(subscriptionId: string): Promise<Result<true>> {
     const result = await this.update<Subscription>(subscriptionId, {
       status: 'canceled',
-    });
+    })
     if (result.error) {
-      return { data: null, error: result.error };
+      return { data: null, error: result.error }
     }
-    return { data: true, error: null };
+    return { data: true, error: null }
   }
 }

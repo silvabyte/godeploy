@@ -2,7 +2,7 @@
 
 [test]
 # Preload test setup
-preload = ["./src/test/setup.ts"]
+# preload = ["./src/test/setup.ts"]
 
 # Enable coverage reporting
 coverage = false # Set to true when needed

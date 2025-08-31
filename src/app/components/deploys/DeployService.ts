@@ -1,6 +1,6 @@
-import { BaseService } from '../services/BaseService';
-import type { Deploy } from './deploys.types';
-import type { Result } from '../../types/result.types';
+import type { Result } from '../../types/result.types'
+import { BaseService } from '../services/BaseService'
+import type { Deploy } from './deploys.types'
 //TODO: include commit metadata to the dp
 // commit_hash: '34567890',
 // branch: 'main',
@@ -12,7 +12,7 @@ import type { Result } from '../../types/result.types';
  */
 export class DeployService extends BaseService {
   constructor() {
-    super('deploys');
+    super('deploys')
   }
 
   /**
@@ -20,10 +20,8 @@ export class DeployService extends BaseService {
    * @param deploy Deploy data
    * @returns Result containing the created deployment or error message
    */
-  async recordDeploy(
-    deploy: Omit<Deploy, 'id' | 'created_at' | 'updated_at'>
-  ): Promise<Result<Deploy>> {
-    return this.create<Deploy>(deploy);
+  async recordDeploy(deploy: Omit<Deploy, 'id' | 'created_at' | 'updated_at'>): Promise<Result<Deploy>> {
+    return this.create<Deploy>(deploy)
   }
 
   /**
@@ -32,15 +30,12 @@ export class DeployService extends BaseService {
    * @param status New status
    * @returns Result indicating success or error message
    */
-  async updateDeployStatus(
-    deployId: string,
-    status: 'pending' | 'success' | 'failed'
-  ): Promise<Result<true>> {
-    const result = await this.update<Deploy>(deployId, { status });
+  async updateDeployStatus(deployId: string, status: 'pending' | 'success' | 'failed'): Promise<Result<true>> {
+    const result = await this.update<Deploy>(deployId, { status })
     if (result.error) {
-      return { data: null, error: result.error };
+      return { data: null, error: result.error }
     }
-    return { data: true, error: null };
+    return { data: true, error: null }
   }
 
   /**
@@ -49,10 +44,7 @@ export class DeployService extends BaseService {
    * @param limit Number of deploys to return
    * @returns Result containing the deploys or error message
    */
-  async getProjectDeploys(
-    projectId: string,
-    limit = 10
-  ): Promise<Result<Deploy[]>> {
+  async getProjectDeploys(projectId: string, limit = 10): Promise<Result<Deploy[]>> {
     const result = await this.list<Deploy>({
       eqFilters: { project_id: projectId },
       pagination: {
@@ -63,16 +55,16 @@ export class DeployService extends BaseService {
       tenantId: '', // Not needed for this query
       userId: '', // Not needed for this query
       tableName: this.tableName,
-    });
+    })
 
     if (result.error || !result.data) {
-      return { data: null, error: result.error };
+      return { data: null, error: result.error }
     }
 
-    return { data: result.data.data, error: null };
+    return { data: result.data.data, error: null }
   }
 
   async getDeployById(id: string): Promise<Result<Deploy>> {
-    return this.getById<Deploy>(id);
+    return this.getById<Deploy>(id)
   }
 }

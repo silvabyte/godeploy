@@ -1,13 +1,13 @@
-import { BaseService } from '../services/BaseService';
-import type { Project } from './projects.types';
-import type { Result } from '../../types/result.types';
+import type { Result } from '../../types/result.types'
+import { BaseService } from '../services/BaseService'
+import type { Project } from './projects.types'
 
 /**
  * Service for managing projects
  */
 export class ProjectService extends BaseService {
   constructor() {
-    super('projects');
+    super('projects')
   }
 
   /**
@@ -16,14 +16,11 @@ export class ProjectService extends BaseService {
    * @param tenantId Tenant ID
    * @returns Result containing the project or error message
    */
-  async getProjectByName(
-    projectName: string,
-    tenantId: string
-  ): Promise<Result<Project>> {
+  async getProjectByName(projectName: string, tenantId: string): Promise<Result<Project>> {
     return this.getOneByFilters<Project>({
       name: projectName,
       tenant_id: tenantId,
-    });
+    })
   }
 
   /**
@@ -32,7 +29,7 @@ export class ProjectService extends BaseService {
    * @returns Result containing the project or error message
    */
   async getProjectBySubdomain(subdomain: string): Promise<Result<Project>> {
-    return this.getOneByFilters<Project>({ subdomain });
+    return this.getOneByFilters<Project>({ subdomain })
   }
 
   /**
@@ -40,10 +37,8 @@ export class ProjectService extends BaseService {
    * @param project Project data
    * @returns Result containing the created project or error message
    */
-  async createProject(
-    project: Omit<Project, 'id' | 'created_at' | 'updated_at'>
-  ): Promise<Result<Project>> {
-    return this.create<Project>(project);
+  async createProject(project: Omit<Project, 'id' | 'created_at' | 'updated_at'>): Promise<Result<Project>> {
+    return this.create<Project>(project)
   }
 
   /**
@@ -61,12 +56,12 @@ export class ProjectService extends BaseService {
       tenantId,
       userId: '', // Not needed for this query
       tableName: this.tableName,
-    });
+    })
 
     if (result.error || !result.data) {
-      return { data: null, error: result.error };
+      return { data: null, error: result.error }
     }
 
-    return { data: result.data.data, error: null };
+    return { data: result.data.data, error: null }
   }
 }

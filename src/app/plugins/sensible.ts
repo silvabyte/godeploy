@@ -1,6 +1,6 @@
-import type { FastifyInstance } from 'fastify';
-import fp from 'fastify-plugin';
-import sensible from '@fastify/sensible';
+import sensible from '@fastify/sensible'
+import type { FastifyInstance } from 'fastify'
+import fp from 'fastify-plugin'
 
 /**
  * This plugins adds some utilities to handle http errors
@@ -8,7 +8,7 @@ import sensible from '@fastify/sensible';
  * @see https://github.com/fastify/fastify-sensible
  */
 export default fp(async function (fastify: FastifyInstance) {
-  fastify.register(sensible);
+  fastify.register(sensible)
 
   // Add error handler for validation errors
   fastify.setErrorHandler(function (error, _request, reply) {
@@ -18,15 +18,15 @@ export default fp(async function (fastify: FastifyInstance) {
         success: false,
         error: 'Validation error',
         details: error.validation,
-      });
-      return;
+      })
+      return
     }
 
     // Handle other errors
-    const statusCode = error.statusCode || 500;
+    const statusCode = error.statusCode || 500
     reply.status(statusCode).send({
       success: false,
       error: error.message || 'Internal server error',
-    });
-  });
-});
+    })
+  })
+})

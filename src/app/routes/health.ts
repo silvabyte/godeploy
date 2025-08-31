@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify'
 
 export default async function (fastify: FastifyInstance) {
   fastify.get('/health', {
@@ -22,7 +22,7 @@ export default async function (fastify: FastifyInstance) {
         status: 'ok',
         timestamp: new Date().toISOString(),
         version: '1.0.0',
-      };
+      }
     },
-  });
+  })
 }

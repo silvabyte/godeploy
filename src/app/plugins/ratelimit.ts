@@ -1,17 +1,6 @@
-import type { FastifyInstance } from 'fastify';
-import fp from 'fastify-plugin';
-import rateLimit from '@fastify/rate-limit';
-
-// Keep only the most critical suspicious paths
-export const SUSPICIOUS_PATHS = [
-  '/.env',
-  '/.git/config',
-  '/.ssh/id_rsa',
-  '/wp-admin',
-  '/phpmyadmin',
-];
-
-export const blockedIPs = new Set<string>();
+import rateLimit from '@fastify/rate-limit'
+import type { FastifyInstance } from 'fastify'
+import fp from 'fastify-plugin'
 
 /**
  * This plugins adds minimal rate limit support
@@ -24,7 +13,7 @@ export default fp(async function (fastify: FastifyInstance) {
     global: true,
     max: 1000, // Very high limit
     timeWindow: '1 minute',
-  });
+  })
 
   // Only apply stricter rate limits to 404 routes to prevent scanning
   fastify.setNotFoundHandler(
@@ -34,10 +23,10 @@ export default fp(async function (fastify: FastifyInstance) {
         timeWindow: '1 minute',
       }),
     },
-    (_request, reply) => {
-      void reply.code(404).send({ message: 'Not Found' });
-    }
-  );
+    async (_request, reply) => {
+      await reply.code(404).send({ message: 'Not Found' })
+    },
+  )
 
   // // Keep minimal protection against obvious abuse attempts
   // fastify.addHook('onRequest', async (request, reply) => {
@@ -61,4 +50,4 @@ export default fp(async function (fastify: FastifyInstance) {
   //       .send({ message: 'Blocked due to suspicious activity' });
   //   }
   // });
-});
+})

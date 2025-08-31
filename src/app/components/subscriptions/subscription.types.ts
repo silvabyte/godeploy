@@ -1,11 +1,11 @@
-import { z } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
+import { z } from 'zod'
+import { zodToJsonSchema } from 'zod-to-json-schema'
 import {
   commonResponseSchemas,
   errorResponseJsonSchema,
   notFoundResponseJsonSchema,
   successResponseJsonSchema,
-} from '../http/response.types';
+} from '../http/response.types'
 
 // Define Zod schemas
 export const subscriptionSchema = z.object({
@@ -22,7 +22,7 @@ export const subscriptionSchema = z.object({
   stripe_subscription_id: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
-});
+})
 
 export const createSubscriptionSchema = z.object({
   plan_name: z.string(),
@@ -32,7 +32,7 @@ export const createSubscriptionSchema = z.object({
   trial_ends_at: z.string().optional(),
   current_period_end: z.string().optional(),
   stripe_subscription_id: z.string().optional(),
-});
+})
 
 export const updateSubscriptionSchema = z.object({
   plan_name: z.string().optional(),
@@ -43,21 +43,17 @@ export const updateSubscriptionSchema = z.object({
   trial_ends_at: z.string().optional(),
   current_period_end: z.string().optional(),
   stripe_subscription_id: z.string().optional(),
-});
+})
 
 // Generate JSON schemas
-export const subscriptionJsonSchema = zodToJsonSchema(subscriptionSchema);
-export const createSubscriptionJsonSchema = zodToJsonSchema(
-  createSubscriptionSchema
-);
-export const updateSubscriptionJsonSchema = zodToJsonSchema(
-  updateSubscriptionSchema
-);
+export const subscriptionJsonSchema = zodToJsonSchema(subscriptionSchema)
+export const createSubscriptionJsonSchema = zodToJsonSchema(createSubscriptionSchema)
+export const updateSubscriptionJsonSchema = zodToJsonSchema(updateSubscriptionSchema)
 
 // Define types from Zod schemas
-export type Subscription = z.infer<typeof subscriptionSchema>;
-export type CreateSubscription = z.infer<typeof createSubscriptionSchema>;
-export type UpdateSubscription = z.infer<typeof updateSubscriptionSchema>;
+export type Subscription = z.infer<typeof subscriptionSchema>
+export type CreateSubscription = z.infer<typeof createSubscriptionSchema>
+export type UpdateSubscription = z.infer<typeof updateSubscriptionSchema>
 
 // Define route schemas
 export const routeSchemas = {
@@ -103,4 +99,4 @@ export const routeSchemas = {
       },
     },
   },
-};
+}
