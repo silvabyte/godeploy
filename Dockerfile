@@ -9,7 +9,7 @@ RUN apk add --no-cache bash zip unzip
 WORKDIR /app
 
 # Copy package.json and bun lockfile
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 
 # Install dependencies with frozen lockfile for production
 RUN bun install --frozen-lockfile --production
