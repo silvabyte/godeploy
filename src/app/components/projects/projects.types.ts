@@ -26,6 +26,10 @@ export const createProjectSchema = z.object({
   description: z.string().optional(),
 })
 
+export const updateProjectDomainSchema = z.object({
+  domain: z.string().nullable().describe('Custom domain for the project (null to remove)'),
+})
+
 // Response schemas
 export const projectsResponseSchema = z.array(projectSchema)
 
@@ -33,6 +37,7 @@ export const projectsResponseSchema = z.array(projectSchema)
 export const projectJsonSchema = zodToJsonSchema(projectSchema)
 export const projectsJsonSchema = zodToJsonSchema(projectsResponseSchema)
 export const createProjectJsonSchema = zodToJsonSchema(createProjectSchema)
+export const updateProjectDomainJsonSchema = zodToJsonSchema(updateProjectDomainSchema)
 
 // Route schemas
 export const routeSchemas = {
@@ -56,8 +61,23 @@ export const routeSchemas = {
       },
     },
   },
+  updateProjectDomain: {
+    schema: {
+      security: [{ bearerAuth: [] }],
+      params: zodToJsonSchema(z.object({ projectId: z.string() })),
+      body: updateProjectDomainJsonSchema,
+      response: {
+        200: projectJsonSchema,
+        400: commonResponseSchemas.error,
+        404: commonResponseSchemas.error,
+        409: commonResponseSchemas.error,
+        500: commonResponseSchemas.error,
+      },
+    },
+  },
 }
 
 // Type exports
 export type Project = z.infer<typeof projectSchema>
 export type CreateProjectBody = z.infer<typeof createProjectSchema>
+export type UpdateProjectDomainBody = z.infer<typeof updateProjectDomainSchema>

@@ -37,3 +37,29 @@ This project uses **Bun** as the JavaScript runtime and package manager.
 - Use nullable types with `!` assertion only when guaranteed
 - Use Biome for formatting and linting (biome.json configuration)
 - Bun test for unit tests (migrating from Vitest)
+
+## Custom Domains
+
+Custom domain support is implemented with the following architecture:
+
+### Configuration
+- Set `GODEPLOY_CNAME_TARGET` environment variable (default: `godeploy-nginx-o3dvb.ondigitalocean.app`)
+- Users point their domain CNAME to this target
+- Nginx automatically routes traffic to DigitalOcean Spaces CDN
+
+### API Endpoints
+
+#### Domain Validation Endpoints (Public & Authenticated)
+- `GET /api/domains/cname-target` - Get the CNAME target for configuration (public)
+- `POST /api/domains/validate` - Validate CNAME configuration (public)
+- `POST /api/domains/check-availability` - Check if domain is available and properly configured (authenticated)
+
+#### Project Domain Management
+- `PATCH /api/projects/:projectId/domain` - Set/update/remove custom domain on a project
+
+### Domain Validation
+- Uses Zod for schema validation
+- Validates domain format and CNAME configuration only (no A records)
+- Ensures domain uniqueness across projects
+- Domain validation utility in `src/app/utils/domain-validator.ts`
+- Dedicated routes in `src/app/routes/domains.ts`

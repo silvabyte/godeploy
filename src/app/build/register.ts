@@ -8,6 +8,7 @@ import sensiblePlugin from '../plugins/sensible.js'
 import supabaseAuthPlugin from '../plugins/supabaseAuth.js'
 import authRoutes from '../routes/auth.js'
 import deploysRoutes from '../routes/deploys.js'
+import domainsRoutes from '../routes/domains.js'
 import healthRoutes from '../routes/health.js'
 import projectsRoutes from '../routes/projects.js'
 // Import routes
@@ -39,5 +40,6 @@ export async function registerPluginsAndRoutes(
   await fastify.register(authRoutes, opts)
   await fastify.register(projectsRoutes, opts)
   await fastify.register(deploysRoutes, opts)
+  await fastify.register(domainsRoutes, opts)
   await fastify.register(subscriptionsRoutes, opts)
 }

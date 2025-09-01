@@ -11,6 +11,15 @@ export class ProjectService extends BaseService {
   }
 
   /**
+   * Get a project by ID
+   * @param projectId Project ID
+   * @returns Result containing the project or error message
+   */
+  async getProjectById(projectId: string): Promise<Result<Project>> {
+    return this.getById<Project>(projectId)
+  }
+
+  /**
    * Get a project by name and tenant ID
    * @param projectName Project name
    * @param tenantId Tenant ID
@@ -63,5 +72,48 @@ export class ProjectService extends BaseService {
     }
 
     return { data: result.data.data, error: null }
+  }
+
+  /**
+   * Update a project's custom domain
+   * @param projectId Project ID
+   * @param domain Custom domain (null to remove)
+   * @returns Result containing the updated project or error message
+   */
+  async updateProjectDomain(projectId: string, domain: string | null): Promise<Result<Project>> {
+    return this.update<Project>(projectId, { domain })
+  }
+
+  /**
+   * Get a project by custom domain
+   * @param domain Custom domain
+   * @returns Result containing the project or error message
+   */
+  async getProjectByDomain(domain: string): Promise<Result<Project>> {
+    return this.getOneByFilters<Project>({ domain })
+  }
+
+  /**
+   * Check if a domain is already in use by another project
+   * @param domain Domain to check
+   * @param excludeProjectId Optional project ID to exclude from check (for updates)
+   * @returns Result containing boolean indicating if domain is available
+   */
+  async isDomainAvailable(domain: string, excludeProjectId?: string): Promise<Result<boolean>> {
+    const result = await this.getProjectByDomain(domain)
+
+    if (result.error?.includes('not found')) {
+      return { data: true, error: null }
+    }
+
+    if (result.error) {
+      return { data: null, error: result.error }
+    }
+
+    if (result.data && excludeProjectId && result.data.id === excludeProjectId) {
+      return { data: true, error: null }
+    }
+
+    return { data: false, error: null }
   }
 }
