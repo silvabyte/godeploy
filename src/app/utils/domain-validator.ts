@@ -10,7 +10,7 @@ const domainSchema = z
   .string()
   .min(1, 'Domain cannot be empty')
   .max(253, 'Domain too long')
-  .regex(/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/, 'Invalid domain format')
+  .regex(/^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/, 'Invalid domain format')
   .refine(
     (val) => {
       // Additional checks for valid domain
