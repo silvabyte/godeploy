@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.1] - 2025-09-01
+
+* feat: improve CLI UX with help and version commands (#13)
+* fix: repo in isntall script
+* chore: release v1.0.0
+
 ## [1.0.0] - 2025-09-01
 
 * docs: update pricing to 9/year unlimited (#12)
