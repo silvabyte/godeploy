@@ -1,8 +1,8 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
-import { DomainValidator } from '../utils/domain-validator'
 import { commonResponseSchemas } from '../components/http/response.types'
+import { DomainValidator } from '../utils/domain-validator'
 
 // Request schemas
 const validateDomainSchema = z.object({

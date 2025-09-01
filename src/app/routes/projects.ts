@@ -2,8 +2,8 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { addUrlToProject, validateAndTransformProjectName } from '../components/projects/project-utils'
 import {
   type CreateProjectBody,
-  type UpdateProjectDomainBody,
   routeSchemas,
+  type UpdateProjectDomainBody,
 } from '../components/projects/projects.types'
 import { DomainValidator } from '../utils/domain-validator'
 
