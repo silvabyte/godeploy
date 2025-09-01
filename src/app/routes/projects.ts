@@ -1,6 +1,11 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { addUrlToProject, validateAndTransformProjectName } from '../components/projects/project-utils'
-import { type CreateProjectBody, routeSchemas } from '../components/projects/projects.types'
+import {
+  type CreateProjectBody,
+  routeSchemas,
+  type UpdateProjectDomainBody,
+} from '../components/projects/projects.types'
+import { DomainValidator } from '../utils/domain-validator'
 
 export default async function (fastify: FastifyInstance) {
   // Get all projects for the authenticated tenant
@@ -104,6 +109,119 @@ export default async function (fastify: FastifyInstance) {
 
       request.measure.success()
       return reply.code(201).send(projectWithUrl)
+    },
+  })
+
+  // Update project domain
+  fastify.patch('/api/projects/:projectId/domain', {
+    ...routeSchemas.updateProjectDomain,
+    handler: async (
+      request: FastifyRequest<{
+        Params: { projectId: string }
+        Body: UpdateProjectDomainBody
+      }>,
+      reply: FastifyReply,
+    ) => {
+      const { tenant_id } = request.user
+      const { projectId } = request.params
+      const { domain } = request.body
+
+      request.measure.start('update_project_domain', {
+        reqId: request.id,
+        userId: request.user.user_id,
+        tenantId: tenant_id,
+        projectId,
+      })
+
+      // Check if project exists and belongs to tenant
+      request.measure.add('check_project')
+      const projectResult = await request.db.projects.getProjectById(projectId)
+
+      if (projectResult.error || !projectResult.data) {
+        request.measure.failure('Project not found')
+        return reply.code(404).send({
+          error: 'Project not found',
+          message: 'The specified project does not exist',
+        })
+      }
+
+      if (projectResult.data.tenant_id !== tenant_id) {
+        request.measure.failure('Unauthorized')
+        return reply.code(403).send({
+          error: 'Unauthorized',
+          message: 'You do not have permission to update this project',
+        })
+      }
+
+      // If domain is provided, validate format and availability
+      if (domain) {
+        // Validate domain format
+        if (!DomainValidator.isValidDomainFormat(domain)) {
+          request.measure.failure('Invalid domain format')
+          return reply.code(400).send({
+            error: 'Invalid domain format',
+            message: 'The provided domain is not in a valid format',
+          })
+        }
+
+        // Check if domain is already in use by another project
+        request.measure.add('check_domain_availability')
+        const availabilityResult = await request.db.projects.isDomainAvailable(domain, projectId)
+
+        if (availabilityResult.error) {
+          request.measure.failure(availabilityResult.error)
+          return reply.code(500).send({
+            error: 'Failed to check domain availability',
+            message: availabilityResult.error,
+          })
+        }
+
+        if (!availabilityResult.data) {
+          request.measure.failure('Domain already in use')
+          return reply.code(409).send({
+            error: 'Domain already in use',
+            message: 'This domain is already assigned to another project',
+          })
+        }
+
+        // Validate CNAME configuration
+        request.measure.add('validate_cname')
+        const validationResult = await DomainValidator.validateCnameConfiguration(domain)
+
+        if (validationResult.error) {
+          request.measure.failure(validationResult.error)
+          return reply.code(500).send({
+            error: 'Failed to validate domain',
+            message: validationResult.error,
+          })
+        }
+
+        if (!validationResult.data?.isValid) {
+          request.measure.failure('Invalid CNAME configuration')
+          return reply.code(400).send({
+            error: 'Invalid CNAME configuration',
+            message: validationResult.data?.error || 'Domain CNAME is not properly configured',
+          })
+        }
+      }
+
+      // Update the project domain
+      request.measure.add('update_domain')
+      const updateResult = await request.db.projects.updateProjectDomain(projectId, domain)
+
+      if (updateResult.error || !updateResult.data) {
+        request.measure.failure(updateResult.error || 'Failed to update domain')
+        return reply.code(500).send({
+          error: 'Failed to update domain',
+          message: updateResult.error,
+        })
+      }
+
+      // Add URL to project
+      const projectWithUrl = addUrlToProject(updateResult.data)
+
+      request.measure.success()
+      return reply.code(200).send(projectWithUrl)
     },
   })
 }
