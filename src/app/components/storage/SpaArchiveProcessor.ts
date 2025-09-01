@@ -39,7 +39,7 @@ export async function saveBufferToTemp(buffer: Buffer, filename: string): Promis
 
 /**
  * Validate a SPA archive file
- * Checks for required index.html file
+ * Checks that the archive contains static files
  * @param archivePath Path to the archive file
  * @returns Result containing validation status
  */
@@ -58,46 +58,33 @@ export async function validateSpaArchive(archivePath: string): Promise<Result<bo
       // Extract the archive
       await extractZip(archivePath, tempDir)
 
-      // Check for index.html at various common locations
-      const possiblePaths = [
-        path.join(tempDir, 'index.html'),
-        path.join(tempDir, 'dist', 'index.html'),
-        path.join(tempDir, 'build', 'index.html'),
-        path.join(tempDir, 'public', 'index.html'),
-        path.join(tempDir, 'out', 'index.html'),
-      ]
+      // Just check if there are any files in the archive
+      const entries = await fs.readdir(tempDir)
 
-      for (const indexPath of possiblePaths) {
-        try {
-          await fs.access(indexPath)
-          // Found index.html, archive is valid
-          return { data: true, error: null }
-        } catch {
-          // Continue checking other paths
+      if (entries.length === 0) {
+        return {
+          data: false,
+          error: 'Archive is empty. Please ensure your static files are included.',
         }
       }
 
-      // Also check if the first directory in the archive contains index.html
-      // (common when archiving a built directory)
-      const entries = await fs.readdir(tempDir)
+      // If there's a single directory, check if it has contents
       if (entries.length === 1 && entries[0]) {
         const firstEntry = path.join(tempDir, entries[0])
         const stats = await fs.stat(firstEntry)
         if (stats.isDirectory()) {
-          const nestedIndexPath = path.join(firstEntry, 'index.html')
-          try {
-            await fs.access(nestedIndexPath)
-            return { data: true, error: null }
-          } catch {
-            // Not found in nested directory either
+          const nestedEntries = await fs.readdir(firstEntry)
+          if (nestedEntries.length === 0) {
+            return {
+              data: false,
+              error: 'Archive directory is empty. Please ensure your static files are included.',
+            }
           }
         }
       }
 
-      return {
-        data: false,
-        error: 'Archive does not contain index.html. Please ensure your SPA build is included.',
-      }
+      // Archive has files, validation passes
+      return { data: true, error: null }
     } finally {
       // Clean up temp directory
       await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {
