@@ -126,11 +126,9 @@ React, Vue, Angular, Svelte, SolidJS, Astro, Next.js (static export), Nuxt (stat
 
 ## Pricing
 
-- **Free tier** - For side projects
-- **Pro** - $9/mo for real apps
-- **Scale** - Usage-based for bigger stuff
+**$49/year**
 
-No surprises. Cancel anytime.
+That's it. Unlimited app deployments. No usage fees. No surprises.
 
 ## Limits
 
