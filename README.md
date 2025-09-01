@@ -1,220 +1,163 @@
-# GoDeploy — Deploy Your Web Apps to the Cloud Instantly
+# godeploy
 
-[![CI](https://github.com/matsilva/godeploy/actions/workflows/go.yml/badge.svg)](https://github.com/matsilva/godeploy/actions/workflows/go.yml)
-[![Release: Automated with xrelease](https://img.shields.io/badge/Release-Automated%20with%20xrelease-blueviolet?logo=github&logoColor=white)](https://github.com/matsilva/xrelease)
+Dead simple SPA deployment. Push your React, Vue, or whatever to the cloud. No BS.
 
-Deploy your Single Page Applications (SPAs) to the cloud in seconds with GoDeploy - the simplest way to get your frontend applications online.
+## What is this?
 
-## 🚀 Features
+A CLI that deploys your single-page apps. Build your app, run one command, get a URL. That's it.
 
-- **Instant Deployment**: Deploy your SPA with a single command
-- **Zero Configuration**: Works out of the box with React, Vue, Angular, and other frameworks
-- **Automatic HTTPS**: SSL certificates provisioned automatically
-- **Global CDN**: Your apps are served from edge locations worldwide
-- **Multi-App Support**: Deploy multiple SPAs from a single configuration
-- **Authentication**: Secure account-based deployments
-- **Custom Domains**: Connect your own domains (coming soon)
-- **Team Collaboration**: Multi-user support (coming soon)
+```bash
+# Install
+curl -sSL https://install.godeploy.app/now.sh | bash
 
-## 📦 Installation
+# Deploy
+godeploy auth sign-up
+godeploy init
+npm run build
+godeploy deploy
+```
 
-### macOS/Linux
+Your app is live. No Docker configs. No nginx tuning. No AWS dashboard.
+
+## Why?
+
+Because deploying a frontend shouldn't require a DevOps degree. 
+
+I built this because I was tired of:
+- Writing Dockerfiles for static files
+- Configuring nginx for SPAs
+- Fighting with cloud provider dashboards
+- Paying $20/month to host 50KB of JavaScript
+
+## Features
+
+- **One command deploy** - `godeploy deploy` and you're done
+- **Automatic HTTPS** - SSL certs handled
+- **Global CDN** - Your app loads fast everywhere
+- **SPA-ready** - Client-side routing just works
+- **Fair pricing** - Pay for what you use, not what you might use
+
+## Getting Started
+
+### 1. Install
 
 ```bash
 curl -sSL https://install.godeploy.app/now.sh | bash
 ```
 
-### Manual Installation
-
-Download the latest binary from our [releases page](https://github.com/silvabyte/godeploy/releases) and add it to your PATH.
-
-## 🏃‍♂️ Quick Start
-
-### 1. Sign Up
-
-Create your GoDeploy account:
+### 2. Sign up
 
 ```bash
 godeploy auth sign-up
 ```
 
-### 2. Initialize
-
-In your project directory, create a configuration file:
+### 3. Configure
 
 ```bash
 godeploy init
 ```
 
-This creates a `godeploy.config.json` file:
+This creates `godeploy.config.json`:
 
 ```json
 {
   "apps": [
     {
-      "name": "yourAppName",
+      "name": "my-app",
       "source_dir": "dist",
-      "description": "Your application description",
+      "description": "My app",
       "enabled": true
     }
   ]
 }
-```
-
-### 3. Build Your App
-
-Build your SPA using your framework's build command:
-
-```bash
-# React/Vue/Angular
-npm run build
-
-# Or your framework's build command
 ```
 
 ### 4. Deploy
 
-Deploy your application to the cloud:
-
 ```bash
+npm run build  # or yarn, pnpm, whatever
 godeploy deploy
 ```
 
-Your app is now live at `https://yourAppName-12345.godeploy.app`! 🎉
+You get a URL like `https://my-app-12345.godeploy.app`
 
-## 📖 Configuration
+## Commands
 
-### Basic Configuration
+- `godeploy init` - Create config file
+- `godeploy auth sign-up` - Create account  
+- `godeploy auth login` - Sign in
+- `godeploy auth logout` - Sign out
+- `godeploy auth status` - Check auth status
+- `godeploy deploy` - Ship it
+- `godeploy deploy --project NAME` - Deploy specific app
+- `godeploy version` - Version info
 
-The `godeploy.config.json` file defines your deployment settings:
+## Multi-app Setup
 
-- `name`: Your application's name (used in the deployment URL)
-- `source_dir`: The directory containing your built files (e.g., `dist`, `build`)
-- `description`: A brief description of your application
-- `enabled`: Whether the app should be deployed
-
-### Multi-App Configuration
-
-Deploy multiple SPAs from a single project:
+Got multiple SPAs? No problem:
 
 ```json
 {
   "apps": [
     {
-      "name": "main-app",
-      "source_dir": "apps/main/dist",
+      "name": "marketing-site",
+      "source_dir": "apps/marketing/dist",
       "enabled": true
     },
     {
-      "name": "admin-panel",
+      "name": "app",
+      "source_dir": "apps/app/dist", 
+      "enabled": true
+    },
+    {
+      "name": "admin",
       "source_dir": "apps/admin/dist",
-      "enabled": true
-    },
-    {
-      "name": "docs",
-      "source_dir": "apps/docs/dist",
       "enabled": true
     }
   ]
 }
 ```
 
-## 🔐 Authentication
+Each gets its own URL. Deploy all or deploy one.
 
-### Login
+## Works With
 
-```bash
-godeploy auth login
-```
+React, Vue, Angular, Svelte, SolidJS, Astro, Next.js (static export), Nuxt (static), Gatsby, Hugo, Jekyll, Eleventy, vanilla JS, whatever generates HTML/CSS/JS.
 
-### Check Status
+## Pricing
 
-```bash
-godeploy auth status
-```
+- **Free tier** - For side projects
+- **Pro** - $9/mo for real apps
+- **Scale** - Usage-based for bigger stuff
 
-### Logout
+No surprises. Cancel anytime.
 
-```bash
-godeploy auth logout
-```
+## Limits
 
-## 📝 Commands
+- This is for SPAs and static sites only
+- No server-side rendering (yet)
+- No edge functions (yet)
+- Max file size: 100MB per deployment
 
-| Command                            | Description                         |
-| ---------------------------------- | ----------------------------------- |
-| `godeploy init`                    | Initialize a new configuration file |
-| `godeploy auth sign-up` | Create a new GoDeploy account |
-| `godeploy auth login`              | Authenticate with your account      |
-| `godeploy auth status`             | Check authentication status         |
-| `godeploy auth logout`             | Log out from your account           |
-| `godeploy deploy`                  | Deploy your SPA to the cloud        |
-| `godeploy deploy --project <name>` | Deploy a specific project           |
-| `godeploy version`                 | Display the CLI version             |
+## Support
 
-## 🌟 Why GoDeploy?
+- Issues: [github.com/silvabyte/godeploy](https://github.com/silvabyte/godeploy/issues)
+- Email: support@godeploy.app
 
-### Simple
+## The Technical Bits
 
-No complex configurations, build steps, or infrastructure management. Just build and deploy.
+For the curious:
 
-### Fast
+- Go CLI because it's fast and works everywhere
+- Uploads to S3-compatible storage
+- CloudFront CDN for distribution
+- Let's Encrypt for SSL
+- Zero-config by design
 
-Global CDN ensures your app loads quickly for users worldwide with edge caching and optimized delivery.
+## License
 
-### Secure
-
-Automatic HTTPS with SSL certificates keeps your app and users safe.
-
-### Reliable
-
-Enterprise-grade infrastructure with 99.9% uptime SLA.
-
-### Performance Optimized
-
-- Automatic cache control headers for optimal browser caching
-- Content hashing for efficient updates
-- Gzip compression for faster downloads
-- Global edge locations for low latency
-
-## 🎯 Perfect For
-
-- **Single Page Applications**: React, Vue, Angular, Svelte, and more
-- **Static Sites**: Documentation, blogs, landing pages
-- **Client-Side Games**: JavaScript games that run in the browser
-- **Dashboards**: Admin panels and data visualization apps
-- **Portfolio Sites**: Showcase your work with fast, reliable hosting
-
-## 💳 Pricing
-
-- **Free Tier**: Perfect for personal projects and testing
-- **Pro**: $9/month for production apps with custom domains
-- **Team**: $29/month for collaboration features
-- **Enterprise**: Custom pricing for large-scale deployments
-
-## 🤝 Support
-
-- **Email**: support@godeploy.app
-- **Issues**: [GitHub Issues](https://github.com/silvabyte/godeploy/issues)
-
-## 🚧 Roadmap
-
-- [x] Core deployment functionality
-- [x] Authentication system
-- [x] Multi-app support
-- [ ] Custom domains
-- [ ] Environment variables
-- [ ] Team collaboration
-- [ ] Analytics dashboard
-- [ ] Rollback capabilities
-- [ ] Build hooks and CI/CD integration
-- [ ] Edge functions
-
-## 📄 License
-
-Copyright © 2024 GoDeploy. All rights reserved.
+MIT. Do whatever.
 
 ---
 
-Built with ❤️ for developers who want to ship fast.
-
+Built by [@matsilva](https://github.com/matsilva). I made this because I needed it. Hope you find it useful too.
