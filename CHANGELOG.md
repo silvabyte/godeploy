@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0] - 2025-09-01
+
+* docs: update pricing to 9/year unlimited (#12)
+* docs: rewrite README with authentic indie hacker voice (#11)
+* refactor: transition to SaaS-only model (#10)
+* chore: release v0.4.0
+
 ## [0.4.0] - 2025-08-31
 
 * feat: Add password-based authentication (#9)
