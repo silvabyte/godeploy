@@ -113,7 +113,7 @@ install_godeploy() {
     log_info "Fetching latest version information..."
 
     # Debug the GitHub API response
-    GITHUB_API_RESPONSE=$(curl -s https://api.github.com/repos/audetic/godeploy/releases/latest)
+    GITHUB_API_RESPONSE=$(curl -s https://api.github.com/repos/silvabyte/godeploy/releases/latest)
     if [ -z "$GITHUB_API_RESPONSE" ]; then
       log_crit "Empty response from GitHub API"
       exit 1
@@ -274,4 +274,3 @@ install_godeploy() {
 
 # Run the installation
 install_godeploy
-
