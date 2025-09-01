@@ -22,13 +22,14 @@ import (
 // CLI represents the command-line interface structure
 var CLI struct {
 	// Global flags
-	Config string `help:"Path to the SPA configuration file" default:"godeploy.config.json"`
+	Config      string `help:"Path to the SPA configuration file" default:"godeploy.config.json"`
+	VersionFlag bool   `name:"version" short:"v" help:"Display the version of godeploy"`
 
 	// Commands
-	Init    InitCmd    `cmd:"" help:"Initialize a new godeploy.config.json file"`
-	Auth    AuthCmd    `cmd:"" help:"Authentication commands"`
-	Deploy  DeployCmd  `cmd:"" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
-	Version VersionCmd `cmd:"" help:"Display the version of godeploy"`
+	Init    InitCmd    `cmd:"init" help:"Initialize a new godeploy.config.json file"`
+	Auth    AuthCmd    `cmd:"auth" help:"Authentication commands"`
+	Deploy  DeployCmd  `cmd:"deploy" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
+	Version VersionCmd `cmd:"version" help:"Display the version of godeploy"`
 }
 
 // InitCmd represents the init command
@@ -751,6 +752,34 @@ func (d *DeployCmd) Run() error {
 
 // RunCLI parses and executes the CLI commands
 func RunCLI() error {
+	// Check for version flag early
+	for _, arg := range os.Args[1:] {
+		if arg == "--version" || arg == "-v" {
+			ver, err := version.GetVersion()
+			if err != nil {
+				return fmt.Errorf("error retrieving version: %w", err)
+			}
+			fmt.Printf("godeploy version %s\n", ver)
+			return nil
+		}
+	}
+
+	// Check for help as first argument (help command)
+	if len(os.Args) > 1 && os.Args[1] == "help" {
+		// Remove "help" from args so Kong doesn't process it as a command
+		// and instead shows the general usage
+		if len(os.Args) == 2 {
+			os.Args = []string{os.Args[0], "--help"}
+		} else {
+			// If there are more args after help, show help for that command
+			// e.g., "godeploy help auth" -> "godeploy auth --help"
+			newArgs := []string{os.Args[0]}
+			newArgs = append(newArgs, os.Args[2:]...)
+			newArgs = append(newArgs, "--help")
+			os.Args = newArgs
+		}
+	}
+
 	ctx := kong.Parse(&CLI,
 		kong.Name("godeploy"),
 		kong.Description("A CLI tool for deploying SPAs to the GoDeploy cloud service"),
@@ -759,6 +788,12 @@ func RunCLI() error {
 			Compact: true,
 			Summary: true,
 		}),
+		kong.Vars{
+			"version": func() string {
+				ver, _ := version.GetVersion()
+				return ver
+			}(),
+		},
 	)
 
 	return ctx.Run()
