@@ -21,6 +21,12 @@ release:
         pattern: '"version":\\s*"([^"]+)"' # Matches the version field value
         template: '"version": "${version}"' # Replaces with new version from release
 
+      # internal/version/version.go - Updates the Version constant with the new version
+      # Example: Version = "1.0.0" -> Version = "1.1.0"
+      - path: 'internal/version/version.go'
+        pattern: 'Version = "([^"]+)"' # Matches the Version constant value
+        template: 'Version = "${version}"' # Replaces with new version from release
+
   # Changelog configuration
   changelog:
     enabled: true
