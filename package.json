@@ -54,7 +54,8 @@
     "random-word": "^3.0.0",
     "uuid": "^11.1.0",
     "zod": "^3.25.76",
-    "zod-to-json-schema": "^3.24.5"
+    "zod-to-json-schema": "^3.24.5",
+    "unzipper": "^0.12.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.2",
@@ -63,6 +64,8 @@
     "@types/bun": "latest",
     "@types/node": "~18.16.9",
     "@types/random-word": "^2.0.2",
+    "@types/unzipper": "^0.10.11",
+    "fflate": "^0.8.2",
     "husky": "^9.1.7",
     "knip": "^5.63.0",
     "typescript": "~5.7.2"
