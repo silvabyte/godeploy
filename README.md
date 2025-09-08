@@ -21,13 +21,14 @@ Your app is live. No Docker configs. No nginx tuning. No AWS dashboard.
 
 ## Why?
 
-Because deploying a frontend shouldn't require a DevOps degree.
+Because I missed being able to run a single command be be instantly live.
 
 I built this because I was tired of:
 
 - Writing Dockerfiles for static files
 - Configuring nginx for SPAs
-- Fighting with cloud provider dashboards
+- Learning some new cloud provider dashboard
+- Ejecting out of SSR frameworks
 - Paying $20/month to host 50KB of JavaScript
 
 ## Features
