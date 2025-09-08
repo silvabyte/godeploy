@@ -153,6 +153,7 @@ Deploy multiple SPAs from one project:
 - **Build First**: Always build your app before deploying
 - **Multiple Deploys**: Each deploy creates a new version - no downtime!
 - **Custom Domains**: Coming soon!
+- **Long Deploys**: Default timeout is 10 minutes. If needed, increase it with `GODEPLOY_DEPLOY_TIMEOUT` (e.g., `export GODEPLOY_DEPLOY_TIMEOUT=10m`).
 
 ---
 

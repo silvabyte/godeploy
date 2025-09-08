@@ -10,14 +10,17 @@ import (
 	"time"
 
 	"github.com/silvabyte/godeploy/internal/auth"
+    "os"
 )
 
 const (
-	// DefaultAPIBaseURL is the default base URL for the API
-	DefaultAPIBaseURL = "https://api.godeploy.app"
+    // DefaultAPIBaseURL is the default base URL for the API
+    DefaultAPIBaseURL = "https://api.godeploy.app"
 
-	// DefaultTimeout is the default timeout for API requests
-	DefaultTimeout = 30 * time.Second
+    // DefaultTimeout is the default timeout for API requests
+    DefaultTimeout = 30 * time.Second
+    // DefaultDeployTimeout is the default timeout for deploy requests
+    DefaultDeployTimeout = 10 * time.Minute
 )
 
 // Client represents an API client
@@ -436,11 +439,27 @@ func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte
 	// Set the content type
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
-	// Send the authenticated request
-	resp, err := c.DoAuthenticatedRequest(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
-	}
+    // For deploys, use a longer timeout that can be overridden via env var.
+    deployTimeout := DefaultDeployTimeout
+    if v := os.Getenv("GODEPLOY_DEPLOY_TIMEOUT"); v != "" {
+        if d, err := time.ParseDuration(v); err == nil {
+            deployTimeout = d
+        }
+    }
+
+    // Add auth header manually to use a custom HTTP client for this call.
+    token, err := c.GetAuthToken()
+    if err != nil {
+        return nil, fmt.Errorf("failed to get auth token: %w", err)
+    }
+    c.AuthenticatedRequest(req, token)
+
+    httpClient := &http.Client{Timeout: deployTimeout}
+    // Send the request with the extended-timeout client
+    resp, err := httpClient.Do(req)
+    if err != nil {
+        return nil, fmt.Errorf("failed to send request: %w", err)
+    }
 	defer func() {
 		_ = resp.Body.Close()
 	}()
@@ -451,15 +470,15 @@ func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	// Check the status code
-	if resp.StatusCode != http.StatusOK {
-		// Try to parse the error response
-		var errResp ErrorResponse
-		if err := json.Unmarshal(respBody, &errResp); err == nil && errResp.Error != "" {
-			return nil, fmt.Errorf("API error: %s", errResp.Error)
-		}
-		return nil, fmt.Errorf("unexpected status code: %d, body: %s", resp.StatusCode, string(respBody))
-	}
+    // Check the status code (accept OK/Created/Accepted)
+    if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusAccepted {
+        // Try to parse the error response
+        var errResp ErrorResponse
+        if err := json.Unmarshal(respBody, &errResp); err == nil && errResp.Error != "" {
+            return nil, fmt.Errorf("API error: %s", errResp.Error)
+        }
+        return nil, fmt.Errorf("unexpected status code: %d, body: %s", resp.StatusCode, string(respBody))
+    }
 
 	// Decode the response
 	var deployResp DeployResponse

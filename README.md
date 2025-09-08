@@ -21,9 +21,10 @@ Your app is live. No Docker configs. No nginx tuning. No AWS dashboard.
 
 ## Why?
 
-Because deploying a frontend shouldn't require a DevOps degree. 
+Because deploying a frontend shouldn't require a DevOps degree.
 
 I built this because I was tired of:
+
 - Writing Dockerfiles for static files
 - Configuring nginx for SPAs
 - Fighting with cloud provider dashboards
@@ -81,10 +82,16 @@ godeploy deploy
 
 You get a URL like `https://my-app-12345.godeploy.app`
 
+Default deploy timeout is 10 minutes. If your deploys take longer to upload/process, you can increase the client timeout using an environment variable:
+
+```bash
+export GODEPLOY_DEPLOY_TIMEOUT=10m   # supports Go duration strings (e.g., 90s, 2m, 15m)
+```
+
 ## Commands
 
 - `godeploy init` - Create config file
-- `godeploy auth sign-up` - Create account  
+- `godeploy auth sign-up` - Create account
 - `godeploy auth login` - Sign in
 - `godeploy auth logout` - Sign out
 - `godeploy auth status` - Check auth status
@@ -106,7 +113,7 @@ Got multiple SPAs? No problem:
     },
     {
       "name": "app",
-      "source_dir": "apps/app/dist", 
+      "source_dir": "apps/app/dist",
       "enabled": true
     },
     {
@@ -140,7 +147,7 @@ That's it. Unlimited app deployments. No usage fees. No surprises.
 ## Support
 
 - Issues: [github.com/silvabyte/godeploy](https://github.com/silvabyte/godeploy/issues)
-- Email: support@godeploy.app
+- Email: <support@godeploy.app>
 
 ## The Technical Bits
 

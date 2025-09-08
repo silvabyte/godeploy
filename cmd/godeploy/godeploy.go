@@ -732,13 +732,17 @@ func (d *DeployCmd) Run() error {
 	)
 	deployCancel := deploySpinner.Start(ctx)
 
-	// Deploy the SPA
-	deployResp, err := apiClient.Deploy(projectName, configData, zipData)
-	if err != nil {
-		deployCancel()
-		deploySpinner.Fail("Failed to deploy project")
-		return fmt.Errorf("error deploying project: %w", err)
-	}
+    // Deploy the SPA
+    deployResp, err := apiClient.Deploy(projectName, configData, zipData)
+    if err != nil {
+        deployCancel()
+        deploySpinner.Fail("Failed to deploy project")
+        // If this was a timeout while awaiting headers, deployment may still have succeeded server-side.
+        if strings.Contains(err.Error(), "Client.Timeout exceeded") || strings.Contains(err.Error(), "context deadline exceeded") {
+            return fmt.Errorf("request timed out waiting for server response; your deployment may still complete. Consider increasing timeout via GODEPLOY_DEPLOY_TIMEOUT (e.g. '5m'). Underlying error: %w", err)
+        }
+        return fmt.Errorf("error deploying project: %w", err)
+    }
 
 	deployCancel()
 	deploySpinner.Stop("Project deployed successfully")
