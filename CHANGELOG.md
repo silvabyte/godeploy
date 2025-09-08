@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.2] - 2025-09-08
+
+* feat: increase default deploy timeout to 10m\n\n- Use per-deploy HTTP client with 10m default timeout (configurable via GODEPLOY_DEPLOY_TIMEOUT)\n- Accept 200/201/202 as successful deploy statuses\n- Improve CLI error when timeouts occur with guidance\n- Update README and docs with timeout info
+* chore: release v1.0.1
+
 ## [1.0.1] - 2025-09-01
 
 * feat: improve CLI UX with help and version commands (#13)
