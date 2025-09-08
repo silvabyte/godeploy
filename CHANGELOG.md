@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.3] - 2025-09-08
+
+* fix: ensure installer points to silvabyte org\n\n- Centralize GitHub org/repo as variables\n- Update all URLs to use silvabyte/godeploy\n
+* Update README.md
+* chore: release v1.0.2
+
 ## [1.0.2] - 2025-09-08
 
 * feat: increase default deploy timeout to 10m\n\n- Use per-deploy HTTP client with 10m default timeout (configurable via GODEPLOY_DEPLOY_TIMEOUT)\n- Accept 200/201/202 as successful deploy statuses\n- Improve CLI error when timeouts occur with guidance\n- Update README and docs with timeout info
