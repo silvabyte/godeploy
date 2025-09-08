@@ -102,18 +102,22 @@ export class ProjectService extends BaseService {
   async isDomainAvailable(domain: string, excludeProjectId?: string): Promise<Result<boolean>> {
     const result = await this.getProjectByDomain(domain)
 
-    if (result.error?.includes('not found')) {
+    // If no project is found and no error, the domain is available
+    if (!result.data && !result.error) {
       return { data: true, error: null }
     }
 
+    // Propagate unexpected errors
     if (result.error) {
       return { data: null, error: result.error }
     }
 
+    // If the found project is the one we're updating, the domain is effectively available
     if (result.data && excludeProjectId && result.data.id === excludeProjectId) {
       return { data: true, error: null }
     }
 
+    // Otherwise, domain is in use by another project
     return { data: false, error: null }
   }
 }

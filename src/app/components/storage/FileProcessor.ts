@@ -1,5 +1,4 @@
 import type { MultipartFile } from '@fastify/multipart'
-import { to } from 'await-to-js'
 import type { ActionTelemetry } from '../../../logging/ActionTelemetry'
 import { saveStreamToTemp, validateSpaArchive } from './SpaArchiveProcessor'
 

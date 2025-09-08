@@ -5,5 +5,5 @@
   "ignore": ["supabase/migrations/**", "docs/**"],
   "ignoreDependencies": ["husky", "@biomejs/biome"],
   "ignoreExportsUsedInFile": true,
-  "ignoreBinaries": ["unzip", "xrelease"]
+  "ignoreBinaries": ["xrelease"]
 }

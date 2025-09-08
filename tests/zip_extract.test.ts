@@ -1,8 +1,8 @@
-import { writeFile, mkdtemp, rm, readFile, stat } from 'node:fs/promises'
+import { describe, expect, it } from 'bun:test'
+import { mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { describe, it, expect } from 'bun:test'
-import { zipSync, strToU8 } from 'fflate'
+import { strToU8, zipSync } from 'fflate'
 import { extractZip } from '../src/app/components/storage/Zip'
 
 describe('Zip.extractZip', () => {
@@ -36,4 +36,3 @@ describe('Zip.extractZip', () => {
     await rm(tmp, { recursive: true, force: true })
   })
 })
-

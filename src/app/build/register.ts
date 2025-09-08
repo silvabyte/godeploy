@@ -10,7 +10,9 @@ import authRoutes from '../routes/auth.js'
 import deploysRoutes from '../routes/deploys.js'
 import domainsRoutes from '../routes/domains.js'
 import healthRoutes from '../routes/health.js'
+import metricsPagesRoutes from '../routes/metrics.pages.js'
 import projectsRoutes from '../routes/projects.js'
+import publicMetricsRoutes from '../routes/public.metrics.js'
 // Import routes
 import rootRoutes from '../routes/root.js'
 import subscriptionsRoutes from '../routes/subscriptions.js'
@@ -41,5 +43,7 @@ export async function registerPluginsAndRoutes(
   await fastify.register(projectsRoutes, opts)
   await fastify.register(deploysRoutes, opts)
   await fastify.register(domainsRoutes, opts)
+  await fastify.register(metricsPagesRoutes, opts)
+  await fastify.register(publicMetricsRoutes, opts)
   await fastify.register(subscriptionsRoutes, opts)
 }
