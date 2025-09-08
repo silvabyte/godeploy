@@ -3,6 +3,7 @@ import type { MultipartFile } from '@fastify/multipart'
 import { FileProcessor } from '../src/app/components/storage/FileProcessor'
 import { ActionTelemetry } from '../src/logging/ActionTelemetry'
 import { readFile } from 'node:fs/promises'
+import { Readable } from 'node:stream'
 
 function makePart(opts: {
   fieldname: string
@@ -16,7 +17,7 @@ function makePart(opts: {
     filename: opts.filename,
     toBuffer: async () => Buffer.from(buf),
     // Unused fields for our test; provide minimal stubs
-    file: undefined as any,
+    file: Readable.from([Buffer.from(buf)]),
     mimetype: 'application/octet-stream',
     encoding: '7bit',
     fields: {},
@@ -63,4 +64,3 @@ describe('FileProcessor.processDeployFiles', () => {
     expect(writtenConfig).toContain('spa')
   })
 })
-

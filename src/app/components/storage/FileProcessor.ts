@@ -1,7 +1,7 @@
 import type { MultipartFile } from '@fastify/multipart'
 import { to } from 'await-to-js'
 import type { ActionTelemetry } from '../../../logging/ActionTelemetry'
-import { saveBufferToTemp, validateSpaArchive } from './SpaArchiveProcessor'
+import { saveStreamToTemp, validateSpaArchive } from './SpaArchiveProcessor'
 
 interface Result<T> {
   data: T | null
@@ -30,26 +30,17 @@ export class FileProcessor {
     const error: string | null = null
 
     try {
-      // Process the uploaded files
+      // Process the uploaded files using streams to avoid buffering in memory
       for await (const part of parts) {
         if (part.type === 'file') {
-          const [bufferErr, buffer] = await to(part.toBuffer())
-          if (bufferErr) {
-            return {
-              archivePath: null,
-              configPath: null,
-              error: `Failed to read file buffer: ${bufferErr.message}`,
-            }
-          }
-
           this.measure.add('process_file', {
             fieldname: part.fieldname,
-            size: buffer.length,
+            filename: part.filename,
           })
 
           if (part.fieldname === 'archive' || part.filename.includes('.zip')) {
             this.measure.add('save_archive')
-            const result = await saveBufferToTemp(buffer, 'archive.zip')
+            const result = await saveStreamToTemp(part.file, 'archive.zip')
             if (result.error) {
               return {
                 archivePath: null,
@@ -61,7 +52,7 @@ export class FileProcessor {
             this.measure.add('archive_saved', { path: archivePath })
           } else if (part.fieldname === 'spa_config') {
             this.measure.add('save_config')
-            const result = await saveBufferToTemp(buffer, 'spa-config.json')
+            const result = await saveStreamToTemp(part.file, 'spa-config.json')
             if (result.error) {
               return {
                 archivePath,
