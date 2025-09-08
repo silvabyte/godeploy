@@ -90,6 +90,10 @@ mktmpdir() {
   echo "${TMPDIR}"
 }
 
+# Configurable GitHub org/repo for releases
+GITHUB_ORG="silvabyte"
+GITHUB_REPO="godeploy"
+
 # Main installation function
 install_godeploy() {
   # Get OS and architecture
@@ -113,7 +117,7 @@ install_godeploy() {
     log_info "Fetching latest version information..."
 
     # Debug the GitHub API response
-    GITHUB_API_RESPONSE=$(curl -s https://api.github.com/repos/silvabyte/godeploy/releases/latest)
+    GITHUB_API_RESPONSE=$(curl -s https://api.github.com/repos/${GITHUB_ORG}/${GITHUB_REPO}/releases/latest)
     if [ -z "$GITHUB_API_RESPONSE" ]; then
       log_crit "Empty response from GitHub API"
       exit 1
@@ -144,7 +148,7 @@ install_godeploy() {
   log_info "Using extraction directory: $EXTRACT_DIR"
 
   # Construct the correct download URL for the asset
-  DOWNLOAD_URL="https://github.com/silvabyte/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+  DOWNLOAD_URL="https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
   if [ "$OS" == "windows" ]; then
     DOWNLOAD_URL="${DOWNLOAD_URL}.zip"
     ARCHIVE_TYPE="zip"
@@ -199,7 +203,7 @@ install_godeploy() {
 
     # Try direct binary download as fallback
     log_info "Attempting direct binary download as fallback..."
-    DIRECT_URL="https://github.com/silvabyte/godeploy/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+    DIRECT_URL="https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
     if [ "$OS" == "windows" ]; then
       DIRECT_URL="${DIRECT_URL}.exe"
     fi
