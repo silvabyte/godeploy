@@ -1,10 +1,10 @@
-import * as fs from 'node:fs/promises'
 import { createWriteStream } from 'node:fs'
+import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import { pipeline } from 'node:stream/promises'
 import { to } from 'await-to-js'
 import { extractZip } from './Zip'
-import { pipeline } from 'node:stream/promises'
 
 interface Result<T> {
   data: T | null

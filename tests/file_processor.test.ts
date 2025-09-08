@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
+import { readFile } from 'node:fs/promises'
+import { Readable } from 'node:stream'
 import type { MultipartFile } from '@fastify/multipart'
 import { FileProcessor } from '../src/app/components/storage/FileProcessor'
 import { ActionTelemetry } from '../src/logging/ActionTelemetry'
-import { readFile } from 'node:fs/promises'
-import { Readable } from 'node:stream'
 
 function makePart(opts: { fieldname: string; filename: string; content: string | Uint8Array }): MultipartFile {
   const buf = typeof opts.content === 'string' ? new TextEncoder().encode(opts.content) : opts.content
@@ -34,10 +34,12 @@ describe('FileProcessor.processDeployFiles', () => {
       trace: () => {},
       fatal: () => {},
       silent: () => {},
+      /* biome-ignore lint/suspicious/noExplicitAny: lightweight test double */
       child: () => ({}) as any,
       level: 'info',
       setLevel: () => {},
       logRequest: () => {},
+      /* biome-ignore lint/suspicious/noExplicitAny: lightweight test double */
     } as any)
 
     const processor = new FileProcessor(measure)
@@ -50,6 +52,7 @@ describe('FileProcessor.processDeployFiles', () => {
       makePart({ fieldname: 'spa_config', filename: 'spa-config.json', content: configContent }),
     ]
 
+    /* biome-ignore lint/suspicious/noExplicitAny: iterator test helper */
     const result = await processor.processDeployFiles(iterParts(parts) as any)
     expect(result.error).toBeNull()
     expect(result.archivePath).toBeTruthy()

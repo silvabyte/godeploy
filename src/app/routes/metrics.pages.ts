@@ -2,10 +2,10 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 import {
-  createMetricsPageJson,
   type CreateMetricsPageBody,
-  updateMetricsPageJson,
+  createMetricsPageJson,
   type UpdateMetricsPageBody,
+  updateMetricsPageJson,
 } from '../components/metrics/metricsPages.types'
 
 const idParams = z.object({ id: z.string() })

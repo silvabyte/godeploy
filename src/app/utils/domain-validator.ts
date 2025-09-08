@@ -34,6 +34,7 @@ export const domainValidationResultSchema = z.object({
 
 export type DomainValidationResult = z.infer<typeof domainValidationResultSchema>
 
+/* biome-ignore lint/complexity/noStaticOnlyClass: centralize domain validation utilities */
 export class DomainValidator {
   static readonly EXPECTED_CNAME = process.env.GODEPLOY_CNAME_TARGET || 'godeploy-nginx-o3dvb.ondigitalocean.app'
 
