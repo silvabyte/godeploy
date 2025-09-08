@@ -5,11 +5,7 @@ import { ActionTelemetry } from '../src/logging/ActionTelemetry'
 import { readFile } from 'node:fs/promises'
 import { Readable } from 'node:stream'
 
-function makePart(opts: {
-  fieldname: string
-  filename: string
-  content: string | Uint8Array
-}): MultipartFile {
+function makePart(opts: { fieldname: string; filename: string; content: string | Uint8Array }): MultipartFile {
   const buf = typeof opts.content === 'string' ? new TextEncoder().encode(opts.content) : opts.content
   return {
     type: 'file',

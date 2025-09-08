@@ -9,6 +9,10 @@ const DeploySchema = z.object({
   user_id: z.string(),
   url: z.string(),
   status: z.enum(['pending', 'success', 'failed']),
+  commit_sha: z.string().nullable().optional(),
+  commit_branch: z.string().nullable().optional(),
+  commit_message: z.string().nullable().optional(),
+  commit_url: z.string().nullable().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 })
@@ -16,6 +20,10 @@ const DeploySchema = z.object({
 // Request schemas
 const DeployQuerystringSchema = z.object({
   project: z.string(),
+  commit_sha: z.string().optional(),
+  commit_branch: z.string().optional(),
+  commit_message: z.string().optional(),
+  commit_url: z.string().url().optional(),
 })
 
 //TODO: have better generic filter query params

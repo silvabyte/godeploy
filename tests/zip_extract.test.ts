@@ -36,4 +36,3 @@ describe('Zip.extractZip', () => {
     await rm(tmp, { recursive: true, force: true })
   })
 })
-

@@ -67,6 +67,11 @@ POST /api/auth/init
 ```
 Sends magic link → User clicks → CLI gets token → Done.
 
+## Docs
+
+- Custom domains: see `docs/CUSTOM_DOMAINS.md`
+- Metrics pages: see `docs/METRICS_PAGES.md`
+
 ## Local Development
 
 ```bash

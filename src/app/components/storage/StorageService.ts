@@ -36,6 +36,8 @@ const s3Client = new S3Client({
  * Storage service for handling file uploads to DigitalOcean Spaces
  */
 export class StorageService {
+  private static readonly DEFAULT_CONCURRENCY = Number(process.env.UPLOAD_CONCURRENCY || '5')
+  private readonly concurrency = StorageService.DEFAULT_CONCURRENCY
   /**
    * Upload a file to DigitalOcean Spaces
    * @param fileStream ReadStream of the file to upload
@@ -143,30 +145,36 @@ export class StorageService {
       }
     }
 
+    // Build tasks for this directory
+    const tasks: Array<() => Promise<Result<string>>> = []
+
     for (const entry of entries) {
       const fullPath = path.join(dirPath, entry.name)
       const relativePath = path.relative(dirPath, fullPath)
       const key = path.join(baseKey, relativePath).replace(/\\/g, '/')
 
       if (entry.isDirectory()) {
-        const uploadResult = await this.uploadDirectory(fullPath, key)
-        if (uploadResult.error) {
-          return uploadResult
-        }
+        tasks.push(async () => this.uploadDirectory(fullPath, key))
       } else {
-        // Determine content type based on file extension
-        const contentType = this.getContentType(entry.name)
-
-        // Set cache control based on file type
-        const cacheControl = this.getCacheControl(entry.name)
-
-        // Upload the file
-        const fileStream = createReadStream(fullPath)
-        const uploadResult = await this.uploadFile(fileStream, key, contentType, cacheControl)
-        if (uploadResult.error) {
-          return uploadResult
-        }
+        tasks.push(async () => {
+          const contentType = this.getContentType(entry.name)
+          const cacheControl = this.getCacheControl(entry.name)
+          const fileStream = createReadStream(fullPath)
+          return this.uploadFile(fileStream, key, contentType, cacheControl)
+        })
       }
+    }
+
+    // Run tasks in controlled concurrency batches
+    let index = 0
+    while (index < tasks.length) {
+      const batch = tasks.slice(index, index + this.concurrency)
+      const results = await Promise.all(batch.map((fn) => fn()))
+      const firstError = results.find((r) => r.error)
+      if (firstError) {
+        return { data: null, error: firstError.error }
+      }
+      index += this.concurrency
     }
 
     return { data: '', error: null }

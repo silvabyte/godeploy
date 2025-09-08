@@ -11,43 +11,12 @@ interface Result<T> {
   error: string | null
 }
 
-//TODO: convert to use streams
-/**
- * Save a file buffer to a temporary location
- * @param buffer File buffer
- * @param filename Filename
- * @returns Result containing the file path or error message
- */
-export async function saveBufferToTemp(buffer: Buffer, filename: string): Promise<Result<string>> {
-  const [mkdirErr, tempDir] = await to(fs.mkdtemp(path.join(os.tmpdir(), 'godeploy-')))
-  if (mkdirErr) {
-    return {
-      data: null,
-      error: `Failed to create temp directory: ${mkdirErr.message}`,
-    }
-  }
-
-  const filePath = path.join(tempDir, filename)
-  const [writeErr] = await to(fs.writeFile(filePath, new Uint8Array(buffer)))
-  if (writeErr) {
-    return {
-      data: null,
-      error: `Failed to write file: ${writeErr.message}`,
-    }
-  }
-
-  return { data: filePath, error: null }
-}
-
 /**
  * Save a readable stream to a temporary file
  * @param stream Readable stream
  * @param filename Filename to use in the temp directory
  */
-export async function saveStreamToTemp(
-  stream: NodeJS.ReadableStream,
-  filename: string,
-): Promise<Result<string>> {
+export async function saveStreamToTemp(stream: NodeJS.ReadableStream, filename: string): Promise<Result<string>> {
   const [mkdirErr, tempDir] = await to(fs.mkdtemp(path.join(os.tmpdir(), 'godeploy-')))
   if (mkdirErr) {
     return {

@@ -67,4 +67,24 @@ export class DeployService extends BaseService {
   async getDeployById(id: string): Promise<Result<Deploy>> {
     return this.getById<Deploy>(id)
   }
+
+  /**
+   * Get successful deploys for multiple projects within a date range
+   */
+  async getSuccessfulDeploysInRange(projectIds: string[], from: string, to: string): Promise<Result<Deploy[]>> {
+    // Custom query to leverage 'in' filtering
+    const { data, error } = await this.supabase
+      .from(this.tableName)
+      .select('*')
+      .in('project_id', projectIds)
+      .eq('status', 'success')
+      .gte('created_at', from)
+      .lte('created_at', to)
+      .order('created_at', { ascending: true })
+
+    if (error) {
+      return { data: null, error: `Failed to get ${this.tableName}: ${error.message}` }
+    }
+    return { data: (data ?? []) as Deploy[], error: null }
+  }
 }

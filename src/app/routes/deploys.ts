@@ -1,6 +1,8 @@
 import fastifyMultipart, { type MultipartFile } from '@fastify/multipart'
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { v4 as uuidv4 } from 'uuid'
+import * as path from 'node:path'
+import * as fsp from 'node:fs/promises'
 import { type DeployQuerystring, routeSchemas } from '../components/deploys/deploys.types'
 import { validateAndTransformProjectName } from '../components/projects/project-utils'
 import type { Project } from '../components/projects/projects.types'
@@ -13,7 +15,10 @@ export default async function (fastify: FastifyInstance) {
   try {
     await fastify.register(fastifyMultipart, {
       limits: {
-        fileSize: 100 * 1024 * 1024, // 100mb limit
+        fileSize: 100 * 1024 * 1024, // 100mb per file
+        files: 2, // archive + optional spa_config
+        parts: 3, // be explicit: up to two files
+        fields: 5, // minimal headroom
       },
     })
   } catch (err) {
@@ -73,10 +78,23 @@ export default async function (fastify: FastifyInstance) {
       return reply.code(400).send({ error: processError || 'No archive file found' })
     }
 
+    // Helper to cleanup uploaded archive temp dir
+    const cleanupArchiveTemp = async () => {
+      if (archivePath) {
+        const dir = path.dirname(archivePath)
+        try {
+          await fsp.rm(dir, { recursive: true, force: true })
+        } catch {
+          // ignore cleanup errors
+        }
+      }
+    }
+
     // Validate archive
     const validateResult = await fileProcessor.validateArchive(archivePath)
     if (validateResult.error || !validateResult.data) {
       request.measure.failure(validateResult.error || 'Archive validation failed')
+      await cleanupArchiveTemp()
       return reply.code(400).send({ error: validateResult.error || 'Archive validation failed' })
     }
 
@@ -104,6 +122,7 @@ export default async function (fastify: FastifyInstance) {
 
       if (existingProjectResult.data) {
         request.measure.failure('Project with this name already exists')
+        await cleanupArchiveTemp()
         return reply.code(400).send({
           error: 'Project with this name already exists',
         })
@@ -111,6 +130,7 @@ export default async function (fastify: FastifyInstance) {
 
       if (existingProjectResult.error) {
         request.measure.failure(existingProjectResult.error)
+        await cleanupArchiveTemp()
         return reply.code(500).send({
           error: 'Failed to check project existence',
           message: existingProjectResult.error,
@@ -130,6 +150,7 @@ export default async function (fastify: FastifyInstance) {
 
       if (createResult.error || !createResult.data) {
         request.measure.failure(createResult.error || 'Failed to create project')
+        await cleanupArchiveTemp()
         return reply.code(500).send({
           error: 'Failed to create project',
           message: createResult.error,
@@ -149,10 +170,15 @@ export default async function (fastify: FastifyInstance) {
       user_id,
       url: ProjectDomain.from(project).determine(),
       status: 'pending',
+      commit_sha: request.query.commit_sha ?? null,
+      commit_branch: request.query.commit_branch ?? null,
+      commit_message: request.query.commit_message ?? null,
+      commit_url: request.query.commit_url ?? null,
     })
 
     if (deployResult.error || !deployResult.data) {
       request.measure.failure(deployResult.error || 'Failed to record deployment')
+      await cleanupArchiveTemp()
       return reply.code(500).send({
         error: 'Failed to record deployment',
         message: deployResult.error,
@@ -174,6 +200,7 @@ export default async function (fastify: FastifyInstance) {
           request.measure.add('failed_to_update_status')
         }
       }
+      await cleanupArchiveTemp()
       return reply.code(500).send({
         error: 'Failed to upload files',
         message: uploadResult.error,
@@ -184,6 +211,7 @@ export default async function (fastify: FastifyInstance) {
     request.measure.add('update_status')
     if (!deploy.id) {
       request.measure.failure('Deploy ID not found')
+      await cleanupArchiveTemp()
       return reply.code(500).send({
         error: 'Failed to update deployment status',
         message: 'Deploy ID not found',
@@ -194,6 +222,7 @@ export default async function (fastify: FastifyInstance) {
 
     if (updateResult.error) {
       request.measure.failure(updateResult.error)
+      await cleanupArchiveTemp()
       return reply.code(500).send({
         error: 'Failed to update deployment status',
         message: updateResult.error,
@@ -201,6 +230,7 @@ export default async function (fastify: FastifyInstance) {
     }
 
     request.measure.success()
+    await cleanupArchiveTemp()
     return reply.code(200).send(deploy)
   }
 
