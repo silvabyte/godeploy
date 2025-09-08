@@ -1,6 +1,9 @@
+-- Ensure UUID extension is available (idempotent)
+create extension if not exists "uuid-ossp" with schema extensions;
+
 -- Create metrics_pages table for public metrics pages
 create table public.metrics_pages (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   tenant_id uuid not null references public.tenants(id) on delete cascade,
   owner_id uuid not null references public.users(id) on delete cascade,
   slug text not null unique,
@@ -40,4 +43,3 @@ with check (
   OR
   tenant_id = (select tenant_id from public.users where id = auth.uid())
 );
-
