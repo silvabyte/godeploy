@@ -65,10 +65,8 @@ export default async function (fastify: FastifyInstance) {
       }
     } catch (err) {
       request.measure.failure('Failed to parse multipart form')
-      return reply.code(400).send({
-        error: 'Failed to parse multipart form',
-        message: err instanceof Error ? err.message : 'Unknown error',
-      })
+      // Keep 400 response shape minimal to satisfy route schema
+      return reply.code(400).send({ error: 'Failed to parse multipart form' })
     }
 
     // Process uploaded files

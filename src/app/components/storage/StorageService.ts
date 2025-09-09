@@ -164,7 +164,15 @@ export class StorageService {
           }
         }
       } finally {
-        await dir.close().catch(() => {})
+        try {
+          // Some environments may implement close() without returning a Promise
+          // Use try/catch instead of chaining .catch() on the return value
+          if (typeof (dir as any).close === 'function') {
+            await (dir as any).close()
+          }
+        } catch {
+          // ignore close errors
+        }
       }
     }
 
