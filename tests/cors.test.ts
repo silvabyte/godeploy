@@ -21,10 +21,12 @@ describe('CORS configuration', () => {
       headers: {
         origin: 'https://foo.godeploy.app',
         'access-control-request-method': 'GET',
+        'access-control-request-headers': 'traceparent',
       },
     })
     // Should reflect the origin in Access-Control-Allow-Origin
     expect(res.headers['access-control-allow-origin']).toBe('https://foo.godeploy.app')
+    expect((res.headers['access-control-allow-headers'] || '').toLowerCase()).toContain('traceparent')
   })
 
   it('rejects non-godeploy.app origins in production', async () => {
@@ -41,4 +43,3 @@ describe('CORS configuration', () => {
     expect(res.headers['access-control-allow-origin']).toBeUndefined()
   })
 })
-

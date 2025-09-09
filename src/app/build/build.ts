@@ -136,7 +136,8 @@ export async function buildApp() {
       cb(null, false)
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    // Allow W3C trace context and common auth/content headers
+    allowedHeaders: ['Content-Type', 'Authorization', 'traceparent', 'tracestate'],
     credentials: true,
   })
 
