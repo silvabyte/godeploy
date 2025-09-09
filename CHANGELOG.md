@@ -2,6 +2,12 @@
 
 ## [1.0.4] - 2025-09-09
 
+* chore: update install url
+* feat: attach git commit metadata on deploy
+* chore: release v1.0.3
+
+## [1.0.4] - 2025-09-09
+
 * feat: include git commit metadata on deploy via CLI
   - New flags: `--commit-sha`, `--commit-branch`, `--commit-message`, `--commit-url`
   - Auto-detects from local git repo by default; disable with `--no-git`
