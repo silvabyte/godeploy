@@ -11,7 +11,7 @@ Welcome to GoDeploy! Let's get your app live in just a few minutes.
 Run this in your terminal to install GoDeploy:
 
 ```bash
-curl -sSL https://install.godeploy.app/now.sh | bash
+curl -sSL https://install.spa.godeploy.app/now.sh | bash
 ```
 
 ---
@@ -54,8 +54,8 @@ Example configuration:
 {
   "apps": [
     {
-      "name": "my-app",           // Your app name (used in URL)
-      "source_dir": "dist",        // Your build folder
+      "name": "my-app", // Your app name (used in URL)
+      "source_dir": "dist", // Your build folder
       "description": "My awesome SPA",
       "enabled": true
     }
@@ -64,6 +64,7 @@ Example configuration:
 ```
 
 👉 **Important settings:**
+
 - `name`: Your app identifier (alphanumeric and hyphens only)
 - `source_dir`: Your build folder (e.g., `dist`, `build`, `out`)
 - `description`: Brief description of your app
@@ -80,7 +81,7 @@ npm run build   # Or yarn build, pnpm build, etc.
 
 ---
 
-## 🚀 Step 6: Deploy!
+## 🚀 Step 6: Deploy
 
 Deploy your app to the cloud:
 
@@ -91,6 +92,7 @@ godeploy deploy
 🎉 **That's it!** Your app is now live with HTTPS and global CDN.
 
 Example output:
+
 ```
 ✅ Successfully deployed project 'my-app'!
 🌍 URL: https://my-app-12345.godeploy.app
@@ -120,6 +122,7 @@ godeploy deploy --no-git
 ```
 
 Notes:
+
 - Auto-detection reads: `git rev-parse HEAD`, `git rev-parse --abbrev-ref HEAD`, `git log -1 --pretty=%B`, and the `remote.origin.url` to build a commit URL for GitHub remotes.
 - All fields are optional; only provided values are sent.
 
@@ -161,12 +164,12 @@ Deploy multiple SPAs from one project:
 
 ## 🔑 Authentication Commands
 
-| Command | Description |
-|---------|-------------|
-| `godeploy auth sign-up` | Create a new account |
-| `godeploy auth login` | Log in to your account |
-| `godeploy auth status` | Check if you're logged in |
-| `godeploy auth logout` | Log out |
+| Command                 | Description               |
+| ----------------------- | ------------------------- |
+| `godeploy auth sign-up` | Create a new account      |
+| `godeploy auth login`   | Log in to your account    |
+| `godeploy auth status`  | Check if you're logged in |
+| `godeploy auth logout`  | Log out                   |
 
 ---
 
