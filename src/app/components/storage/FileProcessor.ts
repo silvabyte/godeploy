@@ -1,16 +1,16 @@
-import type { MultipartFile } from '@fastify/multipart'
-import type { ActionTelemetry } from '../../../logging/ActionTelemetry'
-import { saveStreamToTemp, validateSpaArchive } from './SpaArchiveProcessor'
+import type { MultipartFile } from "@fastify/multipart";
+import type { ActionTelemetry } from "../../../logging/ActionTelemetry";
+import { saveStreamToTemp, validateSpaArchive } from "./SpaArchiveProcessor";
 
 interface Result<T> {
-  data: T | null
-  error: string | null
+  data: T | null;
+  error: string | null;
 }
 
 interface ProcessedFiles {
-  archivePath: string | null
-  configPath: string | null
-  error: string | null
+  archivePath: string | null;
+  configPath: string | null;
+  error: string | null;
 }
 
 export class FileProcessor {
@@ -21,57 +21,59 @@ export class FileProcessor {
    * @param parts Iterator of multipart files
    * @returns Object containing paths to processed files and any error
    */
-  async processDeployFiles(parts: AsyncIterableIterator<MultipartFile>): Promise<ProcessedFiles> {
-    this.measure.add('validate_files')
+  async processDeployFiles(
+    parts: AsyncIterableIterator<MultipartFile>,
+  ): Promise<ProcessedFiles> {
+    this.measure.add("validate_files");
 
-    let archivePath: string | null = null
-    let configPath: string | null = null
-    const error: string | null = null
+    let archivePath: string | null = null;
+    let configPath: string | null = null;
+    const error: string | null = null;
 
     try {
       // Process the uploaded files using streams to avoid buffering in memory
       for await (const part of parts) {
-        if (part.type === 'file') {
-          this.measure.add('process_file', {
+        if (part.type === "file") {
+          this.measure.add("process_file", {
             fieldname: part.fieldname,
             filename: part.filename,
-          })
+          });
 
-          if (part.fieldname === 'archive' || part.filename.includes('.zip')) {
-            this.measure.add('save_archive')
-            const result = await saveStreamToTemp(part.file, 'archive.zip')
+          if (part.fieldname === "archive" || part.filename.includes(".zip")) {
+            this.measure.add("save_archive");
+            const result = await saveStreamToTemp(part.file, "archive.zip");
             if (result.error) {
               return {
                 archivePath: null,
                 configPath,
                 error: result.error,
-              }
+              };
             }
-            archivePath = result.data
-            this.measure.add('archive_saved', { path: archivePath })
-          } else if (part.fieldname === 'spa_config') {
-            this.measure.add('save_config')
-            const result = await saveStreamToTemp(part.file, 'spa-config.json')
+            archivePath = result.data;
+            this.measure.add("archive_saved", { path: archivePath });
+          } else if (part.fieldname === "spa_config") {
+            this.measure.add("save_config");
+            const result = await saveStreamToTemp(part.file, "spa-config.json");
             if (result.error) {
               return {
                 archivePath,
                 configPath: null,
                 error: result.error,
-              }
+              };
             }
-            configPath = result.data
-            this.measure.add('config_saved', { path: configPath })
+            configPath = result.data;
+            this.measure.add("config_saved", { path: configPath });
           }
         }
       }
 
-      return { archivePath, configPath, error }
+      return { archivePath, configPath, error };
     } catch (err) {
       return {
         archivePath: null,
         configPath: null,
-        error: `Failed to process files: ${err instanceof Error ? err.message : 'Unknown error'}`,
-      }
+        error: `Failed to process files: ${err instanceof Error ? err.message : "Unknown error"}`,
+      };
     }
   }
 
@@ -84,11 +86,11 @@ export class FileProcessor {
     if (!archivePath) {
       return {
         data: false,
-        error: 'Archive file is required',
-      }
+        error: "Archive file is required",
+      };
     }
 
-    const result = await validateSpaArchive(archivePath)
-    return result
+    const result = await validateSpaArchive(archivePath);
+    return result;
   }
 }

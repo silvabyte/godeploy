@@ -40,7 +40,11 @@ Create shareable public pages that showcase deployment frequency (and later DORA
 
 ```json
 {
-  "range": { "from": "2025-08-10T00:00:00.000Z", "to": "2025-09-08T13:00:00.000Z", "interval": "day" },
+  "range": {
+    "from": "2025-08-10T00:00:00.000Z",
+    "to": "2025-09-08T13:00:00.000Z",
+    "interval": "day"
+  },
   "series": [
     {
       "projectId": "project-uuid-1",
@@ -57,11 +61,15 @@ Create shareable public pages that showcase deployment frequency (and later DORA
       ]
     }
   ],
-  "totals": { "overall": 3, "byProject": { "project-uuid-1": 2, "project-uuid-2": 1 } }
+  "totals": {
+    "overall": 3,
+    "byProject": { "project-uuid-1": 2, "project-uuid-2": 1 }
+  }
 }
 ```
 
 Notes
+
 - Counts include only successful deployments within the time window.
 - Dates are zero-filled so charts render contiguous time axes.
 
@@ -74,7 +82,7 @@ Notes
 
 ```json
 {
-  "slug": "my-app-metrics",            // optional; auto-generated if omitted
+  "slug": "my-app-metrics", // optional; auto-generated if omitted
   "title": "My App Metrics",
   "description": "Shipping pace and reliability",
   "projectIds": ["project-uuid-1", "project-uuid-2"],
@@ -156,38 +164,45 @@ curl -s "https://api.godeploy.app/api/public/metrics/my-app-metrics/deploy-frequ
 
 ```ts
 // Create metrics page
-async function createPage(token: string, payload: {
-  slug?: string
-  title?: string
-  description?: string
-  projectIds: string[]
-  isPublic?: boolean
-}) {
-  const res = await fetch('https://api.godeploy.app/api/metrics/pages', {
-    method: 'POST',
+async function createPage(
+  token: string,
+  payload: {
+    slug?: string;
+    title?: string;
+    description?: string;
+    projectIds: string[];
+    isPublic?: boolean;
+  },
+) {
+  const res = await fetch("https://api.godeploy.app/api/metrics/pages", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
-  })
-  if (!res.ok) throw new Error('Failed to create page')
-  return res.json()
+  });
+  if (!res.ok) throw new Error("Failed to create page");
+  return res.json();
 }
 
 // Get public page metadata
 async function getPage(slug: string) {
-  const res = await fetch(`https://api.godeploy.app/api/public/metrics/${slug}`)
-  return res.json()
+  const res = await fetch(
+    `https://api.godeploy.app/api/public/metrics/${slug}`,
+  );
+  return res.json();
 }
 
 // Get frequency time series
 async function getFrequency(slug: string, from?: string, to?: string) {
-  const qs = new URLSearchParams()
-  if (from) qs.set('from', from)
-  if (to) qs.set('to', to)
-  const res = await fetch(`https://api.godeploy.app/api/public/metrics/${slug}/deploy-frequency?${qs}`)
-  return res.json()
+  const qs = new URLSearchParams();
+  if (from) qs.set("from", from);
+  if (to) qs.set("to", to);
+  const res = await fetch(
+    `https://api.godeploy.app/api/public/metrics/${slug}/deploy-frequency?${qs}`,
+  );
+  return res.json();
 }
 ```
 
@@ -197,4 +212,3 @@ async function getFrequency(slug: string, from?: string, to?: string) {
 - The server currently supports `day` granularity and a default 30-day window.
 - For large portfolios, expect future improvements (pre-aggregations/materialized views).
 - Slug must be unique; server will generate one if omitted.
-

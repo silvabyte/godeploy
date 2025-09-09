@@ -1,12 +1,8 @@
-import fs from 'node:fs'
 import type { FastifyInstance } from 'fastify'
 
 export default async function (fastify: FastifyInstance) {
-  //load version from package.json
-  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8')) as {
-    version: string
-  }
-  const version = packageJson.version
+  // Prefer env-provided version to avoid fs I/O
+  const version = process.env.APP_VERSION || process.env.npm_package_version || 'dev'
 
   fastify.get(
     '/',
