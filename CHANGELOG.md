@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.5] - 2025-09-09
+
+* feat: enhance output formatting with lipgloss (#14)
+* chore: release v1.0.4
+
 ## [1.0.4] - 2025-09-09
 
 * chore: update install url
