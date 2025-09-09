@@ -11,6 +11,7 @@ import (
     "syscall"
 
 	"github.com/alecthomas/kong"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/silvabyte/godeploy/internal/api"
 	"github.com/silvabyte/godeploy/internal/archive"
 	"github.com/silvabyte/godeploy/internal/auth"
@@ -561,6 +562,216 @@ func gitOutput(args ...string) string {
     return strings.TrimSpace(string(out))
 }
 
+// formatBytes converts bytes to human readable format
+func formatBytes(bytes int64) string {
+	const unit = 1024
+	if bytes < unit {
+		return fmt.Sprintf("%d B", bytes)
+	}
+	div, exp := int64(unit), 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
+}
+
+// formatZipStats creates a nicely formatted output for zip statistics
+func formatZipStats(stats *archive.ZipStats) string {
+	// Define styles
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#00D4AA")).
+		Background(lipgloss.Color("#1A1A1A")).
+		Padding(0, 1).
+		Margin(1, 0)
+
+	keyStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#FFE55C")).
+		Width(16).
+		Align(lipgloss.Right)
+
+	valueStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#FFFFFF"))
+
+	ratioColor := "#FF6B6B" // Red for poor compression
+	if stats.CompressionRatio < 80 {
+		ratioColor = "#FFD93D" // Yellow for okay compression
+	}
+	if stats.CompressionRatio < 60 {
+		ratioColor = "#6BCF7F" // Green for good compression
+	}
+
+	ratioStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color(ratioColor))
+
+	// Build the content
+	content := lipgloss.JoinVertical(lipgloss.Left,
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Files:"),
+			" ",
+			valueStyle.Render(fmt.Sprintf("%d", stats.FileCount)),
+		),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Original Size:"),
+			" ",
+			valueStyle.Render(formatBytes(stats.TotalSize)),
+		),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Compressed:"),
+			" ",
+			valueStyle.Render(formatBytes(stats.CompressedSize)),
+		),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Ratio:"),
+			" ",
+			ratioStyle.Render(fmt.Sprintf("%.1f%%", stats.CompressionRatio)),
+		),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Duration:"),
+			" ",
+			valueStyle.Render(stats.Duration.String()),
+		),
+	)
+
+	// Create a border around the content
+	borderStyle := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("#444444")).
+		Padding(1, 2).
+		Margin(1, 0)
+
+	return lipgloss.JoinVertical(lipgloss.Left,
+		titleStyle.Render("📦 Archive Details"),
+		borderStyle.Render(content),
+	)
+}
+
+// formatDeploymentSuccess creates a nicely formatted success message
+func formatDeploymentSuccess(projectName, url string, zipStats *archive.ZipStats) string {
+	// Define styles
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#FFFFFF")).
+		Background(lipgloss.Color("#00AA55")).
+		Padding(0, 1).
+		Margin(1, 0)
+
+	keyStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#00D4AA")).
+		Width(14).
+		Align(lipgloss.Right)
+
+	valueStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#FFFFFF"))
+
+	urlStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#4DABF7")).
+		Underline(true)
+
+	// Build the content
+	content := lipgloss.JoinVertical(lipgloss.Left,
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Project:"),
+			" ",
+			valueStyle.Render(projectName),
+		),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Files:"),
+			" ",
+			valueStyle.Render(fmt.Sprintf("%d", zipStats.FileCount)),
+		),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Size:"),
+			" ",
+			valueStyle.Render(formatBytes(zipStats.CompressedSize)),
+		),
+		"",
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("URL:"),
+			" ",
+			urlStyle.Render(url),
+		),
+	)
+
+	// Create a border around the content
+	borderStyle := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("#00AA55")).
+		Padding(1, 2).
+		Margin(1, 0)
+
+	return lipgloss.JoinVertical(lipgloss.Left,
+		titleStyle.Render("✅ Deployment Successful"),
+		borderStyle.Render(content),
+	)
+}
+
+// formatDeploymentError creates a nicely formatted error message
+func formatDeploymentError(projectName string, err error, zipStats *archive.ZipStats) string {
+	// Define styles
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#FFFFFF")).
+		Background(lipgloss.Color("#FF5555")).
+		Padding(0, 1).
+		Margin(1, 0)
+
+	keyStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#FF6B6B")).
+		Width(14).
+		Align(lipgloss.Right)
+
+	valueStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#FFFFFF"))
+
+	errorStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#FFB3B3")).
+		Italic(true)
+
+	// Build the content
+	content := lipgloss.JoinVertical(lipgloss.Left,
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Project:"),
+			" ",
+			valueStyle.Render(projectName),
+		),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Files:"),
+			" ",
+			valueStyle.Render(fmt.Sprintf("%d", zipStats.FileCount)),
+		),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Size:"),
+			" ",
+			valueStyle.Render(formatBytes(zipStats.CompressedSize)),
+		),
+		"",
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			keyStyle.Render("Error:"),
+			" ",
+			errorStyle.Render(err.Error()),
+		),
+	)
+
+	// Create a border around the content
+	borderStyle := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("#FF5555")).
+		Padding(1, 2).
+		Margin(1, 0)
+
+	return lipgloss.JoinVertical(lipgloss.Left,
+		titleStyle.Render("❌ Deployment Failed"),
+		borderStyle.Render(content),
+	)
+}
+
 // buildCommitURL tries to construct a commit URL based on remote and SHA (supports GitHub remotes).
 func buildCommitURL(remoteURL, sha string) string {
     if remoteURL == "" || sha == "" {
@@ -744,7 +955,7 @@ func (d *DeployCmd) Run() error {
 	}
 
 	// Create the zip archive
-	err = archive.CreateZipFromDirectory(sourceDir, zipFilePath)
+	zipStats, err := archive.CreateZipFromDirectory(sourceDir, zipFilePath)
 	if err != nil {
 		zipCancel()
 		zipSpinner.Fail("Failed to create zip archive")
@@ -753,6 +964,9 @@ func (d *DeployCmd) Run() error {
 
 	zipCancel()
 	zipSpinner.Stop("Zip archive created")
+
+	// Display formatted zip statistics
+	fmt.Println(formatZipStats(zipStats))
 
 	// Read the zip file
 	zipData, err := archive.ReadZipFile(zipFilePath)
@@ -804,19 +1018,22 @@ func (d *DeployCmd) Run() error {
     if err != nil {
         deployCancel()
         deploySpinner.Fail("Failed to deploy project")
+        
+        // Display formatted error message
+        fmt.Println(formatDeploymentError(projectName, err, zipStats))
+        
         // If this was a timeout while awaiting headers, deployment may still have succeeded server-side.
         if strings.Contains(err.Error(), "Client.Timeout exceeded") || strings.Contains(err.Error(), "context deadline exceeded") {
-            return fmt.Errorf("request timed out waiting for server response; your deployment may still complete. Consider increasing timeout via GODEPLOY_DEPLOY_TIMEOUT (e.g. '5m'). Underlying error: %w", err)
+            return fmt.Errorf("request timed out waiting for server response; your deployment may still complete. Consider increasing timeout via GODEPLOY_DEPLOY_TIMEOUT (e.g. '5m')")
         }
-        return fmt.Errorf("error deploying project: %w", err)
+        return fmt.Errorf("deployment failed")
     }
 
 	deployCancel()
 	deploySpinner.Stop("Project deployed successfully")
 
-	// Print the deployment URL
-	fmt.Printf("✅ Successfully deployed project '%s'!\n", projectName)
-	fmt.Printf("🌍 URL: %s\n", deployResp.URL)
+	// Display formatted success message
+	fmt.Println(formatDeploymentSuccess(projectName, deployResp.URL, zipStats))
 
 	return nil
 }

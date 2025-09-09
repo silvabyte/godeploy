@@ -2,28 +2,43 @@ package archive
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
-// CreateZipFromDirectory creates a zip archive from a directory
-func CreateZipFromDirectory(sourceDir, outputPath string) error {
+// ZipStats contains statistics about a zip operation
+type ZipStats struct {
+	FileCount        int           `json:"file_count"`
+	TotalSize        int64         `json:"total_size"`
+	CompressedSize   int64         `json:"compressed_size"`
+	CompressionRatio float64       `json:"compression_ratio"`
+	Duration         time.Duration `json:"duration"`
+	SourceDir        string        `json:"source_dir"`
+	OutputPath       string        `json:"output_path"`
+}
+
+// CreateZipFromDirectory creates a zip archive from a directory and returns statistics
+func CreateZipFromDirectory(sourceDir, outputPath string) (*ZipStats, error) {
+	startTime := time.Now()
+	stats := &ZipStats{
+		SourceDir:  sourceDir,
+		OutputPath: outputPath,
+	}
 	zipFile, err := os.Create(outputPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() {
 		_ = zipFile.Close()
 	}()
 
 	archive := zip.NewWriter(zipFile)
-	defer func() {
-		_ = archive.Close()
-	}()
 
-	return filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+	walkErr := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -32,6 +47,10 @@ func CreateZipFromDirectory(sourceDir, outputPath string) error {
 		if info.IsDir() {
 			return nil
 		}
+
+		// Update file count and total size
+		stats.FileCount++
+		stats.TotalSize += info.Size()
 
 		// Create relative path for the file in the zip
 		relPath, err := filepath.Rel(sourceDir, path)
@@ -69,6 +88,30 @@ func CreateZipFromDirectory(sourceDir, outputPath string) error {
 		_, err = io.Copy(writer, file)
 		return err
 	})
+
+	if walkErr != nil {
+		return nil, walkErr
+	}
+
+	// Close the archive writer to finalize the zip
+	if err := archive.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close archive: %w", err)
+	}
+
+	// Get final compressed size and calculate stats
+	stats.Duration = time.Since(startTime)
+	
+	// Get the compressed size from the zip file
+	if zipFileInfo, err := os.Stat(outputPath); err == nil {
+		stats.CompressedSize = zipFileInfo.Size()
+	}
+
+	// Calculate compression ratio
+	if stats.TotalSize > 0 {
+		stats.CompressionRatio = float64(stats.CompressedSize) / float64(stats.TotalSize) * 100
+	}
+
+	return stats, nil
 }
 
 // ReadZipFile reads a zip file and returns its contents as a byte array
