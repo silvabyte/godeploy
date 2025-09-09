@@ -122,8 +122,19 @@ export async function buildApp() {
   })
 
   // Register CORS
+  const isProd = process.env.NODE_ENV === 'production'
+  const godeployOriginRegex = /^https?:\/\/(?:[a-z0-9-]+\.)*godeploy\.app(?::\d+)?$/i
   await server.register(cors, {
-    origin: true, // Allow all origins in development
+    origin: (origin, cb) => {
+      // Allow same-origin/non-browser or undefined Origin
+      if (!origin) return cb(null, true)
+      // Allow everything in non-production
+      if (!isProd) return cb(null, true)
+      // In production, allow any *.godeploy.app (including apex)
+      if (godeployOriginRegex.test(origin)) return cb(null, true)
+      // Otherwise, disallow
+      cb(null, false)
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
