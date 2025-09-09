@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.4] - 2025-09-09
+
+* feat: include git commit metadata on deploy via CLI
+  - New flags: `--commit-sha`, `--commit-branch`, `--commit-message`, `--commit-url`
+  - Auto-detects from local git repo by default; disable with `--no-git`
+
 ## [1.0.3] - 2025-09-08
 
 * fix: ensure installer points to silvabyte org\n\n- Centralize GitHub org/repo as variables\n- Update all URLs to use silvabyte/godeploy\n

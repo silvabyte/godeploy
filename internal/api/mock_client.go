@@ -2,10 +2,10 @@ package api
 
 // MockClient is a mock implementation of the API client for testing
 type MockClient struct {
-	// VerifyTokenFunc is a function that will be called by VerifyToken
-	VerifyTokenFunc func(token string) (*VerifyResponse, error)
-	// DeployFunc is a function that will be called by Deploy
-	DeployFunc func(project string, spaConfigData []byte, archiveData []byte) (*DeployResponse, error)
+    // VerifyTokenFunc is a function that will be called by VerifyToken
+    VerifyTokenFunc func(token string) (*VerifyResponse, error)
+    // DeployFunc is a function that will be called by Deploy
+    DeployFunc func(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string) (*DeployResponse, error)
 }
 
 // NewMockClient creates a new mock API client
@@ -25,21 +25,21 @@ func NewMockClient() *MockClient {
 				},
 			}, nil
 		},
-		DeployFunc: func(project string, spaConfigData []byte, archiveData []byte) (*DeployResponse, error) {
-			return &DeployResponse{
-				Success: true,
-				URL:     "https://" + project + ".godeploy.app",
-			}, nil
-		},
-	}
+        DeployFunc: func(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string) (*DeployResponse, error) {
+            return &DeployResponse{
+                Success: true,
+                URL:     "https://" + project + ".godeploy.app",
+            }, nil
+        },
+    }
 }
 
 // VerifyToken calls the mock VerifyTokenFunc
 func (m *MockClient) VerifyToken(token string) (*VerifyResponse, error) {
-	return m.VerifyTokenFunc(token)
+    return m.VerifyTokenFunc(token)
 }
 
 // Deploy calls the mock DeployFunc
-func (m *MockClient) Deploy(project string, spaConfigData []byte, archiveData []byte) (*DeployResponse, error) {
-	return m.DeployFunc(project, spaConfigData, archiveData)
+func (m *MockClient) Deploy(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string) (*DeployResponse, error) {
+    return m.DeployFunc(project, spaConfigData, archiveData, commitSHA, commitBranch, commitMessage, commitURL)
 }

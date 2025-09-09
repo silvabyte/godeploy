@@ -98,6 +98,7 @@ export GODEPLOY_DEPLOY_TIMEOUT=10m   # supports Go duration strings (e.g., 90s, 
 - `godeploy auth status` - Check auth status
 - `godeploy deploy` - Ship it
 - `godeploy deploy --project NAME` - Deploy specific app
+- `godeploy deploy --commit-sha --commit-branch --commit-message --commit-url` - Attach commit metadata (auto-detected from git by default; use `--no-git` to disable)
 - `godeploy version` - Version info
 
 ## Multi-app Setup

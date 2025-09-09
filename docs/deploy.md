@@ -100,6 +100,29 @@ Example output:
 
 ## 📚 Advanced Usage
 
+### Include Commit Metadata
+
+Attach git commit details to your deployment for richer UI (e.g., hover cards with commit info). The CLI auto-detects from your local git repo, or you can pass them explicitly:
+
+```bash
+# Auto-detect from current git repo
+godeploy deploy
+
+# Or provide explicitly
+godeploy deploy \
+  --commit-sha abc123 \
+  --commit-branch main \
+  --commit-message "Fix billing edge case" \
+  --commit-url "https://github.com/acme/my-app/commit/abc123"
+
+# Disable auto-detection
+godeploy deploy --no-git
+```
+
+Notes:
+- Auto-detection reads: `git rev-parse HEAD`, `git rev-parse --abbrev-ref HEAD`, `git log -1 --pretty=%B`, and the `remote.origin.url` to build a commit URL for GitHub remotes.
+- All fields are optional; only provided values are sent.
+
 ### Deploy a Specific Project
 
 If you have multiple apps configured:

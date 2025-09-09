@@ -1,13 +1,14 @@
 package main
 
 import (
-	"bufio"
-	"context"
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-	"syscall"
+    "bufio"
+    "context"
+    "fmt"
+    "os"
+    "os/exec"
+    "path/filepath"
+    "strings"
+    "syscall"
 
 	"github.com/alecthomas/kong"
 	"github.com/silvabyte/godeploy/internal/api"
@@ -15,8 +16,8 @@ import (
 	"github.com/silvabyte/godeploy/internal/auth"
 	"github.com/silvabyte/godeploy/internal/config"
 	"github.com/silvabyte/godeploy/internal/version"
-	"github.com/yarlson/pin"
-	"golang.org/x/term"
+    "github.com/yarlson/pin"
+    "golang.org/x/term"
 )
 
 // CLI represents the command-line interface structure
@@ -65,8 +66,13 @@ type StatusCmd struct{}
 
 // DeployCmd represents the deploy command
 type DeployCmd struct {
-	Project string `help:"Project name for deployment" default:""`
-	Output  string `help:"Output directory for spa build files" default:"dist"`
+    Project string `help:"Project name for deployment" default:""`
+    Output  string `help:"Output directory for spa build files" default:"dist"`
+    CommitSHA     string `name:"commit-sha" help:"Commit SHA to associate with this deployment" default:""`
+    CommitBranch  string `name:"commit-branch" help:"Commit branch name" default:""`
+    CommitMessage string `name:"commit-message" help:"Commit message" default:""`
+    CommitURL     string `name:"commit-url" help:"URL to the commit (e.g., GitHub commit link)" default:""`
+    NoGit         bool   `name:"no-git" help:"Disable auto-detection of git metadata" default:"false"`
 }
 
 // VersionCmd represents the version command
@@ -545,6 +551,41 @@ func (s *StatusCmd) Run() error {
 	return nil
 }
 
+// gitOutput runs a git command and returns its trimmed string output.
+func gitOutput(args ...string) string {
+    cmd := exec.Command("git", args...)
+    out, err := cmd.Output()
+    if err != nil {
+        return ""
+    }
+    return strings.TrimSpace(string(out))
+}
+
+// buildCommitURL tries to construct a commit URL based on remote and SHA (supports GitHub remotes).
+func buildCommitURL(remoteURL, sha string) string {
+    if remoteURL == "" || sha == "" {
+        return ""
+    }
+    // Normalize GitHub remotes
+    if strings.Contains(remoteURL, "github.com") {
+        u := remoteURL
+        // Convert SSH form to HTTPS: git@github.com:owner/repo.git -> https://github.com/owner/repo
+        if strings.HasPrefix(u, "git@github.com:") {
+            u = strings.TrimPrefix(u, "git@github.com:")
+            u = "https://github.com/" + u
+        }
+        // Remove .git suffix if present
+        u = strings.TrimSuffix(u, ".git")
+        // If still missing scheme but contains github.com, add https://
+        if strings.HasPrefix(u, "github.com/") {
+            u = "https://" + u
+        }
+        return u + "/commit/" + sha
+    }
+    // Optionally extend for other providers in future
+    return ""
+}
+
 // Run executes the deploy command
 func (d *DeployCmd) Run() error {
 	// Create a context
@@ -732,8 +773,34 @@ func (d *DeployCmd) Run() error {
 	)
 	deployCancel := deploySpinner.Start(ctx)
 
+    // Prepare commit metadata (from flags or auto-detected via git)
+    commitSHA := d.CommitSHA
+    commitBranch := d.CommitBranch
+    commitMessage := d.CommitMessage
+    commitURL := d.CommitURL
+
+    if !d.NoGit {
+        if commitSHA == "" {
+            commitSHA = gitOutput("rev-parse", "HEAD")
+        }
+        if commitBranch == "" {
+            commitBranch = gitOutput("rev-parse", "--abbrev-ref", "HEAD")
+            if commitBranch == "HEAD" { // detached head; leave as-is or empty
+                // keep as HEAD to indicate detached, unless user provided override
+            }
+        }
+        if commitMessage == "" {
+            // Full subject/body; server will receive URL-encoded value
+            commitMessage = gitOutput("log", "-1", "--pretty=%B")
+        }
+        if commitURL == "" {
+            remote := gitOutput("config", "--get", "remote.origin.url")
+            commitURL = buildCommitURL(remote, commitSHA)
+        }
+    }
+
     // Deploy the SPA
-    deployResp, err := apiClient.Deploy(projectName, configData, zipData)
+    deployResp, err := apiClient.Deploy(projectName, configData, zipData, commitSHA, commitBranch, commitMessage, commitURL)
     if err != nil {
         deployCancel()
         deploySpinner.Fail("Failed to deploy project")

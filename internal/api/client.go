@@ -1,15 +1,16 @@
 package api
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io"
-	"mime/multipart"
-	"net/http"
-	"time"
+    "bytes"
+    "encoding/json"
+    "fmt"
+    "io"
+    "mime/multipart"
+    "net/http"
+    "net/url"
+    "time"
 
-	"github.com/silvabyte/godeploy/internal/auth"
+    "github.com/silvabyte/godeploy/internal/auth"
     "os"
 )
 
@@ -397,7 +398,7 @@ func (c *Client) SignUp(email, password string) (*SignUpResponse, error) {
 }
 
 // Deploy deploys a SPA to the GoDeploy service
-func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte) (*DeployResponse, error) {
+func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string) (*DeployResponse, error) {
 	// Create a new multipart writer
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
@@ -430,8 +431,25 @@ func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte
 		return nil, fmt.Errorf("failed to close multipart writer: %w", err)
 	}
 
-	// Create the request
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/deploy?project=%s", c.BaseURL, project), body)
+    // Build query parameters including optional commit metadata
+    q := url.Values{}
+    q.Set("project", project)
+    if commitSHA != "" {
+        q.Set("commit_sha", commitSHA)
+    }
+    if commitBranch != "" {
+        q.Set("commit_branch", commitBranch)
+    }
+    if commitMessage != "" {
+        q.Set("commit_message", commitMessage)
+    }
+    if commitURL != "" {
+        q.Set("commit_url", commitURL)
+    }
+
+    // Create the request
+    endpoint := fmt.Sprintf("%s/api/deploy?%s", c.BaseURL, q.Encode())
+    req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
