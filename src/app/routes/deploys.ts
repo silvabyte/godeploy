@@ -189,7 +189,22 @@ export default async function (fastify: FastifyInstance) {
 
     request.measure.add('upload_files')
     // Upload files to storage
-    const uploadResult = await storageService.processSpaArchive(archivePath, project)
+    let uploadResult: { data: string | null; error: string | null }
+    try {
+      uploadResult = await storageService.processSpaArchive(archivePath, project)
+    } catch (e) {
+      const err = e as Error
+      request.measure.failure(`Unhandled upload error: ${err.message}`)
+      // Update deployment status to failed (best-effort)
+      if (deploy.id) {
+        await request.db.deploys.updateDeployStatus(deploy.id, 'failed')
+      }
+      await cleanupArchiveTemp()
+      return reply.code(500).send({
+        error: 'Failed to upload files',
+        message: err.message,
+      })
+    }
 
     if (uploadResult.error) {
       request.measure.failure(uploadResult.error)

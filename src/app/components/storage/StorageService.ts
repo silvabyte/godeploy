@@ -36,8 +36,20 @@ const s3Client = new S3Client({
  * Storage service for handling file uploads to DigitalOcean Spaces
  */
 export class StorageService {
-  private static readonly DEFAULT_CONCURRENCY = Number(process.env.UPLOAD_CONCURRENCY || '5')
-  private readonly concurrency = StorageService.DEFAULT_CONCURRENCY
+  // Concurrency controls
+  // - FILE concurrency: how many files to upload in parallel
+  // - PART concurrency: how many multipart chunks per single file in parallel
+  // Keeping these low reduces peak memory usage for large files
+  private static readonly DEFAULT_FILE_CONCURRENCY = Math.max(
+    1,
+    Number(process.env.UPLOAD_FILE_CONCURRENCY || process.env.UPLOAD_CONCURRENCY || '2'),
+  )
+  private static readonly DEFAULT_PART_CONCURRENCY = Math.max(
+    1,
+    Number(process.env.UPLOAD_PART_CONCURRENCY || process.env.UPLOAD_CONCURRENCY || '1'),
+  )
+  private readonly fileConcurrency = StorageService.DEFAULT_FILE_CONCURRENCY
+  private readonly partConcurrency = StorageService.DEFAULT_PART_CONCURRENCY
   private readonly partSizeBytes = Math.max(
     5 * 1024 * 1024, // S3 minimum is 5 MiB
     Number(process.env.UPLOAD_PART_SIZE_BYTES || `${8 * 1024 * 1024}`),
@@ -67,7 +79,8 @@ export class StorageService {
           CacheControl: cacheControl,
           ACL: 'public-read',
         },
-        queueSize: this.concurrency,
+        // Limit multipart concurrency per single file to reduce memory
+        queueSize: this.partConcurrency,
         partSize: this.partSizeBytes,
         leavePartsOnError: false,
       })
@@ -89,6 +102,12 @@ export class StorageService {
         data: null,
         error: `Failed to upload file: ${err instanceof Error ? err.message : 'Unknown error'}`,
       }
+    } finally {
+      // Ensure file descriptor is released promptly even if the uploader
+      // already consumed/closed it.
+      try {
+        fileStream.destroy()
+      } catch {}
     }
   }
 
@@ -194,7 +213,8 @@ export class StorageService {
         if (res.error && !firstError) firstError = res.error
       })()
       schedule(job)
-      if (pool.size >= this.concurrency) {
+      // Backpressure: pause scheduling when pool reaches file concurrency
+      if (pool.size >= this.fileConcurrency) {
         await Promise.race(pool)
       }
     }
