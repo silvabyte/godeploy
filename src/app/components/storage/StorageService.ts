@@ -42,7 +42,7 @@ export class StorageService {
   // Keeping these low reduces peak memory usage for large files
   private static readonly DEFAULT_FILE_CONCURRENCY = Math.max(
     1,
-    Number(process.env.UPLOAD_FILE_CONCURRENCY || process.env.UPLOAD_CONCURRENCY || '2'),
+    Number(process.env.UPLOAD_FILE_CONCURRENCY || process.env.UPLOAD_CONCURRENCY || '1'),
   )
   private static readonly DEFAULT_PART_CONCURRENCY = Math.max(
     1,
@@ -52,7 +52,7 @@ export class StorageService {
   private readonly partConcurrency = StorageService.DEFAULT_PART_CONCURRENCY
   private readonly partSizeBytes = Math.max(
     5 * 1024 * 1024, // S3 minimum is 5 MiB
-    Number(process.env.UPLOAD_PART_SIZE_BYTES || `${8 * 1024 * 1024}`),
+    Number(process.env.UPLOAD_PART_SIZE_BYTES || `${5 * 1024 * 1024}`),
   )
   /**
    * Upload a file to DigitalOcean Spaces
@@ -69,6 +69,19 @@ export class StorageService {
     cacheControl: string,
   ): Promise<Result<string>> {
     try {
+      // Validate configuration before attempting to upload
+      if (!spacesEndpoint || !bucketName) {
+        return {
+          data: null,
+          error: 'Storage not configured: DIGITAL_OCEAN_SPACES_ENDPOINT or DIGITAL_OCEAN_SPACES_BUCKET is missing',
+        }
+      }
+      if (!process.env.DIGITAL_OCEAN_SPACES_KEY || !process.env.DIGITAL_OCEAN_SPACES_SECRET) {
+        return {
+          data: null,
+          error: 'Storage not configured: DIGITAL_OCEAN_SPACES_KEY/SECRET is missing',
+        }
+      }
       const upload = new Upload({
         client: s3Client,
         params: {
