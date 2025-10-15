@@ -46,6 +46,7 @@ GoDeploy is a SaaS deployment platform running on DigitalOcean App Platform with
 | `DIGITAL_OCEAN_SPACES_SECRET`   | [Encrypted]                              | Runtime         |
 | `DIGITAL_OCEAN_SPACES_ENDPOINT` | nyc3.digitaloceanspaces.com              | Runtime         |
 | `DIGITAL_OCEAN_SPACES_BUCKET`   | godeploy-spa-assets                      | Runtime         |
+| `DIGITAL_OCEAN_NGINX_APP_ID`    | 119c27f0-38bf-4150-af45-5a59ace673c5     | Runtime         |
 | `APP_URL`                       | https://api.godeploy.app                 | Runtime         |
 | `HOST`                          | 0.0.0.0                                  | Runtime         |
 | `NODE_ENV`                      | production                               | Build & Runtime |

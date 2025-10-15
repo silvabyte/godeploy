@@ -274,6 +274,7 @@ curl -s -X PATCH https://api.godeploy.app/api/projects/$PROJECT_ID/domain \
 ## Environment
 
 - `GODEPLOY_CNAME_TARGET`: the expected CNAME value; also returned by `GET /api/domains/cname-target`.
+- `DIGITAL_OCEAN_NGINX_APP_ID`: App Platform ID for the nginx/CDN proxy. Required for automatic domain registration.
 
 ## Notes
 

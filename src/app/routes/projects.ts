@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { addUrlToProject, validateAndTransformProjectName } from '../components/projects/project-utils'
+import { DigitalOceanAppPlatformService } from '../components/digitalocean/AppPlatformService'
 import {
   type CreateProjectBody,
   routeSchemas,
@@ -8,6 +9,8 @@ import {
 import { DomainValidator } from '../utils/domain-validator'
 
 export default async function (fastify: FastifyInstance) {
+  const digitalOceanAppPlatform = DigitalOceanAppPlatformService.fromEnv()
+
   // Get all projects for the authenticated tenant
   fastify.get('/api/projects', {
     ...routeSchemas.getProjects,
@@ -153,6 +156,8 @@ export default async function (fastify: FastifyInstance) {
         })
       }
 
+      const currentDomain = projectResult.data.domain ?? null
+
       // If domain is provided, validate format and availability
       if (domain) {
         // Validate domain format
@@ -202,6 +207,38 @@ export default async function (fastify: FastifyInstance) {
             error: 'Invalid CNAME configuration',
             message: validationResult.data?.error || 'Domain CNAME is not properly configured',
           })
+        }
+
+        if (digitalOceanAppPlatform) {
+          request.measure.add('digitalocean_add_domain')
+          const addResult = await digitalOceanAppPlatform.addDomain(domain)
+
+          if (!addResult.ok) {
+            request.measure.failure(addResult.error || 'Failed to register domain with DigitalOcean')
+            return reply.code(502).send({
+              error: 'Failed to register domain with hosting provider',
+              message: addResult.error || 'Unable to add domain to DigitalOcean App Platform',
+            })
+          }
+        } else {
+          request.log.warn({ domain }, 'DigitalOcean App Platform credentials missing; skipping domain registration')
+        }
+      }
+
+      if (!domain && currentDomain) {
+        if (digitalOceanAppPlatform) {
+          request.measure.add('digitalocean_remove_domain')
+          const removeResult = await digitalOceanAppPlatform.removeDomain(currentDomain)
+
+          if (!removeResult.ok) {
+            request.measure.failure(removeResult.error || 'Failed to remove domain from DigitalOcean')
+            return reply.code(502).send({
+              error: 'Failed to remove domain from hosting provider',
+              message: removeResult.error || 'Unable to remove domain from DigitalOcean App Platform',
+            })
+          }
+        } else {
+          request.log.warn({ domain: currentDomain }, 'DigitalOcean App Platform credentials missing; skipping domain removal')
         }
       }
 
