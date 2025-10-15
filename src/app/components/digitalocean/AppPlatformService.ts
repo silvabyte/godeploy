@@ -19,6 +19,14 @@ interface RequestOptions {
   body?: string
 }
 
+type FetchResponse = {
+  ok: boolean
+  status: number
+  json(): Promise<unknown>
+}
+
+type JsonBody = AppPlatformDomainResponse | { message?: string }
+
 /**
  * Minimal DigitalOcean App Platform client for managing custom domains.
  */
@@ -52,10 +60,10 @@ export class DigitalOceanAppPlatformService {
   private async request(method: string, path: string, init: RequestOptions = {}): Promise<ServiceResult> {
     const url = `${DigitalOceanAppPlatformService.API_BASE}${path}`
 
-    let response: any
+    let response: FetchResponse
 
     try {
-      response = await fetch(url, {
+      const rawResponse = await fetch(url, {
         method,
         headers: {
           Authorization: `Bearer ${this.token}`,
@@ -63,6 +71,9 @@ export class DigitalOceanAppPlatformService {
         },
         body: init.body,
       })
+      // Bun/Node fetch responses include the fields we care about, but their
+      // typings do not align with our minimal interface, so coerce via unknown.
+      response = rawResponse as unknown as FetchResponse
     } catch (error) {
       return {
         ok: false,
@@ -74,8 +85,8 @@ export class DigitalOceanAppPlatformService {
       return { ok: true }
     }
 
-    const status = response.status as number
-    let body: AppPlatformDomainResponse | { message?: string } | null = null
+    const status = response.status
+    let body: JsonBody | null = null
 
     try {
       body = (await response.json()) as AppPlatformDomainResponse | { message?: string }
