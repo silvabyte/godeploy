@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 import { commonResponseSchemas } from '../components/http/response.types'
 import { DomainValidator } from '../utils/domain-validator'
+import { DigitalOceanAppPlatformService } from '../components/digitalocean/AppPlatformService'
 
 // Request schemas
 const validateDomainSchema = z.object({
@@ -42,6 +43,22 @@ type ValidateDomainBody = z.infer<typeof validateDomainSchema>
 type CheckDomainAvailabilityBody = z.infer<typeof checkDomainAvailabilitySchema>
 
 export default async function (fastify: FastifyInstance) {
+  const digitalOceanAppPlatform = DigitalOceanAppPlatformService.fromEnv()
+
+  const ensureDomainRegistered = async (domain: string, request: FastifyRequest) => {
+    if (!digitalOceanAppPlatform) {
+      request.log.warn({ domain }, 'DigitalOcean App Platform credentials missing; skipping domain registration')
+      return
+    }
+
+    request.measure.add('digitalocean_add_domain')
+    const addResult = await digitalOceanAppPlatform.addDomain(domain)
+
+    if (!addResult.ok) {
+      request.log.error({ domain, error: addResult.error }, 'Failed to register domain with DigitalOcean App Platform')
+    }
+  }
+
   // Public endpoint - Get the CNAME target for domain configuration
   fastify.get('/api/domains/cname-target', {
     schema: {
@@ -98,6 +115,10 @@ export default async function (fastify: FastifyInstance) {
           error: 'Failed to validate domain',
           message: validationResult.error,
         })
+      }
+
+      if (validationResult.data?.isValid) {
+        await ensureDomainRegistered(domain, request)
       }
 
       request.measure.success()
@@ -176,6 +197,10 @@ export default async function (fastify: FastifyInstance) {
 
       // Domain is available if it's not in use and has valid CNAME
       const isAvailable = availabilityResult.data && validationResult.data?.isValid === true
+
+      if (isAvailable) {
+        await ensureDomainRegistered(domain, request)
+      }
 
       request.measure.success()
       return reply.code(200).send({
