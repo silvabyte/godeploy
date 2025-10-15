@@ -10,8 +10,9 @@ interface AppPlatformDomainResponse {
   meta?: unknown
 }
 
-interface ServiceResult {
+interface ServiceResult<T = undefined> {
   ok: boolean
+  data?: T
   error?: string
 }
 
@@ -26,6 +27,23 @@ type FetchResponse = {
 }
 
 type JsonBody = AppPlatformDomainResponse | { message?: string }
+
+interface AppSpecDomain {
+  domain: string
+  type?: string
+  wildcard?: boolean
+}
+
+interface AppSpec {
+  domains?: AppSpecDomain[]
+  [key: string]: unknown
+}
+
+interface AppResponse {
+  app?: {
+    spec?: AppSpec
+  }
+}
 
 /**
  * Minimal DigitalOcean App Platform client for managing custom domains.
@@ -48,16 +66,67 @@ export class DigitalOceanAppPlatformService {
   ) {}
 
   async addDomain(domain: string): Promise<ServiceResult> {
-    return this.request('POST', `/apps/${this.appId}/domains`, {
-      body: JSON.stringify({ domain }),
-    })
+    return this.ensureDomainInSpec(domain, true)
   }
 
   async removeDomain(domain: string): Promise<ServiceResult> {
-    return this.request('DELETE', `/apps/${this.appId}/domains/${domain}`)
+    return this.ensureDomainInSpec(domain, false)
   }
 
-  private async request(method: string, path: string, init: RequestOptions = {}): Promise<ServiceResult> {
+  private async ensureDomainInSpec(domain: string, present: boolean): Promise<ServiceResult> {
+    const specResult = await this.getAppSpec()
+
+    if (!specResult.ok || !specResult.data?.app?.spec) {
+      return {
+        ok: false,
+        error: specResult.error || 'Unable to retrieve app spec from DigitalOcean',
+      }
+    }
+
+    const spec = this.cloneSpec(specResult.data.app.spec)
+    const domains = Array.isArray(spec.domains) ? [...spec.domains] : []
+    const normalized = domain.toLowerCase()
+    const exists = domains.some((d) => d.domain?.toLowerCase() === normalized)
+
+    if (present) {
+      if (exists) {
+        return { ok: true }
+      }
+      domains.push({ domain: normalized })
+    } else {
+      if (!exists) {
+        return { ok: true }
+      }
+      spec.domains = domains.filter((d) => d.domain?.toLowerCase() !== normalized)
+    }
+
+    if (present) {
+      spec.domains = domains
+    }
+
+    const updateResult = await this.updateAppSpec(spec)
+    if (!updateResult.ok) {
+      return updateResult
+    }
+
+    return { ok: true }
+  }
+
+  private async getAppSpec(): Promise<ServiceResult<AppResponse>> {
+    return this.request<AppResponse>('GET', `/apps/${this.appId}`)
+  }
+
+  private async updateAppSpec(spec: AppSpec): Promise<ServiceResult> {
+    return this.request('PUT', `/apps/${this.appId}/spec`, {
+      body: JSON.stringify({ spec }),
+    })
+  }
+
+  private cloneSpec(spec: AppSpec): AppSpec {
+    return JSON.parse(JSON.stringify(spec)) as AppSpec
+  }
+
+  private async request<T = undefined>(method: string, path: string, init: RequestOptions = {}): Promise<ServiceResult<T>> {
     const url = `${DigitalOceanAppPlatformService.API_BASE}${path}`
 
     let response: FetchResponse
@@ -68,6 +137,7 @@ export class DigitalOceanAppPlatformService {
         headers: {
           Authorization: `Bearer ${this.token}`,
           'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
         body: init.body,
       })
@@ -82,7 +152,15 @@ export class DigitalOceanAppPlatformService {
     }
 
     if (response.ok) {
-      return { ok: true }
+      let data: T | undefined
+
+      if (response.status !== 204) {
+        try {
+          data = (await response.json()) as T
+        } catch {}
+      }
+
+      return data !== undefined ? { ok: true, data } : { ok: true }
     }
 
     const status = response.status
