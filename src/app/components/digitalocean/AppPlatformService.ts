@@ -117,7 +117,7 @@ export class DigitalOceanAppPlatformService {
   }
 
   private async updateAppSpec(spec: AppSpec): Promise<ServiceResult> {
-    return this.request('PUT', `/apps/${this.appId}/spec`, {
+    return this.request('PUT', `/apps/${this.appId}`, {
       body: JSON.stringify({ spec }),
     })
   }
@@ -180,10 +180,12 @@ export class DigitalOceanAppPlatformService {
       return { ok: true }
     }
 
-    const errorMessage =
+    const statusText = `DigitalOcean API responded with status ${status}`
+    const detailedMessage =
       (body && 'message' in body && body.message) ||
-      (body && 'domain' in body && body.domain?.state) ||
-      `DigitalOcean API responded with status ${status}`
+      (body && 'domain' in body && body.domain?.state)
+
+    const errorMessage = detailedMessage ? `${statusText}: ${detailedMessage}` : statusText
 
     return {
       ok: false,
