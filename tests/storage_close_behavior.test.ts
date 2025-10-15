@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
-import * as path from 'node:path'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { mkdtemp, writeFile, rm, mkdir } from 'node:fs/promises'
+import * as path from 'node:path'
 
 import { StorageService } from '../src/app/components/storage/StorageService'
 
@@ -16,15 +16,20 @@ describe('StorageService.uploadDirectory dir.close() robustness', () => {
     const service = new StorageService()
 
     // Stub uploadFile to avoid network and always succeed
-    const origUpload = (service as any).uploadFile
-    ;(service as any).uploadFile = async () => ({ data: '', error: null })
+    type StorageServiceInternal = StorageService & {
+      uploadFile: (file: string, key: string) => Promise<{ data: string | null; error: string | null }>
+      uploadDirectory: (dirPath: string, baseKey: string) => Promise<{ data: string | null; error: string | null }>
+    }
+    const internalService = service as unknown as StorageServiceInternal
+    const origUpload = internalService.uploadFile
+    internalService.uploadFile = async () => ({ data: '', error: null })
 
     try {
-      const res = await (service as any).uploadDirectory(root, 'test/base')
+      const res = await internalService.uploadDirectory(root, 'test/base')
       expect(res.error).toBeNull()
     } finally {
       // Restore stubs and cleanup
-      ;(service as any).uploadFile = origUpload
+      internalService.uploadFile = origUpload
       await rm(root, { recursive: true, force: true })
     }
   })

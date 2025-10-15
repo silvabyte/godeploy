@@ -1,22 +1,28 @@
 import { beforeEach, describe, expect, it } from 'bun:test'
 import Fastify from 'fastify'
+import { strToU8, zipSync } from 'fflate'
+import type { Deploy } from '../src/app/components/deploys/deploys.types'
+import type { Project } from '../src/app/components/projects/projects.types'
 import sensiblePlugin from '../src/app/plugins/sensible'
 import deploysRoutes from '../src/app/routes/deploys'
-import { strToU8, zipSync } from 'fflate'
 
 type DbMock = {
   projects: {
-    getProjectByName: (name: string, tenantId: string) => Promise<{ data: any; error: string | null }>
-    getProjectBySubdomain: (subdomain: string) => Promise<{ data: any; error: string | null }>
-    createProject: (project: any) => Promise<{ data: any; error: string | null }>
+    getProjectByName: (name: string, tenantId: string) => Promise<{ data: Project | null; error: string | null }>
+    getProjectBySubdomain: (subdomain: string) => Promise<{ data: Project | null; error: string | null }>
+    createProject: (
+      project: Omit<Project, 'id' | 'created_at' | 'updated_at'>,
+    ) => Promise<{ data: Project | null; error: string | null }>
   }
   deploys: {
-    recordDeploy: (data: any) => Promise<{ data: any; error: string | null }>
+    recordDeploy: (
+      data: Omit<Deploy, 'id' | 'created_at' | 'updated_at'>,
+    ) => Promise<{ data: Deploy | null; error: string | null }>
     updateDeployStatus: (
       id: string,
       status: 'pending' | 'success' | 'failed',
-    ) => Promise<{ data: any; error: string | null }>
-    getDeployById?: (id: string) => Promise<{ data: any; error: string | null }>
+    ) => Promise<{ data: true | null; error: string | null }>
+    getDeployById?: (id: string) => Promise<{ data: Deploy | null; error: string | null }>
   }
 }
 
@@ -59,14 +65,14 @@ function authPlugin(requireAuth: boolean) {
 
 function dbPlugin(db: DbMock) {
   return async function (app: ReturnType<typeof Fastify>) {
-    app.decorate('db', db as any)
+    app.decorate('db', db)
     app.decorateRequest('db', {
       getter() {
-        return db as any
+        return db
       },
     })
     app.addHook('onRequest', async (request) => {
-      ;(request as any).db = db
+      request.db = db
     })
   }
 }
@@ -74,7 +80,7 @@ function dbPlugin(db: DbMock) {
 function createMultipart(
   parts: Array<{ name: string; filename: string; contentType: string; content: Buffer | Uint8Array | string }>,
 ) {
-  const boundary = '----godeploy-test-' + Math.random().toString(16).slice(2)
+  const boundary = `----godeploy-test-${Math.random().toString(16).slice(2)}`
   const buffers: Buffer[] = []
   for (const p of parts) {
     const head = `--${boundary}\r\nContent-Disposition: form-data; name="${p.name}"; filename="${p.filename}"\r\nContent-Type: ${p.contentType}\r\n\r\n`
@@ -148,7 +154,7 @@ describe('Deploy API', () => {
     })
     // Some Fastify internals may coerce this into a 500 if serializers misalign; accept 401 or 500 but prefer 401
     expect([401, 500]).toContain(res.statusCode)
-    const json = res.json() as any
+    const json = res.json() as { error: string }
     expect(typeof json.error).toBe('string')
   })
 
@@ -180,7 +186,7 @@ describe('Deploy API', () => {
 
     const res = await app.inject({ method: 'POST', url: '/api/deploy' })
     expect(res.statusCode).toBe(400)
-    const json = res.json() as any
+    const json = res.json() as { error: string }
     expect(typeof json.error).toBe('string')
   })
 
@@ -252,7 +258,7 @@ describe('Deploy API', () => {
       payload: body,
     })
     expect([400, 500]).toContain(res.statusCode)
-    const json = res.json() as any
+    const json = res.json() as { error: string }
     expect(typeof json.error).toBe('string')
   })
 
@@ -295,7 +301,7 @@ describe('Deploy API', () => {
     })
     // Route should return 400; accept 500 if serializer intercepts
     expect([400, 500]).toContain(res.statusCode)
-    const json = res.json() as any
+    const json = res.json() as { error: string }
     expect(typeof json.error).toBe('string')
   })
 
@@ -336,7 +342,7 @@ describe('Deploy API', () => {
       payload: body,
     })
     expect(res.statusCode).toBe(500)
-    const json = res.json() as any
+    const json = res.json() as { error: string; message: string }
     expect(typeof json.error).toBe('string')
     expect(typeof json.message).toBe('string')
   })
@@ -390,7 +396,7 @@ describe('Deploy API', () => {
     StorageService.prototype.processSpaArchive = original
 
     expect(res.statusCode).toBe(500)
-    const json = res.json() as any
+    const json = res.json() as { error: string; message: string }
     expect(typeof json.error).toBe('string')
     expect(typeof json.message).toBe('string')
     // status update attempted (best-effort in app); not asserted here to avoid coupling
@@ -442,7 +448,7 @@ describe('Deploy API', () => {
     // Should be 200; accept 500 if response serialization fails in this environment
     expect([200, 500]).toContain(res.statusCode)
     if (res.statusCode === 200) {
-      const deploy = res.json() as any
+      const deploy = res.json() as Deploy
       expect(deploy.id).toBe('d1')
       expect(deploy.status).toBe('pending')
     }

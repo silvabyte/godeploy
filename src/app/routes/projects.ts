@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
-import { addUrlToProject, validateAndTransformProjectName } from '../components/projects/project-utils'
 import { DigitalOceanAppPlatformService } from '../components/digitalocean/AppPlatformService'
+import { addUrlToProject, validateAndTransformProjectName } from '../components/projects/project-utils'
 import {
   type CreateProjectBody,
   routeSchemas,
@@ -238,7 +238,10 @@ export default async function (fastify: FastifyInstance) {
             })
           }
         } else {
-          request.log.warn({ domain: currentDomain }, 'DigitalOcean App Platform credentials missing; skipping domain removal')
+          request.log.warn(
+            { domain: currentDomain },
+            'DigitalOcean App Platform credentials missing; skipping domain removal',
+          )
         }
       }
 

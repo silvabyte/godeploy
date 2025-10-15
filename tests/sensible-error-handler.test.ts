@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import Fastify from 'fastify'
-
-import sensiblePlugin from '../src/app/plugins/sensible'
-import { routeSchemas as deployRouteSchemas } from '../src/app/components/deploys/deploys.types'
 import { authErrorResponseJsonSchema, signUpJsonSchema } from '../src/app/components/auth/auth.types'
+import { routeSchemas as deployRouteSchemas } from '../src/app/components/deploys/deploys.types'
+import sensiblePlugin from '../src/app/plugins/sensible'
 
 describe('Global error handler integration', () => {
   it('returns { error, message } for 500 to satisfy deploy 500 schema', async () => {
