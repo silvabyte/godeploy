@@ -1,4 +1,5 @@
 import { buildApp } from "./app/build/build.js";
+import { Log } from "./logging/logger.js";
 
 // Set NODE_ENV to development if not already set
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
@@ -18,10 +19,12 @@ async function startServer() {
 			server.log.error(err);
 			process.exit(1);
 		} else {
+			server.log.info({ host, port }, "Server started");
 		}
 	});
 }
 
-startServer().catch((_err) => {
+startServer().catch((err) => {
+	Log.error(err, "Failed to start server");
 	process.exit(1);
 });
