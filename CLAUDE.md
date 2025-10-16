@@ -9,8 +9,8 @@ This project uses **Bun** as the JavaScript runtime and package manager.
 ## Commands
 
 - Build/Run: `bun dev` (development with watch), `bun start` (production)
-- Test: `bun test` (all tests), `bun test src/path/to/test.test.ts` (single test)
-- Smoke Tests: `bun run test:smoke`, `bun run test:auth`
+- Test: `bun run test` (all tests), `bun run --cwd apps/api test src/path/to/test.test.ts` (single test)
+- Smoke Tests: `./scripts/test-api.sh`, `./scripts/test-auth.sh`
 - Format: `bun run format` (format code with Biome)
 - Lint: `bun run lint` (check), `bun run lint:fix` (fix issues)
 - Check: `bun run check` (lint + format check), `bun run check:fix` (fix all)
@@ -28,7 +28,7 @@ This project uses **Bun** as the JavaScript runtime and package manager.
 - Class-based services with descriptive method names
 - Use async/await for promises
 - Conventional commits (feat, fix, chore, etc.)
-- Fastify routes and plugins using explicit registration (src/app/build/register.ts)
+- Fastify routes and plugins using explicit registration (`apps/api/src/app/build/register.ts`)
 - Use zod for type defintions
 - Use zodToJsonSchema to convert type definaitons to json schemas, for fastify
 - Fastify route handlers with explicit type definitions and schema validation
@@ -61,5 +61,5 @@ Custom domain support is implemented with the following architecture:
 - Uses Zod for schema validation
 - Validates domain format and CNAME configuration only (no A records)
 - Ensures domain uniqueness across projects
-- Domain validation utility in `src/app/utils/domain-validator.ts`
-- Dedicated routes in `src/app/routes/domains.ts`
+- Domain validation utility in `apps/api/src/app/utils/domain-validator.ts`
+- Dedicated routes in `apps/api/src/app/routes/domains.ts`

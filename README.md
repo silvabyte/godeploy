@@ -41,6 +41,11 @@ Built with boring, reliable tech that just works:
 - **DigitalOcean Spaces** - S3-compatible storage that's actually affordable
 - **Biome** - One tool for formatting/linting (bye Prettier + ESLint)
 
+## Monorepo Layout
+
+- `apps/api` - Fastify service powering the GoDeploy API
+- `libs/` - Shared packages live here (add new libraries under `libs/*`)
+
 ## Core Endpoints
 
 ### Deploy a Site

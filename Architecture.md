@@ -4,15 +4,15 @@
 
 ### 1.1 Core Directories
 
-- `src/` – Application source code
+- `apps/api/src/` – Application source code
   - `app/` – Core application logic
   - `assets/` – Static assets
   - `logging/` – Logging setup and configurations
 - `supabase/` – Database migrations and configurations
 - `scripts/` – Utility and helper scripts
-- `tests/` – Automated test suite
+- `apps/api/tests/` – Automated test suite
 
-### 1.2 Application Components (`src/app/`)
+### 1.2 Application Components (`apps/api/src/app/`)
 
 - `routes/` – API route definitions and handlers
 - `services/` – Business logic and service layers
@@ -121,13 +121,12 @@
 ### 6.1 Code Quality
 
 - TypeScript
-- ESLint
-- Prettier
+- Biome (formatting + linting)
 - Husky (Git hooks)
 
 ### 6.2 Testing
 
-- Vitest
+- Bun test runner
 - Utility libraries for testing
 - Mock implementations for external services
 

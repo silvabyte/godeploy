@@ -1,9 +1,13 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["src/**/*.test.ts", "src/**/*.spec.ts"],
-  "project": ["src/**/*.ts", "!src/**/*.d.ts"],
-  "ignore": ["supabase/migrations/**", "docs/**"],
-  "ignoreDependencies": ["husky", "@biomejs/biome"],
-  "ignoreExportsUsedInFile": true,
-  "ignoreBinaries": ["xrelease"]
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"entry": ["apps/api/tests/**/*.test.ts", "apps/api/tests/**/*.spec.ts"],
+	"project": [
+		"apps/api/src/**/*.ts",
+		"apps/api/tests/**/*.ts",
+		"!apps/api/src/**/*.d.ts"
+	],
+	"ignore": ["supabase/migrations/**", "docs/**"],
+	"ignoreDependencies": ["husky", "@biomejs/biome"],
+	"ignoreExportsUsedInFile": true,
+	"ignoreBinaries": ["xrelease"]
 }

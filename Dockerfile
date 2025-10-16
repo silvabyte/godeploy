@@ -8,8 +8,9 @@ RUN apk add --no-cache bash zip unzip
 # Create and set working directory
 WORKDIR /app
 
-# Copy package.json and bun lockfile
+# Copy workspace manifests and lockfile
 COPY package.json bun.lock ./
+COPY apps/api/package.json apps/api/package.json
 
 # Install dependencies with frozen lockfile for production
 RUN bun install --frozen-lockfile --production
