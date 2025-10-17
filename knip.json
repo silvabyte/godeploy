@@ -4,7 +4,9 @@
 	"project": [
 		"apps/api/src/**/*.ts",
 		"apps/api/tests/**/*.ts",
-		"!apps/api/src/**/*.d.ts"
+		"!apps/api/src/**/*.d.ts",
+		"apps/dashboard/src/**/*.ts",
+		"apps/marketing/src/**/*.ts"
 	],
 	"ignore": ["supabase/migrations/**", "docs/**"],
 	"ignoreDependencies": ["husky", "@biomejs/biome"],

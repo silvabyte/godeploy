@@ -3,10 +3,7 @@
  * Focus on core funnel metrics for SPA deployment marketing
  */
 
-import config, {
-    EVENTS,
-    AUTO_TRACK_CONFIG
-} from './mixpanel-config.js';
+import config, { EVENTS, AUTO_TRACK_CONFIG } from "./mixpanel-config.js";
 
 // Initialize URL parameters for campaign tracking
 const urlParams = new URLSearchParams(window.location.search);
@@ -18,6 +15,4 @@ const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
  * Core tracking initialization
  * Call this when the page loads
  */
-export function initTracking() {
-
-}
+export function initTracking() {}

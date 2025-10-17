@@ -1,0 +1,49 @@
+{
+	"common": {
+		"actions": {
+			"processing": "Processing",
+			"add": "Add",
+			"cancel": "Cancel"
+		},
+		"errors": {
+			"oops": "Uh oh!",
+			"generic": "Sorry, an unexpected error occured."
+		},
+		"support": {
+			"contact": "contact support"
+		}
+	},
+	"session": {
+		"authenticate": {
+			"oops": "Uh oh!",
+			"signingIn": "signing in",
+			"please": "Please try",
+			"again": "again or",
+			"contact": "contact support"
+		},
+		"inputs": {
+			"email": {
+				"label": "Email",
+				"placeholder": "Enter your email"
+			},
+			"password": {
+				"label": "Password",
+				"placeholder": "Enter your password"
+			}
+		},
+		"signin": {
+			"title": "Sign In to GoDeploy",
+			"loginLink": "Email a Login Link",
+			"loginButton": "Sign In",
+			"details": "Just enter your email, and we'll send you a link to get started. Whether you're new here or coming back, you're only a click away from joining the <span class=\"font-bold italic\">GoDeploy <s>revolution</s> resolution.</span>"
+		},
+		"verify": {
+			"emailSent": "Email sent!",
+			"checkInbox": "Check your inbox! If we found your email address you'll have a link to login waiting for you.",
+			"spam": " Sometimes this can land in SPAM! While we hope that isn't the case if it doesn't arrive in a minute or three, please check."
+		}
+	},
+	"nav": {
+		"goHome": "Go back home"
+	}
+}

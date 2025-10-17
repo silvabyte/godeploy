@@ -1,0 +1,11 @@
+{
+	"apps": [
+		{
+			"name": "godeploy-auth",
+			"source_dir": "dist",
+			"path": "/",
+			"description": "Auth service for godeploy",
+			"enabled": true
+		}
+	]
+}

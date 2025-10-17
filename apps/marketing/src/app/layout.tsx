@@ -1,66 +1,66 @@
-import { type Metadata } from 'next'
-import { Inter, Lexend, Fira_Mono } from 'next/font/google'
-import clsx from 'clsx'
-import Script from 'next/script'
+import { type Metadata } from "next";
+import { Inter, Lexend, Fira_Mono } from "next/font/google";
+import clsx from "clsx";
+import Script from "next/script";
 
-import '@/styles/tailwind.css'
+import "@/styles/tailwind.css";
 
 export const metadata: Metadata = {
-  title: 'GoDeploy — Zero‑Config Static Hosting for SPAs',
-  description:
-    'Deploy React, Vue, Svelte, Angular and static apps with instant HTTPS and a global CDN. No SSR. No pipelines. Just ship.',
-  openGraph: {
-    title: 'GoDeploy — Zero‑Config Static Hosting for SPAs',
-    description:
-      'Deploy React, Vue, Svelte, Angular and static apps with instant HTTPS and a global CDN. No SSR. No pipelines. Just ship.',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'GoDeploy — Zero‑Config Static Hosting for SPAs',
-    description:
-      'Deploy React, Vue, Svelte, Angular and static apps with instant HTTPS and a global CDN. No SSR. No pipelines. Just ship.',
-  },
-}
+	title: "GoDeploy — Zero‑Config Static Hosting for SPAs",
+	description:
+		"Deploy React, Vue, Svelte, Angular and static apps with instant HTTPS and a global CDN. No SSR. No pipelines. Just ship.",
+	openGraph: {
+		title: "GoDeploy — Zero‑Config Static Hosting for SPAs",
+		description:
+			"Deploy React, Vue, Svelte, Angular and static apps with instant HTTPS and a global CDN. No SSR. No pipelines. Just ship.",
+		type: "website",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "GoDeploy — Zero‑Config Static Hosting for SPAs",
+		description:
+			"Deploy React, Vue, Svelte, Angular and static apps with instant HTTPS and a global CDN. No SSR. No pipelines. Just ship.",
+	},
+};
 
 const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-})
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-inter",
+});
 
 const lexend = Lexend({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-lexend',
-})
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-lexend",
+});
 
 const firaMono = Fira_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  display: 'swap',
-  variable: '--font-fira-mono',
-})
+	subsets: ["latin"],
+	weight: ["400", "500"],
+	display: "swap",
+	variable: "--font-fira-mono",
+});
 
 export default function RootLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode
+	children: React.ReactNode;
 }) {
-  return (
-    <html
-      lang="en"
-      className={clsx(
-        'h-full scroll-smooth bg-white antialiased',
-        inter.variable,
-        lexend.variable,
-        firaMono.variable,
-      )}
-    >
-      <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-      </head>
-      <body className="flex h-full flex-col font-mono">{children}</body>
-    </html>
-  )
+	return (
+		<html
+			lang="en"
+			className={clsx(
+				"h-full scroll-smooth bg-white antialiased",
+				inter.variable,
+				lexend.variable,
+				firaMono.variable,
+			)}
+		>
+			<head>
+				<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+			</head>
+			<body className="flex h-full flex-col font-mono">{children}</body>
+		</html>
+	);
 }

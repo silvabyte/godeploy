@@ -12,7 +12,7 @@
 		"test:watch": "bun run --filter @godeploy/api test:watch",
 		"test:coverage": "bun run --filter @godeploy/api test:coverage",
 		"typecheck": "bun run --filter @godeploy/api typecheck",
-		"format": "bunx biome format --write .",
+		"fmt": "bunx biome format --write .",
 		"lint": "bunx biome lint .",
 		"lint:fix": "bunx biome lint --write .",
 		"check": "bunx biome check .",

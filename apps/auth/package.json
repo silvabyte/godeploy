@@ -1,0 +1,52 @@
+{
+	"name": "@godeploy/auth",
+	"version": "0.1.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"lint": "eslint .",
+		"format": "npx -y prettier . --write",
+		"preview": "vite preview",
+		"deploy": "bun run build && godeploy deploy",
+		"test": "vitest run",
+		"clean": "rm -rf dist && rm -rf deploy"
+	},
+	"dependencies": {
+		"@headlessui/react": "^2.2.0",
+		"@hyperdx/browser": "^0.21.2",
+		"@matsilva/xtranslate": "^0.1.5",
+		"@supabase/supabase-js": "^2.49.1",
+		"clsx": "^2.1.1",
+		"mobx": "^6.13.7",
+		"mobx-react": "^9.2.0",
+		"react": "^19.0.0",
+		"react-aria": "^3.38.0",
+		"react-dom": "^19.0.0",
+		"react-router-dom": "6.11.2",
+		"react-stately": "^3.36.0",
+		"tailwindcss": "^4.0.14"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^19.8.0",
+		"@commitlint/config-conventional": "^19.8.0",
+		"@eslint/js": "^9.21.0",
+		"@tailwindcss/vite": "^4.0.13",
+		"@testing-library/dom": "^10.4.0",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/react": "^16.2.0",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
+		"@vitejs/plugin-react": "^4.3.4",
+		"eslint": "^9.21.0",
+		"eslint-plugin-react-hooks": "^5.1.0",
+		"eslint-plugin-react-refresh": "^0.4.19",
+		"globals": "^15.15.0",
+		"jsdom": "^26.0.0",
+		"prettier": "3.5.2",
+		"typescript": "~5.7.2",
+		"typescript-eslint": "^8.24.1",
+		"vite": "^6.2.0",
+		"vitest": "^3.0.8"
+	}
+}

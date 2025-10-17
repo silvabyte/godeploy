@@ -1,0 +1,8 @@
+button.brand {
+	background: var(--Navy-Gradient);
+	transition: filter 0.3s ease; /* Smooth transition for the filter effect */
+}
+
+button.brand:hover {
+	filter: brightness(1.5); /* Increase brightness by 20% on hover */
+}
