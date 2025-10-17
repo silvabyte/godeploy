@@ -142,3 +142,5 @@ dist
 
 # Bun
 bun.lockb
+
+apps/cli/bin/
