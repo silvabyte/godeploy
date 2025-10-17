@@ -35,7 +35,7 @@ func TestConfigPath(t *testing.T) {
 	}
 }
 
-func TestAuthConfig(t *testing.T) {
+func TestConfigLifecycle(t *testing.T) {
 	// Create a temporary directory for testing
 	tempDir, err := os.MkdirTemp("", "godeploy-test")
 	if err != nil {
@@ -46,7 +46,7 @@ func TestAuthConfig(t *testing.T) {
 	}()
 
 	// Create a test config
-	testConfig := &AuthConfig{
+	testConfig := &Config{
 		AuthToken: "test-token",
 	}
 

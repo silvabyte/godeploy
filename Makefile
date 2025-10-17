@@ -75,6 +75,7 @@ lint-install:
 	@go install github.com/remyoudompheng/go-misc/deadcode@latest
 	@go install github.com/kisielk/errcheck@latest
 	@go install golang.org/x/tools/cmd/goimports@latest
+	@go install github.com/mgechev/revive@latest
 
 # Security audit
 audit:

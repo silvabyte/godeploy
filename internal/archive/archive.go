@@ -100,7 +100,7 @@ func CreateZipFromDirectory(sourceDir, outputPath string) (*ZipStats, error) {
 
 	// Get final compressed size and calculate stats
 	stats.Duration = time.Since(startTime)
-	
+
 	// Get the compressed size from the zip file
 	if zipFileInfo, err := os.Stat(outputPath); err == nil {
 		stats.CompressedSize = zipFileInfo.Size()

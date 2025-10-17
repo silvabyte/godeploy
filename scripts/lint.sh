@@ -86,6 +86,19 @@ else
     echo -e "${YELLOW}⚠ errcheck not installed. Install with: go install github.com/kisielk/errcheck@latest${NC}"
 fi
 
+# Revive linting
+echo -e "\n${YELLOW}Running revive...${NC}"
+if command -v revive &> /dev/null; then
+    if revive -set_exit_status -config revive.toml -formatter friendly ./...; then
+        echo -e "${GREEN}✓ Revive passed with no issues${NC}"
+    else
+        echo -e "${RED}✗ Revive reported issues${NC}"
+        FAILED=1
+    fi
+else
+    echo -e "${YELLOW}⚠ revive not installed. Install with: go install github.com/mgechev/revive@latest${NC}"
+fi
+
 # Summary
 echo -e "\n================================"
 if [ $FAILED -eq 0 ]; then

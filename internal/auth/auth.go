@@ -8,8 +8,8 @@ import (
 	"runtime"
 )
 
-// AuthConfig represents the authentication configuration
-type AuthConfig struct {
+// Config represents the authentication configuration stored on disk
+type Config struct {
 	AuthToken string `json:"auth_token"`
 	Email     string `json:"email"`
 }
@@ -54,7 +54,7 @@ func GetConfigFilePath() (string, error) {
 }
 
 // LoadAuthConfig loads the authentication configuration from the config file
-func LoadAuthConfig() (*AuthConfig, error) {
+func LoadAuthConfig() (*Config, error) {
 	configPath, err := GetConfigFilePath()
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func LoadAuthConfig() (*AuthConfig, error) {
 
 	// If the file doesn't exist, return a default config
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return &AuthConfig{}, nil
+		return &Config{}, nil
 	}
 
 	data, err := os.ReadFile(configPath)
@@ -70,7 +70,7 @@ func LoadAuthConfig() (*AuthConfig, error) {
 		return nil, fmt.Errorf("failed to read auth config file: %w", err)
 	}
 
-	var config AuthConfig
+	var config Config
 	if err := json.Unmarshal(data, &config); err != nil {
 		return nil, fmt.Errorf("failed to parse auth config file: %w", err)
 	}
@@ -79,7 +79,7 @@ func LoadAuthConfig() (*AuthConfig, error) {
 }
 
 // SaveAuthConfig saves the authentication configuration to the config file
-func SaveAuthConfig(config *AuthConfig) error {
+func SaveAuthConfig(config *Config) error {
 	configDir, err := GetConfigDir()
 	if err != nil {
 		return err
