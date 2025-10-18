@@ -11,7 +11,9 @@
 		"test": "bun run --filter @godeploy/api test",
 		"test:watch": "bun run --filter @godeploy/api test:watch",
 		"test:coverage": "bun run --filter @godeploy/api test:coverage",
-		"typecheck": "bun run --filter @godeploy/api typecheck",
+		"typecheck": "bun run --filter @godeploy/api typecheck && bun run --filter @godeploy/ui typecheck && bun run --filter @godeploy/auth typecheck && bun run --filter @godeploy/marketing typecheck",
+		"lint:workspaces": "bun run --filter @godeploy/api lint && bun run --filter @godeploy/ui lint && bun run --filter @godeploy/auth lint && bun run --filter @godeploy/marketing lint",
+		"fmt:workspaces": "bun run --filter @godeploy/api fmt && bun run --filter @godeploy/ui fmt && bun run --filter @godeploy/auth fmt && bun run --filter @godeploy/marketing fmt",
 		"fmt": "bunx biome format --write .",
 		"lint": "bunx biome lint .",
 		"lint:fix": "bunx biome lint --write .",
@@ -33,6 +35,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.2",
+		"happy-dom": "^20.0.5",
 		"knip": "^5.63.0"
 	}
 }

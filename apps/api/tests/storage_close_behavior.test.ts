@@ -16,7 +16,7 @@ describe("StorageService.uploadDirectory dir.close() robustness", () => {
 		const service = new StorageService();
 
 		// Stub uploadFile to avoid network and always succeed
-		type StorageServiceInternal = StorageService & {
+		type StorageServiceTesting = {
 			uploadFile: (
 				file: string,
 				key: string,
@@ -26,7 +26,7 @@ describe("StorageService.uploadDirectory dir.close() robustness", () => {
 				baseKey: string,
 			) => Promise<{ data: string | null; error: string | null }>;
 		};
-		const internalService = service as unknown as StorageServiceInternal;
+		const internalService = service as unknown as StorageServiceTesting;
 		const origUpload = internalService.uploadFile;
 		internalService.uploadFile = async () => ({ data: "", error: null });
 

@@ -1,85 +1,149 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 import Fastify from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { strToU8, zipSync } from "fflate";
 import type { Deploy } from "../src/app/components/deploys/deploys.types";
 import type { Project } from "../src/app/components/projects/projects.types";
 import sensiblePlugin from "../src/app/plugins/sensible";
 import deploysRoutes from "../src/app/routes/deploys";
+import type { Result } from "../src/app/types/result.types";
+import { ActionTelemetry } from "../src/logging/ActionTelemetry.js";
+import type { Logger } from "../src/app/log.js";
+import type { DatabaseService } from "../src/app/components/db/DatabaseService";
 
 type DbMock = {
 	projects: {
 		getProjectByName: (
 			name: string,
 			tenantId: string,
-		) => Promise<{ data: Project | null; error: string | null }>;
+		) => Promise<Result<Project>>;
 		getProjectBySubdomain: (
 			subdomain: string,
-		) => Promise<{ data: Project | null; error: string | null }>;
+		) => Promise<Result<Project>>;
 		createProject: (
 			project: Omit<Project, "id" | "created_at" | "updated_at">,
-		) => Promise<{ data: Project | null; error: string | null }>;
+		) => Promise<Result<Project>>;
 	};
 	deploys: {
 		recordDeploy: (
 			data: Omit<Deploy, "id" | "created_at" | "updated_at">,
-		) => Promise<{ data: Deploy | null; error: string | null }>;
+		) => Promise<Result<Deploy>>;
 		updateDeployStatus: (
 			id: string,
 			status: "pending" | "success" | "failed",
-		) => Promise<{ data: true | null; error: string | null }>;
-		getDeployById?: (
-			id: string,
-		) => Promise<{ data: Deploy | null; error: string | null }>;
+		) => Promise<Result<true>>;
+		getDeployById?: (id: string) => Promise<Result<Deploy>>;
 	};
 };
 
-function decorateMeasure(app: ReturnType<typeof Fastify>) {
-	const noop = () => {};
-	const measure = {
-		start: noop,
-		add: noop,
-		failure: noop,
-		success: noop,
+type TestRequest = FastifyRequest & {
+	user?: { user_id: string; tenant_id: string };
+	db: DatabaseService;
+	_measure?: ActionTelemetry;
+	measure: ActionTelemetry;
+	resetMeasure: () => void;
+};
+
+const nowIso = () => new Date().toISOString();
+
+function makeProject(overrides: Partial<Project> = {}): Project {
+	const timestamp = nowIso();
+	return {
+		id: "project-1",
+		tenant_id: "tenant-abc",
+		owner_id: "owner-123",
+		name: "default-project",
+		subdomain: "default-project",
+		description: null,
+		domain: null,
+		created_at: timestamp,
+		updated_at: timestamp,
+		...overrides,
 	};
+}
+
+function makeDeploy(overrides: Partial<Deploy> = {}): Deploy {
+	const timestamp = nowIso();
+	return {
+		id: "deploy-1",
+		tenant_id: "tenant-abc",
+		project_id: "project-1",
+		user_id: "user-123",
+		url: "https://default-project.godeploy.app",
+		status: "pending",
+		created_at: timestamp,
+		updated_at: timestamp,
+		...overrides,
+	};
+}
+
+function decorateMeasure(app: FastifyInstance) {
+	const dummyLogger = {
+		level: "info",
+		setLevel: () => {},
+		info: () => {},
+		error: () => {},
+		warn: () => {},
+		debug: () => {},
+		trace: () => {},
+		fatal: () => {},
+		silent: () => {},
+		child: () => dummyLogger,
+	} as unknown as Logger;
+
+	app.decorateRequest("_measure");
 	app.decorateRequest("measure", {
-		getter() {
-			return measure;
+		getter(this: TestRequest) {
+			this._measure ??= new ActionTelemetry(dummyLogger);
+			return this._measure;
 		},
 	});
-	app.decorateRequest("resetMeasure", () => {});
+	app.decorateRequest("resetMeasure", function (this: TestRequest) {
+		this._measure = new ActionTelemetry(dummyLogger);
+	});
 }
 
 function authPlugin(requireAuth: boolean) {
-	return async (app: ReturnType<typeof Fastify>) => {
-		app.addHook("preHandler", async (request, reply) => {
-			if (!requireAuth) {
-				// Populate a default user for tests that bypass auth
-				request.user = { user_id: "user-123", tenant_id: "tenant-abc" };
-				return;
-			}
-			const header = request.headers.authorization;
-			if (!header || !header.startsWith("Bearer ")) {
-				await reply.code(401).send({ error: "Unauthorized: Missing token" });
-				return;
-			}
-			request.user = {
-				user_id: "user-123",
-				tenant_id: "tenant-abc",
-			};
-		});
+	return async (app: FastifyInstance) => {
+		app.addHook(
+			"preHandler",
+			async (request: FastifyRequest, reply: FastifyReply) => {
+				const req = request as TestRequest;
+				if (!requireAuth) {
+					// Populate a default user for tests that bypass auth
+					req.user = { user_id: "user-123", tenant_id: "tenant-abc" };
+					return;
+				}
+				const header = req.headers.authorization;
+				if (!header || !header.startsWith("Bearer ")) {
+					await reply
+						.code(401)
+						.send({ error: "Unauthorized: Missing token" });
+					return;
+				}
+				req.user = {
+					user_id: "user-123",
+					tenant_id: "tenant-abc",
+				};
+			},
+		);
 	};
 }
 
 function dbPlugin(db: DbMock) {
-	return async (app: ReturnType<typeof Fastify>) => {
-		app.decorate("db", db);
+	return async (app: FastifyInstance) => {
+		const dbAsService = db as unknown as DatabaseService;
+		app.decorate("db", dbAsService);
 		app.decorateRequest("db", {
 			getter() {
-				return db;
+				return dbAsService;
+			},
+			setter(value: DatabaseService) {
+				return value;
 			},
 		});
-		app.addHook("onRequest", async (request) => {
-			request.db = db;
+		app.addHook("onRequest", async (request: FastifyRequest) => {
+			(request as TestRequest).db = dbAsService;
 		});
 	};
 }
@@ -93,25 +157,29 @@ function createMultipart(
 	}>,
 ) {
 	const boundary = `----godeploy-test-${Math.random().toString(16).slice(2)}`;
-	const buffers: Buffer[] = [];
+	const buffers: Uint8Array[] = [];
 	for (const p of parts) {
 		const head = `--${boundary}\r\nContent-Disposition: form-data; name="${p.name}"; filename="${p.filename}"\r\nContent-Type: ${p.contentType}\r\n\r\n`;
-		buffers.push(Buffer.from(head, "utf8"));
-		const bodyBuf =
-			typeof p.content === "string"
-				? Buffer.from(p.content, "utf8")
-				: Buffer.from(p.content);
+		buffers.push(Uint8Array.from(Buffer.from(head, "utf8")));
+		let bodyBuf: Uint8Array;
+		if (typeof p.content === "string") {
+			bodyBuf = Uint8Array.from(Buffer.from(p.content, "utf8"));
+		} else if (Buffer.isBuffer(p.content)) {
+			bodyBuf = Uint8Array.from(p.content);
+		} else {
+			bodyBuf = Uint8Array.from(p.content);
+		}
 		buffers.push(bodyBuf);
-		buffers.push(Buffer.from("\r\n"));
+		buffers.push(Uint8Array.from(Buffer.from("\r\n")));
 	}
-	buffers.push(Buffer.from(`--${boundary}--\r\n`));
+	buffers.push(Uint8Array.from(Buffer.from(`--${boundary}--\r\n`)));
 	const body = Buffer.concat(buffers);
 	const contentType = `multipart/form-data; boundary=${boundary}`;
 	return { body, contentType };
 }
 
 async function buildAppWith(db: DbMock, options?: { requireAuth?: boolean }) {
-	const app = Fastify({ logger: false });
+	const app: FastifyInstance = Fastify({ logger: false });
 	decorateMeasure(app);
 	await app.register(sensiblePlugin);
 	await app.register(authPlugin(options?.requireAuth ?? true));
@@ -142,12 +210,18 @@ describe("Deploy API", () => {
 					return { data: null, error: null };
 				},
 				async createProject(project) {
-					return { data: { id: "p1", ...project }, error: null };
+					return {
+						data: makeProject({ id: "p1", ...project }),
+						error: null,
+					};
 				},
 			},
 			deploys: {
 				async recordDeploy(data) {
-					return { data: { id: "d1", ...data }, error: null };
+					return {
+						data: makeDeploy({ id: "d1", ...data }),
+						error: null,
+					};
 				},
 				async updateDeployStatus() {
 					return { data: true, error: null };
@@ -185,17 +259,23 @@ describe("Deploy API", () => {
 					async getProjectByName() {
 						return { data: null, error: null };
 					},
-					async getProjectBySubdomain() {
-						return { data: null, error: null };
-					},
-					async createProject(project) {
-						return { data: { id: "p1", ...project }, error: null };
-					},
+				async getProjectBySubdomain() {
+					return { data: null, error: null };
 				},
-				deploys: {
-					async recordDeploy(data) {
-						return { data: { id: "d1", ...data }, error: null };
-					},
+				async createProject(project) {
+					return {
+						data: makeProject({ id: "p1", ...project }),
+						error: null,
+					};
+				},
+			},
+			deploys: {
+				async recordDeploy(data) {
+					return {
+						data: makeDeploy({ id: "d1", ...data }),
+						error: null,
+					};
+				},
 					async updateDeployStatus() {
 						return { data: true, error: null };
 					},
@@ -217,17 +297,23 @@ describe("Deploy API", () => {
 					async getProjectByName() {
 						return { data: null, error: null };
 					},
-					async getProjectBySubdomain() {
-						return { data: null, error: null };
-					},
-					async createProject(project) {
-						return { data: { id: "p1", ...project }, error: null };
-					},
+				async getProjectBySubdomain() {
+					return { data: null, error: null };
 				},
-				deploys: {
-					async recordDeploy(data) {
-						return { data: { id: "d1", ...data }, error: null };
-					},
+				async createProject(project) {
+					return {
+						data: makeProject({ id: "p1", ...project }),
+						error: null,
+					};
+				},
+			},
+			deploys: {
+				async recordDeploy(data) {
+					return {
+						data: makeDeploy({ id: "d1", ...data }),
+						error: null,
+					};
+				},
 					async updateDeployStatus() {
 						return { data: true, error: null };
 					},
@@ -255,12 +341,18 @@ describe("Deploy API", () => {
 						return { data: null, error: null };
 					},
 					async createProject(project) {
-						return { data: { id: "p1", ...project }, error: null };
+						return {
+							data: makeProject({ id: "p1", ...project }),
+							error: null,
+						};
 					},
 				},
 				deploys: {
 					async recordDeploy(data) {
-						return { data: { id: "d1", ...data }, error: null };
+						return {
+							data: makeDeploy({ id: "d1", ...data }),
+							error: null,
+						};
 					},
 					async updateDeployStatus() {
 						return { data: true, error: null };
@@ -299,7 +391,10 @@ describe("Deploy API", () => {
 						return { data: null, error: null };
 					},
 					async getProjectBySubdomain() {
-						return { data: { id: "p-existing" }, error: null };
+						return {
+							data: makeProject({ id: "p-existing" }),
+							error: null,
+						};
 					},
 					async createProject() {
 						return { data: null, error: null };
@@ -349,7 +444,10 @@ describe("Deploy API", () => {
 						return { data: null, error: null };
 					},
 					async createProject(project) {
-						return { data: { id: "p1", ...project }, error: null };
+						return {
+							data: makeProject({ id: "p1", ...project }),
+							error: null,
+						};
 					},
 				},
 				deploys: {
@@ -401,12 +499,18 @@ describe("Deploy API", () => {
 						return { data: null, error: null };
 					},
 					async createProject(project) {
-						return { data: { id: "p1", ...project }, error: null };
+						return {
+							data: makeProject({ id: "p1", ...project }),
+							error: null,
+						};
 					},
 				},
 				deploys: {
 					async recordDeploy(data) {
-						return { data: { id: "d1", ...data }, error: null };
+						return {
+							data: makeDeploy({ id: "d1", ...data }),
+							error: null,
+						};
 					},
 					async updateDeployStatus(id, status) {
 						calls.updateStatus.push({ id, status });
@@ -458,12 +562,12 @@ describe("Deploy API", () => {
 				projects: {
 					async getProjectByName() {
 						return {
-							data: {
+							data: makeProject({
 								id: "p1",
 								name: "my-app",
 								subdomain: "my-app",
 								tenant_id: "tenant-abc",
-							},
+							}),
 							error: null,
 						};
 					},
@@ -476,7 +580,10 @@ describe("Deploy API", () => {
 				},
 				deploys: {
 					async recordDeploy(data) {
-						return { data: { id: "d1", ...data }, error: null };
+						return {
+							data: makeDeploy({ id: "d1", ...data }),
+							error: null,
+						};
 					},
 					async updateDeployStatus() {
 						return { data: true, error: null };

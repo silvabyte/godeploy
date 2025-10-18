@@ -1,12 +1,18 @@
 {
 	"$schema": "https://unpkg.com/knip@5/schema.json",
-	"entry": ["apps/api/tests/**/*.test.ts", "apps/api/tests/**/*.spec.ts"],
+	"entry": [
+		"apps/api/tests/**/*.{test,spec}.ts",
+		"apps/dashboard/src/**/*.{test,spec}.{ts,tsx}",
+		"apps/auth/src/**/*.{test,spec}.{ts,tsx}",
+		"apps/marketing/src/**/*.{test,spec}.{ts,tsx}"
+	],
 	"project": [
 		"apps/api/src/**/*.ts",
 		"apps/api/tests/**/*.ts",
 		"!apps/api/src/**/*.d.ts",
-		"apps/dashboard/src/**/*.ts",
-		"apps/marketing/src/**/*.ts"
+		"apps/dashboard/src/**/*.{ts,tsx}",
+		"apps/auth/src/**/*.{ts,tsx}",
+		"apps/marketing/src/**/*.{ts,tsx}"
 	],
 	"ignore": ["supabase/migrations/**", "docs/**"],
 	"ignoreDependencies": ["husky", "@biomejs/biome"],

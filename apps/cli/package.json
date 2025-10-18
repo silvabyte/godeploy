@@ -1,14 +1,14 @@
 {
-  "name": "godeploy",
-  "version": "1.0.5",
-  "type": "module",
-  "scripts": {
-    "test": "echo \"add your test command here\""
-  },
-  "private": true,
-  "devDependencies": {
-    "@commitlint/cli": "^19.8.0",
-    "@commitlint/config-conventional": "^19.8.0",
-    "husky": "^9.1.7"
-  }
+	"name": "godeploy",
+	"version": "1.0.5",
+	"type": "module",
+	"scripts": {
+		"test": "echo \"add your test command here\""
+	},
+	"private": true,
+	"devDependencies": {
+		"@commitlint/cli": "^19.8.0",
+		"@commitlint/config-conventional": "^19.8.0",
+		"husky": "^9.1.7"
+	}
 }

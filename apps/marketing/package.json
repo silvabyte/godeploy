@@ -6,8 +6,15 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint",
-		"deploy": "bun run build && godeploy deploy"
+		"deploy": "bun run build && godeploy deploy",
+		"typecheck": "tsc --noEmit --project tsconfig.json",
+		"fmt": "bunx biome format --write .",
+		"format": "bunx biome format --write .",
+		"lint": "bunx biome lint .",
+		"lint:fix": "bunx biome lint --write .",
+		"lint:next": "next lint",
+		"check": "bunx biome check .",
+		"check:fix": "bunx biome check --write ."
 	},
 	"browserslist": "defaults, not ie <= 11",
 	"dependencies": {
@@ -30,8 +37,7 @@
 	"devDependencies": {
 		"eslint": "^8.56.0",
 		"eslint-config-next": "^14.0.4",
-		"prettier": "^3.3.2",
-		"prettier-plugin-tailwindcss": "^0.6.10",
-		"sharp": "0.33.1"
+		"sharp": "0.33.1",
+		"@biomejs/biome": "^2.2.2"
 	}
 }

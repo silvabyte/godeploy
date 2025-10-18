@@ -90,10 +90,6 @@ mktmpdir() {
   echo "${TMPDIR}"
 }
 
-# Configurable GitHub org/repo for releases
-GITHUB_ORG="silvabyte"
-GITHUB_REPO="godeploy"
-
 # Main installation function
 install_godeploy() {
   # Get OS and architecture
@@ -113,28 +109,12 @@ install_godeploy() {
     log_info "Using specified version: $VERSION"
     LATEST_VERSION="$VERSION"
   else
-    # Get the latest version from GitHub API
+    # Get the latest version from install.godeploy.com
     log_info "Fetching latest version information..."
 
-    # Debug the GitHub API response
-    GITHUB_API_RESPONSE=$(curl -s https://api.github.com/repos/${GITHUB_ORG}/${GITHUB_REPO}/releases/latest)
-    if [ -z "$GITHUB_API_RESPONSE" ]; then
-      log_crit "Empty response from GitHub API"
-      exit 1
-    fi
-
-    # Try different methods to extract the version
-    LATEST_VERSION=$(echo "$GITHUB_API_RESPONSE" | grep -o '"tag_name": *"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"')
-
+    LATEST_VERSION=$(curl -s https://install.godeploy.com/releases/latest.txt)
     if [ -z "$LATEST_VERSION" ]; then
-      # Alternative method
-      LATEST_VERSION=$(echo "$GITHUB_API_RESPONSE" | grep -o '"tag_name":"[^"]*"' | cut -d':' -f2 | tr -d '"')
-    fi
-
-    if [ -z "$LATEST_VERSION" ]; then
-      log_crit "Failed to determine latest version from GitHub API"
-      log_info "GitHub API response excerpt:"
-      echo "$GITHUB_API_RESPONSE" | head -20
+      log_crit "Failed to fetch latest version from install.godeploy.com"
       log_info "Falling back to hardcoded version v0.1.0"
       LATEST_VERSION="v0.1.0"
     fi
@@ -148,7 +128,7 @@ install_godeploy() {
   log_info "Using extraction directory: $EXTRACT_DIR"
 
   # Construct the correct download URL for the asset
-  DOWNLOAD_URL="https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+  DOWNLOAD_URL="https://install.godeploy.com/releases/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
   if [ "$OS" == "windows" ]; then
     DOWNLOAD_URL="${DOWNLOAD_URL}.zip"
     ARCHIVE_TYPE="zip"
@@ -203,7 +183,7 @@ install_godeploy() {
 
     # Try direct binary download as fallback
     log_info "Attempting direct binary download as fallback..."
-    DIRECT_URL="https://github.com/${GITHUB_ORG}/${GITHUB_REPO}/releases/download/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+    DIRECT_URL="https://install.godeploy.com/releases/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
     if [ "$OS" == "windows" ]; then
       DIRECT_URL="${DIRECT_URL}.exe"
     fi
@@ -233,7 +213,7 @@ install_godeploy() {
     }
   else
     log_info "Permissions required for installation to $INSTALL_DIR — alternatively specify a new directory with:"
-    log_info "  $ curl -sSL https://install.godeploy.app/now.sh | PREFIX=\$HOME/.local/bin bash"
+    log_info "  $ curl -sSL https://install.godeploy.com/now.sh | PREFIX=\$HOME/.local/bin bash"
     sudo cp "$GODEPLOY_BIN" "$INSTALL_DIR/godeploy" && sudo chmod +x "$INSTALL_DIR/godeploy" || {
       log_crit "Failed to install binary"
       exit 1

@@ -10,6 +10,8 @@ lerna-debug.log*
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
+.cursor/screenshots
+
 # Runtime data
 pids
 *.pid
@@ -144,3 +146,6 @@ dist
 bun.lockb
 
 apps/cli/bin/
+
+# CLI release binaries (version directories contain .tar.gz and .zip files)
+apps/cli/install/releases/v*/

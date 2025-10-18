@@ -11,23 +11,29 @@ export function CallToAction() {
 						id="pricing-heading"
 						className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl"
 					>
-						Simple Pricing
+						Pricing That Makes Sense
 					</h2>
-					<p className="mt-6 text-lg leading-8 text-slate-300">
-						Start free. Upgrade when you’re ready.
+					<p className="mt-6 text-xl leading-8 text-slate-300">
+						Start free, scale when you need to. No surprise bills, no bandwidth
+						charges, ever.
 					</p>
 				</div>
 
 				<div className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-8 lg:grid-cols-2">
 					{/* Free */}
-					<div className="rounded-2xl bg-white p-8 shadow-lg">
-						<h3 className="text-xl font-bold text-slate-900">Free</h3>
+					<div className="rounded-2xl bg-white p-8 shadow-lg hover:shadow-xl transition-shadow">
+						<h3 className="text-2xl font-bold text-slate-900">Free</h3>
 						<p className="mt-2 text-base text-slate-600">
-							For personal projects and trials.
+							Perfect for side projects and trying things out.
 						</p>
-						<p className="mt-6 text-5xl font-bold tracking-tight text-slate-900">
-							$0
-						</p>
+						<div className="mt-6">
+							<span className="text-5xl font-bold tracking-tight text-slate-900">
+								$0
+							</span>
+							<span className="ml-2 text-lg font-normal text-slate-600">
+								forever
+							</span>
+						</div>
 
 						<ul className="mt-8 space-y-4 text-sm text-slate-700">
 							<li className="flex items-center">
@@ -65,27 +71,31 @@ export function CallToAction() {
 								color="green"
 								className="w-full"
 							>
-								Get Started
+								Get Started Free →
 							</Button>
 						</div>
 					</div>
 
 					{/* Pro */}
-					<div className="rounded-2xl bg-white p-8 ring-2 shadow-lg ring-green-500">
-						<div className="flex items-center justify-between">
-							<h3 className="text-xl font-bold text-slate-900">Pro</h3>
-							<span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
-								Popular
+					<div className="rounded-2xl bg-white p-8 ring-2 shadow-lg ring-green-500 hover:shadow-2xl transition-shadow relative">
+						<div className="absolute -top-4 left-1/2 -translate-x-1/2">
+							<span className="rounded-full bg-green-500 px-4 py-1.5 text-xs font-bold text-white uppercase tracking-wide shadow-lg">
+								Most Popular
 							</span>
 						</div>
+						<h3 className="text-2xl font-bold text-slate-900 mt-2">Pro</h3>
 						<p className="mt-2 text-base text-slate-600">
-							For teams shipping frontends at speed.
+							For professionals and teams shipping production apps.
 						</p>
-						<p className="mt-6 text-5xl font-bold tracking-tight text-slate-900">
-							$49
+						<div className="mt-6">
+							<span className="text-5xl font-bold tracking-tight text-slate-900">
+								$49
+							</span>
 							<span className="text-lg font-normal text-slate-600">/year</span>
+						</div>
+						<p className="mt-2 text-sm text-green-600 font-medium">
+							That's just $4.08/month — less than a coffee ☕
 						</p>
-						<p className="mt-1 text-sm text-slate-600">or $5/month</p>
 
 						<ul className="mt-8 space-y-4 text-sm text-slate-700">
 							<li className="flex items-center">
@@ -134,11 +144,11 @@ export function CallToAction() {
 								color="green"
 								className="w-full"
 							>
-								Try Pro
+								Start with Pro →
 							</Button>
-							<p className="mt-2 text-center text-xs text-slate-500">
-								No bandwidth fees • Storage includes deploys + previews • Manage
-								retention
+							<p className="mt-3 text-center text-xs text-slate-500">
+								💳 Cancel anytime • 🚫 No bandwidth fees • 📦 Includes storage
+								for deploys + previews
 							</p>
 						</div>
 					</div>

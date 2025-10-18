@@ -18,7 +18,7 @@ describe("Zip.extractZip", () => {
 		};
 		const zipped = zipSync(files);
 
-		await writeFile(zipPath, Buffer.from(zipped));
+		await writeFile(zipPath, zipped);
 
 		// Ensure out dir exists (unzipper will create it if needed, but be explicit)
 		await Bun.$`mkdir -p ${outDir}`;

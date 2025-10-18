@@ -28,9 +28,12 @@ describe("CORS configuration", () => {
 		expect(res.headers["access-control-allow-origin"]).toBe(
 			"https://foo.godeploy.app",
 		);
-		expect(
-			(res.headers["access-control-allow-headers"] || "").toLowerCase(),
-		).toContain("traceparent");
+		const allowHeaders = res.headers["access-control-allow-headers"];
+		const normalizedHeaders = Array.isArray(allowHeaders)
+			? allowHeaders.join(",")
+			: allowHeaders;
+		const headerValue = normalizedHeaders === undefined ? "" : String(normalizedHeaders);
+		expect(headerValue.toLowerCase()).toContain("traceparent");
 	});
 
 	it("rejects non-godeploy.app origins in production", async () => {

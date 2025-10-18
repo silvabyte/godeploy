@@ -13,32 +13,38 @@ import {
 const features = [
 	{
 		name: "Zero‑Config Deploys",
-		description: "Push your build, go live — no servers to manage.",
+		description:
+			"Run one command and go live. No YAML files, no configuration hell, no Docker expertise required.",
 		icon: CloudArrowUpIcon,
 	},
 	{
-		name: "Global CDN + HTTPS",
-		description: "Instant certificates and edge caching worldwide.",
+		name: "Lightning Fast Global CDN",
+		description:
+			"Sub-100ms response times worldwide. Your users get instant loads, you get happy customers.",
 		icon: GlobeAltIcon,
 	},
 	{
-		name: "Custom Domains",
-		description: "Bring your domain; we provision SSL automatically.",
+		name: "Custom Domains Made Easy",
+		description:
+			"Point your domain, we handle the rest. Automatic SSL provisioning and renewal included.",
 		icon: LinkIcon,
 	},
 	{
-		name: "Cache Busting",
-		description: "Asset hashing and smart cache control out of the box.",
+		name: "Smart Caching Built-In",
+		description:
+			"Optimized cache headers for hashed assets. Maximum performance, zero configuration.",
 		icon: ShieldCheckIcon,
 	},
 	{
-		name: "Rollbacks & Previews",
-		description: "Ship confidently with instant rollbacks and previews.",
+		name: "Deploy with Confidence",
+		description:
+			"Instant rollbacks to any previous version. Preview deployments before going live.",
 		icon: ArrowPathIcon,
 	},
 	{
-		name: "Deployment Insights",
-		description: "Track deploys and performance at a glance.",
+		name: "Know What's Happening",
+		description:
+			"Real-time deployment status, success rates, and performance metrics at your fingertips.",
 		icon: ChartBarIcon,
 	},
 ];
@@ -47,18 +53,19 @@ export function SecondaryFeatures() {
 	return (
 		<Container>
 			<div className="mx-auto max-w-4xl text-center">
-				<h2 className="text-base leading-7 font-semibold text-green-500">
-					FEATURES
+				<h2 className="text-base leading-7 font-semibold text-green-600 uppercase tracking-wider">
+					Features that actually matter
 				</h2>
 				<p
 					id="features-heading"
 					className="mt-2 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
 				>
-					Built for Frontend Teams
+					Built for Developers Who
+					<span className="block text-green-600">Ship Fast</span>
 				</p>
-				<p className="mt-6 text-lg leading-8 text-slate-700">
-					GoDeploy delivers fast, reliable static hosting for SPAs — with zero
-					configuration and sensible defaults.
+				<p className="mt-6 text-xl leading-8 text-slate-700">
+					Everything you need to deploy SPAs globally. Nothing you don't. Fast,
+					reliable hosting with sensible defaults and zero configuration.
 				</p>
 			</div>
 

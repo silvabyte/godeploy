@@ -44,7 +44,11 @@ Built with boring, reliable tech that just works:
 ## Monorepo Layout
 
 - `apps/api` - Fastify service powering the GoDeploy API
-- `libs/` - Shared packages live here (add new libraries under `libs/*`)
+- `apps/auth` - Vite SPA that powers the GoDeploy auth experience
+- `apps/dashboard` - Vite dashboard used after sign-in
+- `apps/marketing` - Next.js marketing site
+- `apps/cli` - Go-based CLI distributed as `godeploy`
+- `libs/*` - Shared packages live here
 
 ## Core Endpoints
 
@@ -80,11 +84,15 @@ Sends magic link → User clicks → CLI gets token → Done.
 ## Local Development
 
 ```bash
-bun dev         # Start with hot reload
-bun test        # Run tests
-bun lint        # Check code quality
-bun typecheck   # Verify types
-bun check       # Lint + format check
+bun dev               # Start API with hot reload (see package.json for app-specific dev scripts)
+bun fmt               # Format the whole workspace with Biome
+bun lint              # Lint everything via Biome
+bun check             # Lint + format check
+bun typecheck         # Run TypeScript checks across all TS workspaces
+
+# Workspace helpers (run per app when you need finer control)
+bun fmt:workspaces    # Call each package-level fmt script
+bun lint:workspaces   # Call each package-level lint script
 ```
 
 ## Database

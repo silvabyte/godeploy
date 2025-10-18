@@ -1,8 +1,8 @@
 # Bun configuration
 
 [test]
-# Preload test setup
-# preload = ["./apps/api/tests/setup.ts"]
+# Preload test setup to provide DOM environment via happy-dom
+preload = ["./libs/testing/setup.ts"]
 
 # Enable coverage reporting
 coverage = false # Set to true when needed

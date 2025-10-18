@@ -87,12 +87,15 @@ export function Testimonials() {
 		>
 			<Container>
 				<div className="mx-auto max-w-2xl md:text-center">
-					<h2 className="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">
-						⚙️ Built on Top of What Works
+					<h2 className="text-base leading-7 font-semibold text-green-600 uppercase tracking-wider">
+						Loved by developers
 					</h2>
-					<p className="mt-4 text-lg tracking-tight text-slate-700">
-						Hear from frontend developers who are using GoDeploy to deploy SPAs
-						without the framework lock-in or DevOps headaches.
+					<p className="mt-2 font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">
+						Deploy in Seconds, Not Hours
+					</p>
+					<p className="mt-6 text-xl tracking-tight text-slate-700">
+						Join developers who escaped the complexity of modern deployment and
+						went back to what actually works.
 					</p>
 				</div>
 				<ul

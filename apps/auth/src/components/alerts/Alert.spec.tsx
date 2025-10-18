@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { render } from "@testing-library/react";
 import { Alert } from "./Alert"; // Adjust the import path as necessary
 

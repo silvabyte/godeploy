@@ -1,6 +1,7 @@
 export const debug = {
 	log: (message: string, context?: unknown) => {
 		if (
+			typeof window !== "undefined" &&
 			window?.localStorage &&
 			window.localStorage.getItem("debug") === "true"
 		) {
@@ -10,6 +11,7 @@ export const debug = {
 	},
 	error: (error: Error | string, context?: unknown) => {
 		if (
+			typeof window !== "undefined" &&
 			window?.localStorage &&
 			window.localStorage.getItem("debug") === "true"
 		) {

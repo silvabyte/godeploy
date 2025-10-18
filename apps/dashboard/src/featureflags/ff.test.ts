@@ -1,19 +1,19 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { FeatureFlags, FLAGS } from "./ff";
 
 describe("FeatureFlags", () => {
-	let mockStorage: Storage & { getItem: ReturnType<typeof vi.fn> };
+	let mockStorage: Storage;
 	let flags: FeatureFlags;
 
 	beforeEach(() => {
 		mockStorage = {
-			getItem: vi.fn(),
-			setItem: vi.fn(),
-			removeItem: vi.fn(),
-			clear: vi.fn(),
+			getItem: mock(() => "0"), // Return "0" to avoid DEFAULT_ENABLED_FLAGS
+			setItem: mock(() => {}),
+			removeItem: mock(() => {}),
+			clear: mock(() => {}),
 			length: 0,
-			key: vi.fn(),
-		} as Storage & { getItem: ReturnType<typeof vi.fn> };
+			key: mock(() => null),
+		} as Storage;
 		// Reset singleton instance
 		(
 			FeatureFlags as unknown as { instance: FeatureFlags | undefined }
@@ -59,8 +59,16 @@ describe("FeatureFlags", () => {
 			FeatureFlags as unknown as { instance: FeatureFlags | undefined }
 		).instance = undefined;
 
-		mockStorage.getItem.mockReturnValue("3");
-		const flagsWithStorage = FeatureFlags.getInstance(mockStorage);
+		// Create new mock storage that returns "3"
+		const storageWith3 = {
+			getItem: mock(() => "3"),
+			setItem: mock(() => {}),
+			removeItem: mock(() => {}),
+			clear: mock(() => {}),
+			length: 0,
+			key: mock(() => null),
+		} as Storage;
+		const flagsWithStorage = FeatureFlags.getInstance(storageWith3);
 		expect(flagsWithStorage.getEnabledFlags()).toBe(3);
 	});
 
@@ -70,8 +78,16 @@ describe("FeatureFlags", () => {
 			FeatureFlags as unknown as { instance: FeatureFlags | undefined }
 		).instance = undefined;
 
-		mockStorage.getItem.mockReturnValue("3");
-		const flagsWithUrl = FeatureFlags.getInstance(mockStorage, -1);
+		// Create new mock storage that returns "3"
+		const storageWith3 = {
+			getItem: mock(() => "3"),
+			setItem: mock(() => {}),
+			removeItem: mock(() => {}),
+			clear: mock(() => {}),
+			length: 0,
+			key: mock(() => null),
+		} as Storage;
+		const flagsWithUrl = FeatureFlags.getInstance(storageWith3, -1);
 		expect(flagsWithUrl.getEnabledFlags()).toBe(2); // 3 & ~1 = 2
 	});
 

@@ -100,17 +100,18 @@ export function Faqs() {
 		<Container>
 			<div className="mx-auto max-w-4xl">
 				<div className="mx-auto max-w-2xl text-center">
-					<h2 className="text-base leading-7 font-semibold text-green-500">
-						FAQ
+					<h2 className="text-base leading-7 font-semibold text-green-600 uppercase tracking-wider">
+						Got questions?
 					</h2>
 					<p
 						id="faq-heading"
 						className="mt-2 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
 					>
-						Frequently asked questions
+						We've Got Answers
 					</p>
-					<p className="mt-6 text-lg leading-8 text-slate-700">
-						Everything you need to know about deploying SPAs with GoDeploy.
+					<p className="mt-6 text-xl leading-8 text-slate-700">
+						Common questions about deploying SPAs with GoDeploy. Still have
+						questions? Just ask.
 					</p>
 				</div>
 

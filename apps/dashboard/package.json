@@ -7,13 +7,17 @@
 		"dev": "vite",
 		"test": "vitest run",
 		"build": "tsc -b && vite build",
-		"deploy": "bun test && bun pnpm run build && godeploy deploy",
-		"lint": "biome check .",
-		"lint:fix": "biome check --write .",
-		"format": "biome format --write .",
-		"generate:types": "npx -y supabase  gen types typescript --project-id \"gadyljeftebtastrldaq\" --schema public > src/services/database.types.ts",
+		"deploy": "bun run test && bun run build && godeploy deploy",
+		"typecheck": "tsc --noEmit --project tsconfig.app.json",
+		"fmt": "bunx biome format --write .",
+		"format": "bunx biome format --write .",
+		"lint": "bunx biome lint .",
+		"lint:fix": "bunx biome lint --write .",
+		"check": "bunx biome check .",
+		"check:fix": "bunx biome check --write .",
+		"generate:types": "bunx supabase gen types typescript --project-id \"gadyljeftebtastrldaq\" --schema public > src/services/database.types.ts",
 		"preview": "vite preview",
-		"knip": "knip"
+		"knip": "bunx knip"
 	},
 	"dependencies": {
 		"@headlessui/react": "^2.2.0",

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "bun:test";
 import { render, renderHook } from "@testing-library/react";
 import { ServiceProvider, useAuthService, useServices } from "./ServiceContext";
 import { createMockAuthService } from "./auth/testUtils";

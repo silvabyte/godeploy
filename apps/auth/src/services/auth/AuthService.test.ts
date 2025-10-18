@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
+import { describe, it, expect, mock, beforeEach, Mock } from "bun:test";
 import { AuthService } from "./AuthService";
 import { SessionManager } from "./SessionManager";
 import { SupabaseClient, Session } from "@supabase/supabase-js";
@@ -23,17 +23,14 @@ describe("AuthService", () => {
 	let sessionManager: ReturnType<typeof SessionManager.getInstance>;
 
 	beforeEach(() => {
-		// Reset mocks
-		vi.clearAllMocks();
-
 		// Create mock Supabase client
 		mockClient = {
 			auth: {
-				setSession: vi.fn(),
-				signInWithOtp: vi.fn(),
-				getUser: vi.fn(),
-				signOut: vi.fn(),
-				refreshSession: vi.fn(),
+				setSession: mock(),
+				signInWithOtp: mock(),
+				getUser: mock(),
+				signOut: mock(),
+				refreshSession: mock(),
 			},
 		};
 

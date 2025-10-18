@@ -1,0 +1,11 @@
+{
+	"name": "@godeploy/testing",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./index.ts",
+		"./setup": "./setup.ts"
+	}
+}
+
