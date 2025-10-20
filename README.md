@@ -83,6 +83,36 @@ Sends magic link → User clicks → CLI gets token → Done.
 
 ## Local Development
 
+### Using Make (Recommended)
+
+We now have a comprehensive Makefile system for all development tasks:
+
+```bash
+make help             # See all available commands
+make api.dev          # Start API with hot reload
+make auth.dev         # Start auth app dev server
+make dashboard.dev    # Start dashboard dev server
+make marketing.dev    # Start marketing site
+
+# Run tests
+make test-all         # Test all apps
+make api.test         # Test API only
+make dashboard.test   # Test dashboard only
+
+# Code quality
+make lint-all         # Lint all apps
+make fmt-all          # Format all apps
+make typecheck-all    # Type check all TypeScript
+
+# Builds
+make build-all        # Build all apps
+make cli.build.all    # Build CLI for all platforms
+```
+
+See [MAKEFILE_README.md](./MAKEFILE_README.md) for complete documentation.
+
+### Using Bun (Traditional)
+
 ```bash
 bun dev               # Start API with hot reload (see package.json for app-specific dev scripts)
 bun fmt               # Format the whole workspace with Biome
@@ -100,9 +130,16 @@ bun lint:workspaces   # Call each package-level lint script
 Using Supabase? Migrations are in `supabase/migrations/`:
 
 ```bash
-bun db:new      # Create migration
-bun db:up       # Apply locally
-bun db:push     # Push to Supabase
+# Using Make
+make db.new      # Create migration
+make db.up       # Apply locally
+make db.push     # Push to Supabase
+make db.status   # Check migration status
+
+# Or using bun
+bun db:new       # Create migration
+bun db:up        # Apply locally
+bun db:push      # Push to Supabase
 ```
 
 ## Testing

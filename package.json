@@ -34,12 +34,14 @@
 		"docker:remove": "docker rm godeploy-api",
 		"docker:start": "bun run docker:build && bun run docker:run",
 		"docker:logs": "docker logs -f godeploy-api",
-		"knip": "bunx knip",
+		"knip": "knip",
 		"knip:fix": "bunx knip --fix"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.2",
+		"@types/node": "^24.9.0",
 		"happy-dom": "^20.0.5",
-		"knip": "^5.63.0"
+		"knip": "^5.66.2",
+		"typescript": "^5.9.3"
 	}
 }
