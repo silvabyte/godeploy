@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import type { Deployment } from "./deployment.types";
 import {
 	calculateDeploymentMetrics,
@@ -42,7 +42,7 @@ describe("calculateDeploymentMetrics", () => {
 	it.skip("should calculate metrics correctly for recent deployments", () => {
 		// TODO: Skipped due to memoization caching issues with fast-memoize in test environment
 		// The memoize function caches results and returns stale data across test runs
-		// This needs to be refactored to either: 
+		// This needs to be refactored to either:
 		// 1. Clear memoize cache between tests
 		// 2. Use a non-memoized version for testing
 		// 3. Mock the memoize function

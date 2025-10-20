@@ -1,13 +1,13 @@
-import { describe, expect, it, mock } from "bun:test";
+import { describe, expect, it, vi } from "vitest";
 import type { Project } from "../components/projects/projects.types.js";
 import { ProjectDomain } from "./url.js";
 
-mock.module("nanoid", () => ({
-	nanoid: mock(() => "-abc123---"),
+vi.mock("nanoid", () => ({
+	nanoid: vi.fn(() => "-abc123---"),
 }));
 
-mock.module("random-word", () => ({
-	default: mock(() => "--sunshine--"),
+vi.mock("random-word", () => ({
+	default: vi.fn(() => "--sunshine--"),
 }));
 
 describe("ProjectDomain", () => {

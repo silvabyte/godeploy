@@ -10,6 +10,12 @@ export default defineConfig({
 	},
 	//@ts-expect-error - this is fine
 	test: {
+		pool: "forks",
+		poolOptions: {
+			forks: {
+				singleFork: true,
+			},
+		},
 		globals: true,
 		environment: "jsdom",
 		include: [

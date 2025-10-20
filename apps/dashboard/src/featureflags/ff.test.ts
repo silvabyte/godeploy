@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, mock } from "bun:test";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FeatureFlags, FLAGS } from "./ff";
 
 describe("FeatureFlags", () => {
@@ -7,12 +7,12 @@ describe("FeatureFlags", () => {
 
 	beforeEach(() => {
 		mockStorage = {
-			getItem: mock(() => "0"), // Return "0" to avoid DEFAULT_ENABLED_FLAGS
-			setItem: mock(() => {}),
-			removeItem: mock(() => {}),
-			clear: mock(() => {}),
+			getItem: vi.fn(() => "0"), // Return "0" to avoid DEFAULT_ENABLED_FLAGS
+			setItem: vi.fn(() => {}),
+			removeItem: vi.fn(() => {}),
+			clear: vi.fn(() => {}),
 			length: 0,
-			key: mock(() => null),
+			key: vi.fn(() => null),
 		} as Storage;
 		// Reset singleton instance
 		(
@@ -61,12 +61,12 @@ describe("FeatureFlags", () => {
 
 		// Create new mock storage that returns "3"
 		const storageWith3 = {
-			getItem: mock(() => "3"),
-			setItem: mock(() => {}),
-			removeItem: mock(() => {}),
-			clear: mock(() => {}),
+			getItem: vi.fn(() => "3"),
+			setItem: vi.fn(() => {}),
+			removeItem: vi.fn(() => {}),
+			clear: vi.fn(() => {}),
 			length: 0,
-			key: mock(() => null),
+			key: vi.fn(() => null),
 		} as Storage;
 		const flagsWithStorage = FeatureFlags.getInstance(storageWith3);
 		expect(flagsWithStorage.getEnabledFlags()).toBe(3);
@@ -80,12 +80,12 @@ describe("FeatureFlags", () => {
 
 		// Create new mock storage that returns "3"
 		const storageWith3 = {
-			getItem: mock(() => "3"),
-			setItem: mock(() => {}),
-			removeItem: mock(() => {}),
-			clear: mock(() => {}),
+			getItem: vi.fn(() => "3"),
+			setItem: vi.fn(() => {}),
+			removeItem: vi.fn(() => {}),
+			clear: vi.fn(() => {}),
 			length: 0,
-			key: mock(() => null),
+			key: vi.fn(() => null),
 		} as Storage;
 		const flagsWithUrl = FeatureFlags.getInstance(storageWith3, -1);
 		expect(flagsWithUrl.getEnabledFlags()).toBe(2); // 3 & ~1 = 2

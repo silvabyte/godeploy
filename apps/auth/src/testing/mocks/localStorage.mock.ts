@@ -1,18 +1,18 @@
 // Mock localStorage
 
-import { mock } from "bun:test";
+import { vi } from "vitest";
 
 export const localStorageMock = (() => {
 	let store: Record<string, string> = {};
 	return {
-		getItem: mock((key: string) => store[key] || null),
-		setItem: mock((key: string, value: string) => {
+		getItem: vi.fn((key: string) => store[key] || null),
+		setItem: vi.fn((key: string, value: string) => {
 			store[key] = value;
 		}),
-		removeItem: mock((key: string) => {
+		removeItem: vi.fn((key: string) => {
 			delete store[key];
 		}),
-		clear: mock(() => {
+		clear: vi.fn(() => {
 			store = {};
 		}),
 	};

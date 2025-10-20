@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "bun:test";
+import { beforeEach, describe, expect, it } from "vitest";
 import Fastify from "fastify";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { strToU8, zipSync } from "fflate";
@@ -17,9 +17,7 @@ type DbMock = {
 			name: string,
 			tenantId: string,
 		) => Promise<Result<Project>>;
-		getProjectBySubdomain: (
-			subdomain: string,
-		) => Promise<Result<Project>>;
+		getProjectBySubdomain: (subdomain: string) => Promise<Result<Project>>;
 		createProject: (
 			project: Omit<Project, "id" | "created_at" | "updated_at">,
 		) => Promise<Result<Project>>;
@@ -116,9 +114,7 @@ function authPlugin(requireAuth: boolean) {
 				}
 				const header = req.headers.authorization;
 				if (!header || !header.startsWith("Bearer ")) {
-					await reply
-						.code(401)
-						.send({ error: "Unauthorized: Missing token" });
+					await reply.code(401).send({ error: "Unauthorized: Missing token" });
 					return;
 				}
 				req.user = {
@@ -259,23 +255,23 @@ describe("Deploy API", () => {
 					async getProjectByName() {
 						return { data: null, error: null };
 					},
-				async getProjectBySubdomain() {
-					return { data: null, error: null };
+					async getProjectBySubdomain() {
+						return { data: null, error: null };
+					},
+					async createProject(project) {
+						return {
+							data: makeProject({ id: "p1", ...project }),
+							error: null,
+						};
+					},
 				},
-				async createProject(project) {
-					return {
-						data: makeProject({ id: "p1", ...project }),
-						error: null,
-					};
-				},
-			},
-			deploys: {
-				async recordDeploy(data) {
-					return {
-						data: makeDeploy({ id: "d1", ...data }),
-						error: null,
-					};
-				},
+				deploys: {
+					async recordDeploy(data) {
+						return {
+							data: makeDeploy({ id: "d1", ...data }),
+							error: null,
+						};
+					},
 					async updateDeployStatus() {
 						return { data: true, error: null };
 					},
@@ -297,23 +293,23 @@ describe("Deploy API", () => {
 					async getProjectByName() {
 						return { data: null, error: null };
 					},
-				async getProjectBySubdomain() {
-					return { data: null, error: null };
+					async getProjectBySubdomain() {
+						return { data: null, error: null };
+					},
+					async createProject(project) {
+						return {
+							data: makeProject({ id: "p1", ...project }),
+							error: null,
+						};
+					},
 				},
-				async createProject(project) {
-					return {
-						data: makeProject({ id: "p1", ...project }),
-						error: null,
-					};
-				},
-			},
-			deploys: {
-				async recordDeploy(data) {
-					return {
-						data: makeDeploy({ id: "d1", ...data }),
-						error: null,
-					};
-				},
+				deploys: {
+					async recordDeploy(data) {
+						return {
+							data: makeDeploy({ id: "d1", ...data }),
+							error: null,
+						};
+					},
 					async updateDeployStatus() {
 						return { data: true, error: null };
 					},

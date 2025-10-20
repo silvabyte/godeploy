@@ -92,7 +92,7 @@ export function Hero() {
 					<div className="absolute -top-12 right-2 w-24 rotate-12 z-10">
 						<Potatosaur />
 					</div>
-					
+
 					{/* Modern browser mockup */}
 					<div className="relative">
 						{/* Browser chrome */}

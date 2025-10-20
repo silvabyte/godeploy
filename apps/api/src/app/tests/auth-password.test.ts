@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "bun:test";
+import { beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../build/build.js";
 
 describe("Password Authentication Routes", () => {
@@ -7,6 +7,8 @@ describe("Password Authentication Routes", () => {
 	const testPassword = "TestPassword123!";
 
 	beforeAll(async () => {
+		process.env.SUPABASE_URL = "https://test.supabase.co";
+		process.env.SUPABASE_API_KEY = "test-key";
 		server = await buildApp();
 	});
 

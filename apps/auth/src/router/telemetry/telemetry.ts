@@ -1,5 +1,5 @@
 import HyperDX from "@hyperdx/browser";
-import { Attributes } from "@opentelemetry/api";
+import type { Attributes } from "@opentelemetry/api";
 
 export function initTelemetry(opts?: {
 	consoleCapture?: boolean;

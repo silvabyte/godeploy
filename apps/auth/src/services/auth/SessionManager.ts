@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { Session } from "@supabase/supabase-js";
+import type { Session } from "@supabase/supabase-js";
 import { config } from "../../config";
 import {
 	JWT_STORAGE_KEY,

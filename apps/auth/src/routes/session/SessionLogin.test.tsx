@@ -77,12 +77,12 @@ describe("SessionLogin", () => {
 				</MemoryRouter>,
 			);
 
-			// Assert
-			expect(screen.getByText("session.signin.title")).toBeInTheDocument();
-			expect(
-				screen.getByLabelText("session.inputs.email.label"),
-			).toBeInTheDocument();
-			expect(screen.getByText("session.signin.loginLink")).toBeInTheDocument();
+		// Assert
+		expect(screen.getByText("session.signin.title")).toBeInTheDocument();
+		expect(
+			screen.getByLabelText("session.inputs.email.label"),
+		).toBeInTheDocument();
+		expect(screen.getByText("session.signin.loginButton")).toBeInTheDocument();
 		});
 
 		it("should capture and store redirect URL from query parameters", async () => {
@@ -111,16 +111,18 @@ describe("SessionLogin", () => {
 	});
 
 	describe("createLoginAction", () => {
-		it("should call signInWithEmail with email and redirect URL", async () => {
+		it("should call signInWithPassword with email, password", async () => {
 			// Arrange
 			const authService = createMockAuthService();
-			authService.signInWithEmail.mockResolvedValue({ data: {}, error: null });
+			authService.signInWithPassword.mockResolvedValue({ data: {}, error: null });
 
 			const email = "test@example.com";
+			const password = "testPassword123";
 			const redirectUrl = `${config.VITE_DASHBOARD_BASE_URL}/api/auth/callback`;
 
 			const formData = new FormData();
 			formData.append("email", email);
+			formData.append("password", password);
 			formData.append(REDIRECT_URL_PARAM, redirectUrl);
 
 			const request = {
@@ -135,22 +137,24 @@ describe("SessionLogin", () => {
 			await loginAction({ request } as ActionFunctionArgs);
 
 			// Assert
-			expect(authService.signInWithEmail).toHaveBeenCalledWith(
+			expect(authService.signInWithPassword).toHaveBeenCalledWith(
 				email,
-				redirectUrl,
+				password,
 			);
 		});
 
-		it("should return error when signInWithEmail fails", async () => {
+		it("should return error when signInWithPassword fails", async () => {
 			// Arrange
 			const authService = createMockAuthService();
 			const error = new Error("Authentication failed");
-			authService.signInWithEmail.mockResolvedValue({ data: null, error });
+			authService.signInWithPassword.mockResolvedValue({ data: null, error });
 
 			const email = "test@example.com";
+			const password = "testPassword123";
 
 			const formData = new FormData();
 			formData.append("email", email);
+			formData.append("password", password);
 
 			const request = {
 				formData: () => Promise.resolve(formData),

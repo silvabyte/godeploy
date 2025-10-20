@@ -8,6 +8,7 @@ export function createMockAuthService() {
 		getCurrentUser: vi.fn(),
 		getSession: vi.fn(),
 		signInWithEmail: vi.fn(),
+		signInWithPassword: vi.fn(),
 		verifyOTP: vi.fn(),
 		logout: vi.fn(),
 		// Add missing properties required by AuthService type

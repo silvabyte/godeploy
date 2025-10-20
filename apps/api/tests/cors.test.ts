@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { buildApp } from "../src/app/build/build";
 
 describe("CORS configuration", () => {
@@ -7,6 +7,8 @@ describe("CORS configuration", () => {
 	beforeEach(() => {
 		process.env.NODE_ENV = "production";
 		process.env.APP_URL = "https://api.godeploy.app";
+		process.env.SUPABASE_URL = "https://test.supabase.co";
+		process.env.SUPABASE_API_KEY = "test-key";
 	});
 
 	afterEach(() => {
@@ -32,7 +34,8 @@ describe("CORS configuration", () => {
 		const normalizedHeaders = Array.isArray(allowHeaders)
 			? allowHeaders.join(",")
 			: allowHeaders;
-		const headerValue = normalizedHeaders === undefined ? "" : String(normalizedHeaders);
+		const headerValue =
+			normalizedHeaders === undefined ? "" : String(normalizedHeaders);
 		expect(headerValue.toLowerCase()).toContain("traceparent");
 	});
 

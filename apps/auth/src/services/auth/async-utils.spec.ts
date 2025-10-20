@@ -1,10 +1,9 @@
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect } from "vitest";
 import { withTimeout } from "./async-utils";
 
 // Note: Bun test doesn't have full timer mocking support like vitest/jest
 // These tests are simplified to work without fake timers
 describe("withTimeout", () => {
-
 	it("should resolve with the promise result when promise resolves before timeout", async () => {
 		// Arrange
 		const expectedResult = { data: "test data" };

@@ -8,7 +8,11 @@
 	"scripts": {
 		"dev": "bun run --filter @godeploy/api dev",
 		"start": "bun run --filter @godeploy/api start",
-		"test": "bun run --filter @godeploy/api test",
+		"test": "bun run test:all",
+		"test:api": "bun run --filter @godeploy/api test",
+		"test:auth": "bun run --filter @godeploy/auth test",
+		"test:dashboard": "bun run --filter @godeploy/ui test",
+		"test:all": "bun run test:api && bun run test:auth && bun run test:dashboard",
 		"test:watch": "bun run --filter @godeploy/api test:watch",
 		"test:coverage": "bun run --filter @godeploy/api test:coverage",
 		"typecheck": "bun run --filter @godeploy/api typecheck && bun run --filter @godeploy/ui typecheck && bun run --filter @godeploy/auth typecheck && bun run --filter @godeploy/marketing typecheck",

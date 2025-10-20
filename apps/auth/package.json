@@ -15,6 +15,7 @@
 		"check:fix": "bunx biome check --write .",
 		"preview": "vite preview",
 		"test": "vitest run",
+		"test:watch": "vitest watch",
 		"clean": "rm -rf dist && rm -rf deploy",
 		"knip": "bunx knip"
 	},
@@ -34,9 +35,9 @@
 		"tailwindcss": "^4.0.14"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^2.2.2",
 		"@commitlint/cli": "^19.8.0",
 		"@commitlint/config-conventional": "^19.8.0",
-		"@biomejs/biome": "^2.2.2",
 		"@eslint/js": "^9.21.0",
 		"@tailwindcss/vite": "^4.0.13",
 		"@testing-library/dom": "^10.4.0",
@@ -53,6 +54,6 @@
 		"typescript": "~5.7.2",
 		"typescript-eslint": "^8.24.1",
 		"vite": "^6.2.0",
-		"vitest": "^3.0.8"
+		"vitest": "^4.0.0-beta.18"
 	}
 }

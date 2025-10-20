@@ -59,7 +59,9 @@ export function HowItWorks() {
 											<div className="h-2 w-2 rounded-full bg-slate-300"></div>
 											<div className="h-2 w-2 rounded-full bg-slate-300"></div>
 										</div>
-										<div className="text-xs text-slate-500">dashboard.godeploy.app/projects</div>
+										<div className="text-xs text-slate-500">
+											dashboard.godeploy.app/projects
+										</div>
 									</div>
 									<img
 										src="/images/projects.png"

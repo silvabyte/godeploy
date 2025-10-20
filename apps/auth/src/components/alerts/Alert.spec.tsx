@@ -1,8 +1,12 @@
-import { describe, expect, it } from "bun:test";
-import { render } from "@testing-library/react";
+import { describe, expect, it, afterEach } from "vitest";
+import { render, cleanup } from "@testing-library/react";
 import { Alert } from "./Alert"; // Adjust the import path as necessary
 
 describe("Alert Component", () => {
+	afterEach(() => {
+		cleanup();
+	});
+
 	it("renders a danger alert with the correct classes and content", () => {
 		const { getByText } = render(
 			<Alert type="danger" title="Danger Alert">

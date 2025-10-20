@@ -1,5 +1,5 @@
 import { redirect } from "react-router-dom";
-import { Session } from "@supabase/supabase-js";
+import type { Session } from "@supabase/supabase-js";
 import { config } from "../../config";
 import { REDIRECT_URL_STORAGE_KEY } from "../../constants/auth.constants";
 import { AuthService } from "../../services/auth/AuthService";

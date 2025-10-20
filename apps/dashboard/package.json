@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "vite",
 		"test": "vitest run",
+		"test:watch": "vitest watch",
 		"build": "tsc -b && vite build",
 		"deploy": "bun run test && bun run build && godeploy deploy",
 		"typecheck": "tsc --noEmit --project tsconfig.app.json",
@@ -50,7 +51,7 @@
 		"knip": "^5.63.0",
 		"typescript": "~5.7.2",
 		"vite": "^6.2.0",
-		"vitest": "^3.0.8"
+		"vitest": "^4.0.0-beta.18"
 	},
 	"packageManager": "pnpm@10.15.0"
 }

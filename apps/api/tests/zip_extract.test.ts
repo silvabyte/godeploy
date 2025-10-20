@@ -1,5 +1,5 @@
-import { describe, expect, it } from "bun:test";
-import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { describe, expect, it } from "vitest";
+import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { strToU8, zipSync } from "fflate";
@@ -21,7 +21,7 @@ describe("Zip.extractZip", () => {
 		await writeFile(zipPath, zipped);
 
 		// Ensure out dir exists (unzipper will create it if needed, but be explicit)
-		await Bun.$`mkdir -p ${outDir}`;
+		await mkdir(outDir, { recursive: true });
 
 		await extractZip(zipPath, outDir);
 
@@ -30,7 +30,7 @@ describe("Zip.extractZip", () => {
 		expect(html).toContain("hello");
 
 		const jsStat = await stat(join(outDir, "assets", "app.js"));
-		expect(jsStat.isFile()).toBeTrue();
+		expect(jsStat.isFile()).toBe(true);
 
 		// cleanup
 		await rm(tmp, { recursive: true, force: true });

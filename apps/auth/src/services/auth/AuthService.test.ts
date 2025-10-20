@@ -1,7 +1,8 @@
-import { describe, it, expect, mock, beforeEach, Mock } from "bun:test";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { Mock } from "vitest";
 import { AuthService } from "./AuthService";
 import { SessionManager } from "./SessionManager";
-import { SupabaseClient, Session } from "@supabase/supabase-js";
+import type { SupabaseClient, Session } from "@supabase/supabase-js";
 
 type MockAuthMethods = {
 	setSession: Mock;
@@ -26,11 +27,11 @@ describe("AuthService", () => {
 		// Create mock Supabase client
 		mockClient = {
 			auth: {
-				setSession: mock(),
-				signInWithOtp: mock(),
-				getUser: mock(),
-				signOut: mock(),
-				refreshSession: mock(),
+				setSession: vi.fn(),
+				signInWithOtp: vi.fn(),
+				getUser: vi.fn(),
+				signOut: vi.fn(),
+				refreshSession: vi.fn(),
 			},
 		};
 

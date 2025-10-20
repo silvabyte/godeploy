@@ -1,11 +1,11 @@
-import {
+import type {
 	UserResponse,
 	Session,
 	AuthOtpResponse,
 	SupabaseClient,
 	AuthResponse,
-	AuthChangeEvent,
 } from "@supabase/supabase-js";
+import type { AuthChangeEvent } from "@supabase/auth-js";
 import { withTimeout } from "./async-utils";
 import { config } from "../../config";
 import { REDIRECT_URL_PARAM } from "../../constants/auth.constants";
