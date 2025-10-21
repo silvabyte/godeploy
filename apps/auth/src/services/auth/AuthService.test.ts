@@ -19,7 +19,7 @@ interface MockSupabaseClient extends Partial<Omit<SupabaseClient, "auth">> {
 describe("AuthService", () => {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	//@ts-expect-error - boo these types
-	let authService: AuthService;
+	let _authService: AuthService;
 	let mockClient: MockSupabaseClient;
 	let sessionManager: ReturnType<typeof SessionManager.getInstance>;
 
@@ -39,7 +39,7 @@ describe("AuthService", () => {
 		sessionManager = SessionManager.getInstance();
 
 		// Create auth service instance
-		authService = new AuthService(mockClient as unknown as SupabaseClient, {
+		_authService = new AuthService(mockClient as unknown as SupabaseClient, {
 			config: {
 				authBaseUrl: "http://localhost:3000",
 				supabaseUrl: "http://localhost:54321",

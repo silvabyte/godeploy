@@ -31,7 +31,7 @@ export function Heading({
 /**
  * Display heading component for hero sections.
  */
-function DisplayHeading({
+function _DisplayHeading({
 	className,
 	children,
 	...props
@@ -48,7 +48,7 @@ function DisplayHeading({
 /**
  * Section kicker text (small heading above main heading)
  */
-function Kicker({
+function _Kicker({
 	className,
 	children,
 	...props

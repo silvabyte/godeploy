@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import type { Metadata } from "next";
 import { Fira_Mono, Inter, Lexend } from "next/font/google";
-import Script from "next/script";
 
 import "@/styles/tailwind.css";
 

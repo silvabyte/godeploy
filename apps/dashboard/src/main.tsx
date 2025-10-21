@@ -54,15 +54,20 @@ const loadApp = async () => {
 		);
 		const services = createServices(client);
 
-		// Create router with the auth service
-		const router = createRouter(services);
+	// Create router with the auth service
+	const router = createRouter(services);
 
-		// Render the application with service provider
-		ReactDOM.createRoot(document.getElementById("root")!).render(
-			<ServiceProvider services={services}>
-				<RouterProvider router={router} />
-			</ServiceProvider>,
-		);
+	// Render the application with service provider
+	const rootElement = document.getElementById("root");
+	if (!rootElement) {
+		debug.log("[Main] Failed to find root element");
+		return;
+	}
+	ReactDOM.createRoot(rootElement).render(
+		<ServiceProvider services={services}>
+			<RouterProvider router={router} />
+		</ServiceProvider>,
+	);
 	} catch (error) {
 		debug.log("[Main] Error initializing application");
 		debug.error(error as Error);

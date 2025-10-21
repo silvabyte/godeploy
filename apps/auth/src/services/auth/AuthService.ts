@@ -87,7 +87,7 @@ export class AuthService {
 
 		if (error) {
 			debug.log(
-				"[AuthService] Error fetching user with jwt: " + session?.access_token,
+				`[AuthService] Error fetching user with jwt: ${session?.access_token}`,
 			);
 			debug.error(error);
 			return null;
@@ -136,7 +136,7 @@ export class AuthService {
 			redirectUrl || config.VITE_DASHBOARD_BASE_URL,
 		);
 
-		debug.log("[AuthService] signInWithEmail redirects: " + emailRedirectTo);
+		debug.log(`[AuthService] signInWithEmail redirects: ${emailRedirectTo}`);
 
 		const { data, error } = await withTimeout<AuthOtpResponse>({
 			promise: this.client.auth.signInWithOtp({
@@ -167,7 +167,7 @@ export class AuthService {
 			return { data: null, error: new Error(`password cannot be empty`) };
 		}
 
-		debug.log("[AuthService] signInWithPassword for email: " + email);
+		debug.log(`[AuthService] signInWithPassword for email: ${email}`);
 
 		const { data, error } = await withTimeout<AuthResponse>({
 			promise: this.client.auth.signInWithPassword({
@@ -196,7 +196,7 @@ export class AuthService {
 			return { data: null, error: new Error(`password cannot be empty`) };
 		}
 
-		debug.log("[AuthService] signUp for email: " + email);
+		debug.log(`[AuthService] signUp for email: ${email}`);
 
 		const { data, error } = await withTimeout<AuthResponse>({
 			promise: this.client.auth.signUp({

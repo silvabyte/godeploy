@@ -9,7 +9,7 @@ import { debug } from "../../utils/debug";
 /**
  * Encodes a session token as a URL-safe string
  */
-function urlencodeJsonToken(jsonToken: Session) {
+function _urlencodeJsonToken(jsonToken: Session) {
 	return encodeURIComponent(JSON.stringify(jsonToken));
 }
 
@@ -28,7 +28,7 @@ export function createRedirectToApp(authService: AuthService) {
 		const session = await authService.refreshOnLoad();
 		// Check if we have a stored redirect URL
 		const storedRedirectUrl = localStorage.getItem(REDIRECT_URL_STORAGE_KEY);
-		const defaultRedirectUrl = config.VITE_DASHBOARD_BASE_URL + "/session";
+		const defaultRedirectUrl = `${config.VITE_DASHBOARD_BASE_URL}/session`;
 
 		if (!session) {
 			debug.log(
@@ -57,7 +57,7 @@ export function createRedirectToApp(authService: AuthService) {
 		let targetUrl = storedRedirectUrl || defaultRedirectUrl;
 		if (new URL(targetUrl).hostname !== new URL(defaultRedirectUrl).hostname) {
 			debug.log(
-				"[RedirectUtils] Redirecting to default URL: " + defaultRedirectUrl,
+				`[RedirectUtils] Redirecting to default URL: ${defaultRedirectUrl}`,
 			);
 			targetUrl = defaultRedirectUrl;
 		}

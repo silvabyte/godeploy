@@ -1,8 +1,7 @@
 export const debug = {
 	log: (message: string, context?: Record<string, unknown>) => {
 		if (
-			window &&
-			window.localStorage &&
+			window?.localStorage &&
 			window.localStorage.getItem("debug") === "true"
 		) {
 			const error = new Error();

@@ -289,8 +289,7 @@ export type Tables<
 				Row: infer R;
 			}
 			? R
-			: never
-		: never;
+		: never
+	: never;
 
-// biome-ignore lint/correctness/noUnusedVariables: generated helper type
 // Removed unused helper generics to satisfy TS noUnusedLocals

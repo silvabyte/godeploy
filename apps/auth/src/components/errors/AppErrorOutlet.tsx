@@ -30,6 +30,7 @@ export function AppErrorOutlet() {
 
 					<div className="flex flex-col items-center gap-6 pt-4">
 						<button
+							type="button"
 							onClick={() => nav("/")}
 							className="text-sm font-medium text-slate-900 underline decoration-green-500 decoration-2 underline-offset-4 transition hover:text-green-600"
 						>

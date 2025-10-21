@@ -44,7 +44,12 @@ const loadApp = async () => {
 	// Initialize internationalization
 
 	// Render the application with service provider
-	createRoot(document.getElementById("root")!).render(
+	const rootElement = document.getElementById("root");
+	if (!rootElement) {
+		debug.log("Failed to find root element");
+		return;
+	}
+	createRoot(rootElement).render(
 		<ServiceProvider authService={authService}>
 			<RouterProvider router={router} />
 		</ServiceProvider>,

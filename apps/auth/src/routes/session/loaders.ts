@@ -45,8 +45,8 @@ export function createSessionAuthenticateLoader(authService: AuthService) {
 		sessionManager.setSession({
 			access_token,
 			refresh_token: refresh_token as string,
-			expires_at: parseInt(expires_at as string),
-			expires_in: parseInt(expires_in as string),
+			expires_at: parseInt(expires_at as string, 10),
+			expires_in: parseInt(expires_in as string, 10),
 			token_type: token_type as string,
 			user,
 		});
