@@ -9,7 +9,7 @@ import { debug } from "../../utils/debug";
 /**
  * Encodes a session token as a URL-safe string
  */
-export function urlencodeJsonToken(jsonToken: Session) {
+function urlencodeJsonToken(jsonToken: Session) {
 	return encodeURIComponent(JSON.stringify(jsonToken));
 }
 

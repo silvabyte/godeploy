@@ -27,9 +27,7 @@ export function ComingSoonPage({
 					</div>
 				</div>
 
-				<p className="text-lg font-light text-slate-500">
-					{description}
-				</p>
+				<p className="text-lg font-light text-slate-500">{description}</p>
 
 				<Link
 					to={backLink}

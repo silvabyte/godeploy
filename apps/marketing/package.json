@@ -18,11 +18,8 @@
 	},
 	"browserslist": "defaults, not ie <= 11",
 	"dependencies": {
-		"@headlessui/react": "^2.1.0",
-		"@heroicons/react": "^2.2.0",
 		"@hyperdx/browser": "^0.21.2",
-		"@supabase/supabase-js": "^2.49.1",
-		"@tailwindcss/forms": "^0.5.3",
+		"@opentelemetry/api": "^1.9.0",
 		"@tailwindcss/postcss": "^4.0.6",
 		"@types/node": "^20.10.8",
 		"@types/react": "^18.2.47",
@@ -35,9 +32,6 @@
 		"typescript": "^5.3.3"
 	},
 	"devDependencies": {
-		"eslint": "^8.56.0",
-		"eslint-config-next": "^14.0.4",
-		"sharp": "0.33.1",
 		"@biomejs/biome": "^2.2.2"
 	}
 }

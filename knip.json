@@ -24,12 +24,7 @@
 		"**/node_modules/**",
 		"commitlint.config.js"
 	],
-	"ignoreDependencies": [
-		"husky",
-		"@biomejs/biome",
-		"tailwindcss",
-		"postcss"
-	],
+	"ignoreDependencies": ["husky", "@biomejs/biome", "tailwindcss", "postcss"],
 	"ignoreExportsUsedInFile": true,
 	"ignoreBinaries": ["xrelease", "godeploy"]
 }

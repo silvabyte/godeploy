@@ -15,4 +15,4 @@ export const SESSION_STORAGE_KEY = "godeploy-auth-session";
 export const REDIRECT_URL_PARAM = "redirect_url";
 
 // The query parameter name for the token
-export const TOKEN_PARAM = "access_token";
+const TOKEN_PARAM = "access_token";

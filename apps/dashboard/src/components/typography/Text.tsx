@@ -63,7 +63,7 @@ export function Text({
 /**
  * Code component for inline code snippets
  */
-export function Code({
+function Code({
 	className,
 	children,
 	...props

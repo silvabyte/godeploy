@@ -51,6 +51,7 @@
 		"@types/node": "~18.16.9",
 		"@types/random-word": "^2.0.2",
 		"@types/unzipper": "^0.10.11",
+		"@vitest/coverage-v8": "^2.1.8",
 		"fflate": "^0.8.2",
 		"husky": "^9.1.7",
 		"knip": "^5.63.0",

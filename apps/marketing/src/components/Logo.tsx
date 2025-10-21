@@ -36,7 +36,7 @@ export function Logo(props: React.ComponentPropsWithoutRef<"svg">) {
 	);
 }
 
-export const LogoIcon = () => {
+const LogoIcon = () => {
 	return (
 		<svg
 			width="40"

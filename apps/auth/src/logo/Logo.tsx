@@ -53,7 +53,7 @@ export function Logo({ reversed = false, ...props }: LogoProps) {
 	);
 }
 
-export const LogoIcon = ({ reversed = false, ...props }: LogoProps) => {
+const LogoIcon = ({ reversed = false, ...props }: LogoProps) => {
 	const primaryColor = reversed ? "#FFFFFF" : "#000000";
 	const accentColor = "#4ADE80"; // Green 500
 	const gradientId = React.useId();
