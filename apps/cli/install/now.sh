@@ -109,12 +109,12 @@ install_godeploy() {
     log_info "Using specified version: $VERSION"
     LATEST_VERSION="$VERSION"
   else
-    # Get the latest version from install.godeploy.com
+    # Get the latest version from install.godeploy.app
     log_info "Fetching latest version information..."
 
-    LATEST_VERSION=$(curl -s https://install.godeploy.com/releases/latest.txt)
+    LATEST_VERSION=$(curl -s https://install.godeploy.app/releases/latest.txt)
     if [ -z "$LATEST_VERSION" ]; then
-      log_crit "Failed to fetch latest version from install.godeploy.com"
+      log_crit "Failed to fetch latest version from install.godeploy.app"
       log_info "Falling back to hardcoded version v0.1.0"
       LATEST_VERSION="v0.1.0"
     fi
@@ -128,7 +128,7 @@ install_godeploy() {
   log_info "Using extraction directory: $EXTRACT_DIR"
 
   # Construct the correct download URL for the asset
-  DOWNLOAD_URL="https://install.godeploy.com/releases/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+  DOWNLOAD_URL="https://install.godeploy.app/releases/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
   if [ "$OS" == "windows" ]; then
     DOWNLOAD_URL="${DOWNLOAD_URL}.zip"
     ARCHIVE_TYPE="zip"
@@ -183,7 +183,7 @@ install_godeploy() {
 
     # Try direct binary download as fallback
     log_info "Attempting direct binary download as fallback..."
-    DIRECT_URL="https://install.godeploy.com/releases/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
+    DIRECT_URL="https://install.godeploy.app/releases/${LATEST_VERSION}/godeploy-${OS}-${ARCH}"
     if [ "$OS" == "windows" ]; then
       DIRECT_URL="${DIRECT_URL}.exe"
     fi
@@ -213,7 +213,7 @@ install_godeploy() {
     }
   else
     log_info "Permissions required for installation to $INSTALL_DIR — alternatively specify a new directory with:"
-    log_info "  $ curl -sSL https://install.godeploy.com/now.sh | PREFIX=\$HOME/.local/bin bash"
+    log_info "  $ curl -sSL https://install.godeploy.app/now.sh | PREFIX=\$HOME/.local/bin bash"
     sudo cp "$GODEPLOY_BIN" "$INSTALL_DIR/godeploy" && sudo chmod +x "$INSTALL_DIR/godeploy" || {
       log_crit "Failed to install binary"
       exit 1

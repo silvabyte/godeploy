@@ -41,7 +41,7 @@ When releasing a new version:
    echo "v{VERSION}" > install/releases/latest.txt
    ```
 
-5. **Deploy to install.godeploy.com**:
+5. **Deploy to install.godeploy.app**:
    ```bash
    godeploy deploy
    ```
@@ -51,12 +51,12 @@ When releasing a new version:
 Users install GoDeploy via:
 
 ```bash
-curl -sSL https://install.godeploy.com/now.sh | bash
+curl -sSL https://install.godeploy.app/now.sh | bash
 ```
 
 The install script automatically:
-- Fetches the latest version from `https://install.godeploy.com/releases/latest.txt`
-- Downloads the appropriate binary from `https://install.godeploy.com/releases/{version}/godeploy-{os}-{arch}.{ext}`
+- Fetches the latest version from `https://install.godeploy.app/releases/latest.txt`
+- Downloads the appropriate binary from `https://install.godeploy.app/releases/{version}/godeploy-{os}-{arch}.{ext}`
 - Installs to `/usr/local/bin/godeploy` (or user-specified `PREFIX`)
 
 ## Specific Version Installation
@@ -64,6 +64,6 @@ The install script automatically:
 Users can install a specific version by setting the `VERSION` environment variable:
 
 ```bash
-curl -sSL https://install.godeploy.com/now.sh | VERSION=v1.0.4 bash
+curl -sSL https://install.godeploy.app/now.sh | VERSION=v1.0.4 bash
 ```
 

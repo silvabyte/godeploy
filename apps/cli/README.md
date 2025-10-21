@@ -9,7 +9,7 @@ A CLI that deploys your single-page apps. Build your app, run one command, get a
 ```bash
 # Install
 
-curl -sSL https://install.godeploy.com/now.sh | bash
+curl -sSL https://install.godeploy.app/now.sh | bash
 
 # Deploy
 godeploy auth sign-up
@@ -45,7 +45,7 @@ I built this because I was tired of:
 ### 1. Install
 
 ```bash
-curl -sSL https://install.godeploy.com/now.sh | bash
+curl -sSL https://install.godeploy.app/now.sh | bash
 ```
 
 ### 2. Sign up

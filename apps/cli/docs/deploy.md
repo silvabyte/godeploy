@@ -11,7 +11,7 @@ Welcome to GoDeploy! Let's get your app live in just a few minutes.
 Run this in your terminal to install GoDeploy:
 
 ```bash
-curl -sSL https://install.spa.godeploy.app/now.sh | bash
+curl -sSL https://install.godeploy.app/now.sh | bash
 ```
 
 ---
