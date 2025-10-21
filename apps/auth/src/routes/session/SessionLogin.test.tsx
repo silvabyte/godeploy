@@ -77,13 +77,9 @@ describe("SessionLogin", () => {
 			);
 
 			// Assert
-			expect(screen.getByText("session.signin.title")).toBeInTheDocument();
-			expect(
-				screen.getByLabelText("session.inputs.email.label"),
-			).toBeInTheDocument();
-			expect(
-				screen.getByText("session.signin.loginButton"),
-			).toBeInTheDocument();
+			expect(screen.getByText("Sign in.")).toBeInTheDocument();
+			expect(screen.getByLabelText("Email")).toBeInTheDocument();
+			expect(screen.getByText("Continue")).toBeInTheDocument();
 		});
 
 		it("should capture and store redirect URL from query parameters", async () => {

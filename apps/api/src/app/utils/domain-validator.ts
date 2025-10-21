@@ -73,8 +73,8 @@ export class DomainValidator {
 		try {
 			const cnameRecords = await resolveCname(normalizedDomain);
 
-			if (cnameRecords && cnameRecords.length > 0) {
-				const cnameRecord = DomainValidator.normalizeHostname(cnameRecords[0]!);
+			if (cnameRecords && cnameRecords.length > 0 && cnameRecords[0]) {
+				const cnameRecord = DomainValidator.normalizeHostname(cnameRecords[0]);
 				const expectedCname = DomainValidator.normalizeHostname(
 					DomainValidator.EXPECTED_CNAME,
 				);

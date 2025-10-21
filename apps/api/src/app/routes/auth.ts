@@ -104,7 +104,7 @@ export default async function (fastify: FastifyInstance) {
 					}
 
 					request.measure.success();
-					return reply.redirect(urlResult.data!.toString());
+					return reply.redirect(urlResult.data?.toString());
 				}
 
 				// If no token found anywhere, redirect without token
@@ -151,8 +151,8 @@ export default async function (fastify: FastifyInstance) {
 			request.measure.success();
 			return reply.code(201).send({
 				success: true,
-				token: result.data!.token,
-				user: result.data!.user,
+				token: result.data?.token,
+				user: result.data?.user,
 			});
 		},
 	});
@@ -187,8 +187,8 @@ export default async function (fastify: FastifyInstance) {
 			request.measure.success();
 			return reply.code(200).send({
 				success: true,
-				token: result.data!.token,
-				user: result.data!.user,
+				token: result.data?.token,
+				user: result.data?.user,
 			});
 		},
 	});
@@ -208,16 +208,16 @@ export default async function (fastify: FastifyInstance) {
 
 			// Extract token from authorization header
 			const tokenResult = extractBearerToken(request.headers.authorization);
-			if (tokenResult.error) {
-				request.measure.failure(tokenResult.error);
+			if (tokenResult.error || !tokenResult.data) {
+				request.measure.failure(tokenResult.error || "Invalid token");
 				return reply.code(401).send({
 					success: false,
-					error: tokenResult.error,
+					error: tokenResult.error || "Invalid token",
 				});
 			}
 
 			const result = await request.db.auth.changePassword(
-				tokenResult.data!,
+				tokenResult.data,
 				currentPassword,
 				newPassword,
 			);
@@ -344,15 +344,15 @@ export default async function (fastify: FastifyInstance) {
 				// Extract token from authorization header using the utility function
 				const tokenResult = extractBearerToken(request.headers.authorization);
 
-				if (tokenResult.error) {
-					request.measure.failure(tokenResult.error);
+				if (tokenResult.error || !tokenResult.data) {
+					request.measure.failure(tokenResult.error || "Invalid token");
 					return reply.code(401).send({
 						valid: false,
-						error: tokenResult.error,
+						error: tokenResult.error || "Invalid token",
 					});
 				}
 
-				const token = tokenResult.data!;
+				const token = tokenResult.data;
 
 				// Use Supabase client directly for token verification
 				request.measure.add("verify_token");

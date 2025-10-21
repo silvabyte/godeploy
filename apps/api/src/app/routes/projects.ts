@@ -68,12 +68,14 @@ export default async function (fastify: FastifyInstance) {
 			request.measure.add("validate_project_name");
 			const nameResult = validateAndTransformProjectName(request.body.name);
 
-			if (nameResult.error) {
-				request.measure.failure(nameResult.error);
-				return reply.code(400).send({ error: nameResult.error });
+			if (nameResult.error || !nameResult.data) {
+				request.measure.failure(nameResult.error || "Invalid project name");
+				return reply.code(400).send({
+					error: nameResult.error || "Invalid project name",
+				});
 			}
 
-			const { name, subdomain } = nameResult.data!;
+			const { name, subdomain } = nameResult.data;
 			request.measure.add("check_subdomain", { subdomain });
 
 			// Check if project with this subdomain already exists

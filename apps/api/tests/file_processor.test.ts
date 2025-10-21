@@ -74,7 +74,10 @@ describe("FileProcessor.processDeployFiles", () => {
 		expect(result.configPath).toBeTruthy();
 
 		// Verify contents were written
-		const writtenConfig = await readFile(result.configPath!, "utf8");
-		expect(writtenConfig).toContain("spa");
+		expect(result.configPath).toBeTruthy();
+		if (result.configPath) {
+			const writtenConfig = await readFile(result.configPath, "utf8");
+			expect(writtenConfig).toContain("spa");
+		}
 	});
 });

@@ -45,6 +45,6 @@ if (version !== CACHE_VERSION) {
 				}),
 			),
 		);
-	} catch (e) {}
+	} catch (_e) {}
 	await Bun.file(path.join(Global.Path.cache, "version")).write(CACHE_VERSION);
 }

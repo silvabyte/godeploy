@@ -28,6 +28,13 @@ export class AuthService {
 				};
 			}
 
+			if (!user.email) {
+				return {
+					error: "User email not found",
+					data: null,
+				};
+			}
+
 			const { data: userData, error: userError } = await this.supabase
 				.from("users")
 				.select("tenant_id")
@@ -45,7 +52,7 @@ export class AuthService {
 				error: null,
 				data: {
 					id: user.id,
-					email: user.email!,
+					email: user.email,
 					tenant_id: userData.tenant_id,
 				},
 			};
@@ -113,6 +120,13 @@ export class AuthService {
 				};
 			}
 
+			if (!data.user.email) {
+				return {
+					error: "User email not found",
+					data: null,
+				};
+			}
+
 			// Get tenant info for the new user
 			const { data: userData, error: userError } = await this.supabase
 				.from("users")
@@ -133,7 +147,7 @@ export class AuthService {
 					token: data.session.access_token,
 					user: {
 						id: data.user.id,
-						email: data.user.email!,
+						email: data.user.email,
 						tenant_id: userData.tenant_id,
 					},
 				},
@@ -170,6 +184,13 @@ export class AuthService {
 				};
 			}
 
+			if (!data.user.email) {
+				return {
+					error: "User email not found",
+					data: null,
+				};
+			}
+
 			// Get tenant info for the user
 			const { data: userData, error: userError } = await this.supabase
 				.from("users")
@@ -190,7 +211,7 @@ export class AuthService {
 					token: data.session.access_token,
 					user: {
 						id: data.user.id,
-						email: data.user.email!,
+						email: data.user.email,
 						tenant_id: userData.tenant_id,
 					},
 				},

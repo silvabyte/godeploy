@@ -1,4 +1,3 @@
-import * as HyperDx from "@hyperdx/node-opentelemetry";
 import pino from "pino";
 import { AppName } from "../global";
 
