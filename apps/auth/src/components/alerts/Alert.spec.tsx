@@ -1,5 +1,5 @@
-import { describe, expect, it, afterEach } from "vitest";
-import { render, cleanup } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 import { Alert } from "./Alert"; // Adjust the import path as necessary
 
 describe("Alert Component", () => {

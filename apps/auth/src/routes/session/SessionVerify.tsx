@@ -1,7 +1,7 @@
 import { t } from "@matsilva/xtranslate";
+import { useEffect } from "react";
 import { Logo } from "../../logo/Logo";
 import { trackEvent } from "../../router/telemetry/telemetry";
-import { useEffect } from "react";
 
 export default function Verify() {
 	useEffect(() => {

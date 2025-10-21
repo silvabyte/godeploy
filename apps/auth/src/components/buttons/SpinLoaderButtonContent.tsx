@@ -1,7 +1,8 @@
-import { useMemo } from "react";
-import { ButtonTheme } from "./button";
-import { classNames } from "../css";
 import { t } from "@matsilva/xtranslate";
+import { useMemo } from "react";
+import { classNames } from "../css";
+import type { ButtonTheme } from "./button";
+
 type SpinLoaderTheme = ButtonTheme;
 
 interface SpinLoaderProps {

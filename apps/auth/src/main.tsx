@@ -1,15 +1,16 @@
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { initializeI18n } from "./i18n/i18nConfig";
-import { ServiceProvider } from "./services/ServiceContext";
 import { createRouter } from "./router/MainAppRoutes";
+import { ServiceProvider } from "./services/ServiceContext";
 import "./styles.css";
 import { createClient } from "@supabase/supabase-js";
 import { config } from "./config";
 import { JWT_STORAGE_KEY } from "./constants/auth.constants";
-import { debug } from "./utils/debug";
-import { AuthService } from "./services/auth/AuthService";
 import { initTelemetry } from "./router/telemetry/telemetry";
+import { AuthService } from "./services/auth/AuthService";
+import { debug } from "./utils/debug";
+
 /**
  * Main application entry point
  * Initializes services, i18n, and renders the React application

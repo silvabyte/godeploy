@@ -1,5 +1,6 @@
-import React, { useMemo } from "react";
+import type React from "react";
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 import { classNames } from "../css";
 
 interface AlertProps {

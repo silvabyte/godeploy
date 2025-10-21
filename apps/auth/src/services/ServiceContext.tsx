@@ -1,5 +1,6 @@
-import React, { createContext, useContext } from "react";
-import { AuthService } from "./auth/AuthService";
+import type React from "react";
+import { createContext, useContext } from "react";
+import type { AuthService } from "./auth/AuthService";
 
 /**
  * Custom hook to access the service context

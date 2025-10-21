@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
 import { render, renderHook } from "@testing-library/react";
-import { ServiceProvider, useAuthService, useServices } from "./ServiceContext";
+import { describe, expect, it } from "vitest";
+import type { AuthService } from "./auth/AuthService";
 import { createMockAuthService } from "./auth/testUtils";
-import { AuthService } from "./auth/AuthService";
+import { ServiceProvider, useAuthService, useServices } from "./ServiceContext";
 
 describe("ServiceContext", () => {
 	describe("ServiceProvider", () => {

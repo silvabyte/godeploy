@@ -1,8 +1,8 @@
-import { useNavigate, useRouteError } from "react-router-dom";
 import { t } from "@matsilva/xtranslate";
-import { SupportLink } from "../support/SupportLink";
 import { useEffect } from "react";
+import { useNavigate, useRouteError } from "react-router-dom";
 import { Logo } from "../../logo/Logo";
+import { SupportLink } from "../support/SupportLink";
 
 export function AppErrorOutlet() {
 	const error = useRouteError() as Error & { statusText?: string };

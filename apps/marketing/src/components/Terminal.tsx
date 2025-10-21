@@ -1,5 +1,5 @@
-import { useState, useEffect, ReactNode } from "react";
 import clsx from "clsx";
+import { type ReactNode, useEffect, useState } from "react";
 
 interface Command {
 	command: string;

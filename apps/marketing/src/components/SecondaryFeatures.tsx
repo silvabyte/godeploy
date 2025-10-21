@@ -1,14 +1,14 @@
 "use client";
 
-import { Container } from "@/components/Container";
 import {
-	CloudArrowUpIcon,
-	GlobeAltIcon,
-	ShieldCheckIcon,
 	ArrowPathIcon,
 	ChartBarIcon,
+	CloudArrowUpIcon,
+	GlobeAltIcon,
 	LinkIcon,
+	ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
+import { Container } from "@/components/Container";
 
 const features = [
 	{

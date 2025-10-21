@@ -1,16 +1,16 @@
 "use client";
+import { useEffect } from "react";
 import { initTelemetry, trackEvent } from "@/app/telemetry/telemetry";
+import { Benefits } from "@/components/Benefits";
 import { CallToAction } from "@/components/CallToAction";
 import { Faqs } from "@/components/Faqs";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { SecondaryFeatures } from "@/components/SecondaryFeatures";
 import { HowItWorks } from "@/components/HowItWorks";
+import { SecondaryFeatures } from "@/components/SecondaryFeatures";
 import { Testimonials } from "@/components/Testimonials";
-import { Benefits } from "@/components/Benefits";
 import { TrustSignals } from "@/components/TrustSignals";
-import { useEffect } from "react";
 
 export default function Home() {
 	useEffect(() => {

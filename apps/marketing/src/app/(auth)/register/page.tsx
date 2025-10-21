@@ -1,15 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
-import { useState, useEffect } from "react";
-
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { initTelemetry, trackEvent } from "@/app/telemetry/telemetry";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
 import { Logo } from "@/components/Logo";
-import { SlimLayout } from "@/components/SlimLayout";
-import { initTelemetry, trackEvent } from "@/app/telemetry/telemetry";
 import { Potatosaur } from "@/components/Potatosaur";
+import { SlimLayout } from "@/components/SlimLayout";
 import "./RegisterAnimations.css";
 
 // Initialize Supabase client

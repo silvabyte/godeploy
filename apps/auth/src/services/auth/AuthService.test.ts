@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import type { Mock } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AuthService } from "./AuthService";
 import { SessionManager } from "./SessionManager";
-import type { SupabaseClient, Session } from "@supabase/supabase-js";
 
 type MockAuthMethods = {
 	setSession: Mock;

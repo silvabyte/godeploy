@@ -1,4 +1,5 @@
-import { describe, vi, beforeEach, it } from "vitest";
+import { beforeEach, describe, it, vi } from "vitest";
+
 // Mock localStorage
 const localStorageMock = (() => {
 	let store: Record<string, string> = {};

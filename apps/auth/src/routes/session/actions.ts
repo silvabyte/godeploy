@@ -1,9 +1,9 @@
-import { debug } from "../../utils/debug";
-import { redirect, ActionFunctionArgs } from "react-router-dom";
-import { AuthService } from "../../services/auth/AuthService";
+import { type ActionFunctionArgs, redirect } from "react-router-dom";
 import { REDIRECT_URL_PARAM } from "../../constants/auth.constants";
-import { SessionManager } from "../../services/auth/SessionManager";
 import { trackEvent } from "../../router/telemetry/telemetry";
+import type { AuthService } from "../../services/auth/AuthService";
+import { SessionManager } from "../../services/auth/SessionManager";
+import { debug } from "../../utils/debug";
 
 /**
  * Creates a login action function with the provided AuthService

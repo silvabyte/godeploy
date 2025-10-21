@@ -1,12 +1,12 @@
-import { makeAutoObservable } from "mobx";
 import type { Session } from "@supabase/supabase-js";
+import { makeAutoObservable } from "mobx";
 import { config } from "../../config";
 import {
+	BACKUP_JWT_STORAGE_KEY,
 	JWT_STORAGE_KEY,
 	REDIRECT_URL_PARAM,
-	SESSION_STORAGE_KEY,
-	BACKUP_JWT_STORAGE_KEY,
 	REDIRECT_URL_STORAGE_KEY,
+	SESSION_STORAGE_KEY,
 } from "../../constants/auth.constants";
 
 export class SessionManager {

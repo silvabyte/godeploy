@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Container } from "@/components/Container";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import { useState } from "react";
+import { Container } from "@/components/Container";
 
 const faqs = [
 	{

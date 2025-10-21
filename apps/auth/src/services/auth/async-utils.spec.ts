@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { withTimeout } from "./async-utils";
 
 // Note: Bun test doesn't have full timer mocking support like vitest/jest

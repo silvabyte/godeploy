@@ -1,12 +1,11 @@
 "use client";
 
-import { type Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { TerminalLine } from "@/components/TerminalLines";
-
 import { Button } from "@/components/Button";
 import { Logo } from "@/components/Logo";
 import { SlimLayout } from "@/components/SlimLayout";
+import { TerminalLine } from "@/components/TerminalLines";
 
 export default function Login() {
 	return (

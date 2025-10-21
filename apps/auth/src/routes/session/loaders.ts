@@ -1,11 +1,9 @@
-import { redirect } from "react-router-dom";
-import { LoaderFunctionArgs } from "react-router-dom";
-import { AuthService } from "../../services/auth/AuthService";
-import { SessionAuthenticateLoaderResponse } from "./SessionAuthenticate";
-import { debug } from "../../utils/debug";
-import { getHashParams } from "../../utils/url";
+import { type LoaderFunctionArgs, redirect } from "react-router-dom";
+import type { AuthService } from "../../services/auth/AuthService";
 import { SessionManager } from "../../services/auth/SessionManager";
-import { addQueryParams } from "../../utils/url";
+import { debug } from "../../utils/debug";
+import { addQueryParams, getHashParams } from "../../utils/url";
+import type { SessionAuthenticateLoaderResponse } from "./SessionAuthenticate";
 
 /**
  * Creates a session authenticate loader function with the provided AuthService

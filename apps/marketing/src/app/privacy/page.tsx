@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
-
-import { Container } from "@/components/Container";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+import { useEffect } from "react";
 import { initTelemetry, trackEvent } from "@/app/telemetry/telemetry";
+import { Container } from "@/components/Container";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
 
 export default function PrivacyPolicy() {
 	useEffect(() => {

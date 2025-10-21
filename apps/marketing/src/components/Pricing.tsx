@@ -1,23 +1,22 @@
 "use client";
-import clsx from "clsx";
-import { useState } from "react";
 import {
 	BeakerIcon,
-	LightBulbIcon,
 	BriefcaseIcon,
-	RocketLaunchIcon,
-	SparklesIcon,
 	CommandLineIcon,
 	CpuChipIcon,
+	LightBulbIcon,
+	RocketLaunchIcon,
+	SparklesIcon,
 	Square2StackIcon,
 	Square3Stack3DIcon,
 	Squares2X2Icon,
 } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import type { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
-
+import { useState } from "react";
+import { trackEvent } from "@/app/telemetry/telemetry";
 import { Button } from "@/components/Button";
 import { Container } from "@/components/Container";
-import { trackEvent } from "@/app/telemetry/telemetry";
 
 function SwirlyDoodle(props: React.ComponentPropsWithoutRef<"svg">) {
 	return (

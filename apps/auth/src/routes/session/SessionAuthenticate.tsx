@@ -1,10 +1,10 @@
-import { Link, useLoaderData } from "react-router-dom";
 import { t } from "@matsilva/xtranslate";
-import { SupportLink } from "../../support/SupportLink";
-import { Logo } from "../../logo/Logo";
-import { Alert } from "../../components/alerts/Alert";
 import { useEffect } from "react";
+import { Link, useLoaderData } from "react-router-dom";
+import { Alert } from "../../components/alerts/Alert";
+import { Logo } from "../../logo/Logo";
 import { trackEvent } from "../../router/telemetry/telemetry";
+import { SupportLink } from "../../support/SupportLink";
 
 export interface SessionAuthenticateLoaderResponse {
 	error: string | null;

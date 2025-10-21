@@ -1,5 +1,5 @@
+import { CheckCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Container } from "@/components/Container";
-import { XMarkIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 
 const problems = [
 	{

@@ -1,8 +1,8 @@
-import { redirect } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
+import { redirect } from "react-router-dom";
 import { config } from "../../config";
 import { REDIRECT_URL_STORAGE_KEY } from "../../constants/auth.constants";
-import { AuthService } from "../../services/auth/AuthService";
+import type { AuthService } from "../../services/auth/AuthService";
 
 import { debug } from "../../utils/debug";
 

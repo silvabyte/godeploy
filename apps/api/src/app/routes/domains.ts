@@ -1,9 +1,9 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { DigitalOceanAppPlatformService } from "../components/digitalocean/AppPlatformService";
 import { commonResponseSchemas } from "../components/http/response.types";
 import { DomainValidator } from "../utils/domain-validator";
-import { DigitalOceanAppPlatformService } from "../components/digitalocean/AppPlatformService";
 
 // Request schemas
 const validateDomainSchema = z.object({

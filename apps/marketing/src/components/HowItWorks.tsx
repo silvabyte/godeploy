@@ -1,7 +1,7 @@
 import { Container } from "@/components/Container";
+import { Potatosaur } from "@/components/Potatosaur";
 import { Terminal } from "@/components/Terminal";
 import { TerminalLine } from "@/components/TerminalLines";
-import { Potatosaur } from "@/components/Potatosaur";
 
 export function HowItWorks() {
 	// CLI-only instructions

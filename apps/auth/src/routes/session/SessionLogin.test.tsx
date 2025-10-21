@@ -1,16 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render } from "@testing-library/react";
 import { screen, waitFor } from "@testing-library/dom";
-import { MemoryRouter } from "react-router-dom";
-import Login from "./SessionLogin";
-import { createLoginAction } from "./actions";
-import { createMockAuthService } from "../../services/auth/testUtils";
+import { render } from "@testing-library/react";
+import { type ActionFunctionArgs, MemoryRouter } from "react-router-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	REDIRECT_URL_PARAM,
 	REDIRECT_URL_STORAGE_KEY,
 } from "../../constants/auth.constants";
-import { ActionFunctionArgs } from "react-router-dom";
-import { AuthService } from "../../services/auth/AuthService";
+import type { AuthService } from "../../services/auth/AuthService";
+import { createMockAuthService } from "../../services/auth/testUtils";
+import { createLoginAction } from "./actions";
+import Login from "./SessionLogin";
 // Setup jest-dom matchers
 import "@testing-library/jest-dom";
 import { config } from "../../config";
@@ -77,12 +76,14 @@ describe("SessionLogin", () => {
 				</MemoryRouter>,
 			);
 
-		// Assert
-		expect(screen.getByText("session.signin.title")).toBeInTheDocument();
-		expect(
-			screen.getByLabelText("session.inputs.email.label"),
-		).toBeInTheDocument();
-		expect(screen.getByText("session.signin.loginButton")).toBeInTheDocument();
+			// Assert
+			expect(screen.getByText("session.signin.title")).toBeInTheDocument();
+			expect(
+				screen.getByLabelText("session.inputs.email.label"),
+			).toBeInTheDocument();
+			expect(
+				screen.getByText("session.signin.loginButton"),
+			).toBeInTheDocument();
 		});
 
 		it("should capture and store redirect URL from query parameters", async () => {
@@ -114,7 +115,10 @@ describe("SessionLogin", () => {
 		it("should call signInWithPassword with email, password", async () => {
 			// Arrange
 			const authService = createMockAuthService();
-			authService.signInWithPassword.mockResolvedValue({ data: {}, error: null });
+			authService.signInWithPassword.mockResolvedValue({
+				data: {},
+				error: null,
+			});
 
 			const email = "test@example.com";
 			const password = "testPassword123";

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/Button";
 import { Container } from "@/components/Container";
 import { Potatosaur } from "@/components/Potatosaur";
+
 // Simplified TS interface for global Mixpanel
 declare global {
 	interface Window {

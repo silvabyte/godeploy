@@ -1,4 +1,4 @@
-import { describe, vi, it } from "vitest";
+import { describe, it, vi } from "vitest";
 import * as asyncUtils from "./async-utils";
 
 // Spy on withTimeout

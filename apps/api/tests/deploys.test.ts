@@ -1,15 +1,15 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import Fastify from "fastify";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import Fastify from "fastify";
 import { strToU8, zipSync } from "fflate";
+import { beforeEach, describe, expect, it } from "vitest";
+import type { DatabaseService } from "../src/app/components/db/DatabaseService";
 import type { Deploy } from "../src/app/components/deploys/deploys.types";
 import type { Project } from "../src/app/components/projects/projects.types";
+import type { Logger } from "../src/app/log.js";
 import sensiblePlugin from "../src/app/plugins/sensible";
 import deploysRoutes from "../src/app/routes/deploys";
 import type { Result } from "../src/app/types/result.types";
 import { ActionTelemetry } from "../src/logging/ActionTelemetry.js";
-import type { Logger } from "../src/app/log.js";
-import type { DatabaseService } from "../src/app/components/db/DatabaseService";
 
 type DbMock = {
 	projects: {

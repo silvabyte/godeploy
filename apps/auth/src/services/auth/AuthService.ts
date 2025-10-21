@@ -1,18 +1,18 @@
-import type {
-	UserResponse,
-	Session,
-	AuthOtpResponse,
-	SupabaseClient,
-	AuthResponse,
-} from "@supabase/supabase-js";
 import type { AuthChangeEvent } from "@supabase/auth-js";
-import { withTimeout } from "./async-utils";
+import type {
+	AuthOtpResponse,
+	AuthResponse,
+	Session,
+	SupabaseClient,
+	UserResponse,
+} from "@supabase/supabase-js";
+import { autorun } from "mobx";
 import { config } from "../../config";
 import { REDIRECT_URL_PARAM } from "../../constants/auth.constants";
 import { debug } from "../../utils/debug";
-import { SessionManager } from "./SessionManager";
 import { addQueryParam } from "../../utils/url";
-import { autorun } from "mobx";
+import { withTimeout } from "./async-utils";
+import { SessionManager } from "./SessionManager";
 export interface AuthConfig {
 	supabaseUrl: string;
 	supabaseKey: string;

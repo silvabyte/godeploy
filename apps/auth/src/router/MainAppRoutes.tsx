@@ -1,21 +1,21 @@
 import {
-	LoaderFunctionArgs,
 	createBrowserRouter,
+	type LoaderFunctionArgs,
 	redirect,
 } from "react-router-dom";
+import { AppErrorOutlet } from "../components/errors/AppErrorOutlet";
+import { config } from "../config";
+import { createLoginAction } from "../routes/session/actions";
+import { createSessionAuthenticateLoader } from "../routes/session/loaders";
+import SessionAuthenticate, {
+	type SessionAuthenticateLoaderResponse,
+} from "../routes/session/SessionAuthenticate";
 import SessionLogin, {
 	LOGIN_ACTION_PATH,
 } from "../routes/session/SessionLogin";
 import SessionVerify from "../routes/session/SessionVerify";
-import SessionAuthenticate, {
-	SessionAuthenticateLoaderResponse,
-} from "../routes/session/SessionAuthenticate";
+import type { AuthService } from "../services/auth/AuthService";
 import { createRedirectToApp } from "./utils/redirectUtils";
-import { AuthService } from "../services/auth/AuthService";
-import { config } from "../config";
-import { AppErrorOutlet } from "../components/errors/AppErrorOutlet";
-import { createLoginAction } from "../routes/session/actions";
-import { createSessionAuthenticateLoader } from "../routes/session/loaders";
 
 /**
  * Creates a router configuration with the provided AuthService

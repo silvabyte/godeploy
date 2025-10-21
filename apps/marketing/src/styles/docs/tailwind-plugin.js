@@ -7,7 +7,7 @@ const plugin = require("tailwindcss/plugin");
  * Import it in your tailwind.config.js file.
  */
 module.exports = plugin(
-	function ({ addComponents, theme }) {
+	({ addComponents, theme }) => {
 		// Add custom components
 		addComponents({
 			".godeploy-button-primary": {

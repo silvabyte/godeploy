@@ -1,6 +1,6 @@
-import React from "react";
-import { classNames } from "../css";
 import { t } from "@matsilva/xtranslate";
+import type React from "react";
+import { classNames } from "../css";
 
 interface SupportLinkProps {
 	href?: string;

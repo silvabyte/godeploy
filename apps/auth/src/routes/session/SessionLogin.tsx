@@ -1,12 +1,12 @@
-import { useFetcher, useLocation, useNavigation } from "react-router-dom";
 import { t } from "@matsilva/xtranslate";
-import { Alert } from "../../components/alerts/Alert";
-import { Logo } from "../../logo/Logo";
-import { Button } from "../../components/Button";
 import { useEffect } from "react";
+import { useFetcher, useLocation, useNavigation } from "react-router-dom";
+import { Alert } from "../../components/alerts/Alert";
+import { Button } from "../../components/Button";
 import { REDIRECT_URL_PARAM } from "../../constants/auth.constants";
-import { SessionManager } from "../../services/auth/SessionManager";
+import { Logo } from "../../logo/Logo";
 import { trackEvent } from "../../router/telemetry/telemetry";
+import { SessionManager } from "../../services/auth/SessionManager";
 
 export const LOGIN_ACTION_PATH = "/api/ui/v1/session/login";
 

@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@/components/Button";
-import { NavLink } from "@/components/NavLink";
-import { ChevronDownIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useState } from "react";
+import { Button } from "@/components/Button";
 import { Logo, LogoIcon } from "@/components/Logo";
+import { NavLink } from "@/components/NavLink";
 import { Potatosaur as PotatosaurComponent } from "@/components/Potatosaur";
 
 export function ComponentExamples() {

@@ -1,5 +1,5 @@
-import { ComponentExamples } from "./components";
 import Link from "next/link";
+import { ComponentExamples } from "./components";
 
 export default function StyleguidePage() {
 	return (

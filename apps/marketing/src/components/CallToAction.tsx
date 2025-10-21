@@ -1,6 +1,6 @@
+import { CheckIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/Button";
 import { Container } from "@/components/Container";
-import { CheckIcon } from "@heroicons/react/24/outline";
 
 export function CallToAction() {
 	return (
