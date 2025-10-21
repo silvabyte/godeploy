@@ -185,6 +185,39 @@ export class AuthService {
 		return { data, error: error ? new Error(error.message) : null };
 	}
 
+	async signUp(email: string | null, password: string | null) {
+		if (!email) {
+			debug.log(
+				"[AuthService] signUp failed because email is empty",
+			);
+			return { data: null, error: new Error(`email cannot be empty`) };
+		}
+
+		if (!password) {
+			debug.log(
+				"[AuthService] signUp failed because password is empty",
+			);
+			return { data: null, error: new Error(`password cannot be empty`) };
+		}
+
+		debug.log("[AuthService] signUp for email: " + email);
+
+		const { data, error } = await withTimeout<AuthResponse>({
+			promise: this.client.auth.signUp({
+				email: email,
+				password: password,
+			}),
+			timeoutDuration: this.timeoutDuration,
+			timeoutReason: `client.auth.signUp timed out after ${this.timeoutInSeconds}s`,
+		});
+
+		if (data?.session) {
+			this.sessionManager.setSession(data.session);
+		}
+
+		return { data, error: error ? new Error(error.message) : null };
+	}
+
 	async logout() {
 		const { error } = await withTimeout({
 			promise: this.client.auth.signOut(),

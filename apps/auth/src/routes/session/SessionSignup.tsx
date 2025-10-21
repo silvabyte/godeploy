@@ -5,17 +5,18 @@ import { Logo } from "../../logo/Logo";
 import { trackEvent } from "../../router/telemetry/telemetry";
 import { SessionManager } from "../../services/auth/SessionManager";
 
-export const LOGIN_ACTION_PATH = "/api/ui/v1/session/login";
+export const SIGNUP_ACTION_PATH = "/api/ui/v1/session/signup";
 
-export default function Login() {
+export default function Signup() {
 	const fetcher = useFetcher();
 	const nav = useNavigation();
 	const { error } = fetcher.data || { error: null };
 	const location = useLocation();
 	const sessionManager = SessionManager.getInstance();
+
 	useEffect(() => {
 		trackEvent("page_view", {
-			page: "login",
+			page: "signup",
 		});
 	}, []);
 
@@ -36,15 +37,15 @@ export default function Login() {
 						<Logo className="h-10" />
 					</div>
 					<h1 className="text-6xl font-light tracking-tight text-slate-900 sm:text-7xl md:text-8xl">
-						Sign in.
+						Sign up.
 					</h1>
 					<p className="mt-8 text-sm font-light text-slate-500">
-						Don't have an account?{" "}
+						Already have an account?{" "}
 						<Link
-							to="/signup"
+							to="/"
 							className="text-slate-900 underline decoration-green-500 decoration-2 underline-offset-4 transition hover:text-green-600"
 						>
-							Sign up
+							Sign in
 						</Link>
 					</p>
 				</div>
@@ -58,9 +59,9 @@ export default function Login() {
 				) : null}
 
 				<fetcher.Form
-					id="session-submit"
+					id="signup-submit"
 					method="POST"
-					action={LOGIN_ACTION_PATH}
+					action={SIGNUP_ACTION_PATH}
 					className="space-y-8"
 				>
 					<div className="space-y-8">
@@ -93,7 +94,7 @@ export default function Login() {
 								id="password"
 								name="password"
 								type="password"
-								autoComplete="current-password"
+								autoComplete="new-password"
 								required
 								placeholder="••••••••"
 								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
@@ -116,7 +117,7 @@ export default function Login() {
 							disabled={nav.state === "submitting"}
 							className="text-sm font-medium text-slate-900 underline decoration-green-500 decoration-2 underline-offset-4 transition hover:text-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
 						>
-							{nav.state === "submitting" ? "Signing in..." : "Continue"}
+							{nav.state === "submitting" ? "Creating account..." : "Continue"}
 						</button>
 					</div>
 				</fetcher.Form>
@@ -124,3 +125,4 @@ export default function Login() {
 		</div>
 	);
 }
+

@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 import { AppErrorOutlet } from "../components/errors/AppErrorOutlet";
 import { config } from "../config";
-import { createLoginAction } from "../routes/session/actions";
+import { createLoginAction, createSignupAction } from "../routes/session/actions";
 import { createSessionAuthenticateLoader } from "../routes/session/loaders";
 import SessionAuthenticate, {
 	type SessionAuthenticateLoaderResponse,
@@ -13,6 +13,9 @@ import SessionAuthenticate, {
 import SessionLogin, {
 	LOGIN_ACTION_PATH,
 } from "../routes/session/SessionLogin";
+import SessionSignup, {
+	SIGNUP_ACTION_PATH,
+} from "../routes/session/SessionSignup";
 import SessionVerify from "../routes/session/SessionVerify";
 import type { AuthService } from "../services/auth/AuthService";
 import { createRedirectToApp } from "./utils/redirectUtils";
@@ -24,6 +27,7 @@ export function createRouter(authService: AuthService) {
 	// Create authentication-related functions with the auth service
 	const redirectToApp = createRedirectToApp(authService);
 	const loginAction = createLoginAction(authService);
+	const signupAction = createSignupAction(authService);
 	const sessionAuthenticateLoader =
 		createSessionAuthenticateLoader(authService);
 
@@ -77,6 +81,20 @@ export function createRouter(authService: AuthService) {
 			element: null,
 			errorElement: commonErrorElement,
 			action: loginAction,
+		},
+		{
+			path: `${basePath}/signup`,
+			element: <SessionSignup />,
+			errorElement: commonErrorElement,
+			loader: async () => {
+				return await redirectToApp();
+			},
+		},
+		{
+			path: SIGNUP_ACTION_PATH,
+			element: null,
+			errorElement: commonErrorElement,
+			action: signupAction,
 		},
 	]);
 }

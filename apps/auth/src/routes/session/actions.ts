@@ -65,3 +65,62 @@ export function createLoginAction(authService: AuthService) {
 		return redirect(redirectUrl || "/");
 	};
 }
+
+/**
+ * Creates a signup action function with the provided AuthService
+ */
+export function createSignupAction(authService: AuthService) {
+	return async function signupAction({ request }: ActionFunctionArgs) {
+		/* ============================================================== */
+		/* 1. Get form data
+    /* ============================================================== */
+		const form = await request.formData();
+		const email = form.get("email") as string;
+		const password = form.get("password") as string;
+		const redirectUrlValue = form.get(REDIRECT_URL_PARAM);
+		const sessionManager = SessionManager.getInstance();
+		const redirectUrl = redirectUrlValue
+			? redirectUrlValue.toString()
+			: sessionManager.getStoredRedirectUrlOrDefault();
+
+		/* ============================================================== */
+		/* 2. Attempt sign up
+    /* ============================================================== */
+		debug.log("[SignupAction] Attempting sign up with password", {
+			email,
+			redirectUrl,
+			hasRedirectParam: !!redirectUrlValue,
+		});
+
+		const { error } = await authService.signUp(email, password);
+
+		if (error) {
+			debug.error(error, {
+				action: "signupAction",
+				email,
+				redirectUrl,
+			});
+			trackEvent("signup.failure", {
+				email,
+				redirectUrl,
+				error: error.message,
+			});
+			return { error: error };
+		}
+
+		/* ============================================================== */
+		/* 3. Redirect to dashboard on success
+    /* ============================================================== */
+		debug.log("[SignupAction] Sign up successful", {
+			email,
+			redirectUrl,
+		});
+		trackEvent("signup.success", {
+			email,
+			redirectUrl,
+		});
+
+		// With password auth, we go directly to the redirect URL instead of verify page
+		return redirect(redirectUrl || "/");
+	};
+}
