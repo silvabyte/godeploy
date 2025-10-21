@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useFetcher, useLocation, useNavigation } from "react-router-dom";
 import { REDIRECT_URL_PARAM } from "../../constants/auth.constants";
 import { Logo } from "../../logo/Logo";
@@ -13,6 +13,9 @@ export default function Signup() {
 	const { error } = fetcher.data || { error: null };
 	const location = useLocation();
 	const sessionManager = SessionManager.getInstance();
+	const [password, setPassword] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [passwordError, setPasswordError] = useState("");
 
 	useEffect(() => {
 		trackEvent("page_view", {
@@ -28,6 +31,16 @@ export default function Signup() {
 			sessionManager.storeRedirectUrl(redirectUrlParam);
 		}
 	}, [location, sessionManager]);
+
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		// Validate password confirmation
+		if (password !== confirmPassword) {
+			e.preventDefault();
+			setPasswordError("Passwords don't match");
+			return;
+		}
+		setPasswordError("");
+	};
 
 	return (
 		<div className="min-h-screen bg-white flex items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
@@ -58,11 +71,20 @@ export default function Signup() {
 					</div>
 				) : null}
 
+				{passwordError ? (
+					<div className="text-center">
+						<p className="text-sm font-light text-red-600">
+							{passwordError}
+						</p>
+					</div>
+				) : null}
+
 				<fetcher.Form
 					id="signup-submit"
 					method="POST"
 					action={SIGNUP_ACTION_PATH}
 					className="space-y-8"
+					onSubmit={handleSubmit}
 				>
 					<div className="space-y-8">
 						<div>
@@ -96,6 +118,28 @@ export default function Signup() {
 								type="password"
 								autoComplete="new-password"
 								required
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								placeholder="••••••••"
+								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+							/>
+						</div>
+
+						<div>
+							<label
+								htmlFor="confirmPassword"
+								className="block text-sm font-light text-slate-500 mb-3"
+							>
+								Confirm password
+							</label>
+							<input
+								id="confirmPassword"
+								name="confirmPassword"
+								type="password"
+								autoComplete="new-password"
+								required
+								value={confirmPassword}
+								onChange={(e) => setConfirmPassword(e.target.value)}
 								placeholder="••••••••"
 								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
 							/>
@@ -125,4 +169,5 @@ export default function Signup() {
 		</div>
 	);
 }
+
 

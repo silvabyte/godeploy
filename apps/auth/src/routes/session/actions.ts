@@ -1,4 +1,5 @@
 import { type ActionFunctionArgs, redirect } from "react-router-dom";
+import { config } from "../../config";
 import { REDIRECT_URL_PARAM } from "../../constants/auth.constants";
 import { trackEvent } from "../../router/telemetry/telemetry";
 import type { AuthService } from "../../services/auth/AuthService";
@@ -79,9 +80,10 @@ export function createSignupAction(authService: AuthService) {
 		const password = form.get("password") as string;
 		const redirectUrlValue = form.get(REDIRECT_URL_PARAM);
 		const sessionManager = SessionManager.getInstance();
+		const defaultDashboardUrl = `${config.VITE_DASHBOARD_BASE_URL}/session`;
 		const redirectUrl = redirectUrlValue
 			? redirectUrlValue.toString()
-			: sessionManager.getStoredRedirectUrlOrDefault();
+			: sessionManager.getStoredRedirectUrlOrDefault() || defaultDashboardUrl;
 
 		/* ============================================================== */
 		/* 2. Attempt sign up
@@ -92,7 +94,7 @@ export function createSignupAction(authService: AuthService) {
 			hasRedirectParam: !!redirectUrlValue,
 		});
 
-		const { error } = await authService.signUp(email, password);
+		const { data, error } = await authService.signUp(email, password);
 
 		if (error) {
 			debug.error(error, {
@@ -114,13 +116,14 @@ export function createSignupAction(authService: AuthService) {
 		debug.log("[SignupAction] Sign up successful", {
 			email,
 			redirectUrl,
+			session: !!data?.session,
 		});
 		trackEvent("signup.success", {
 			email,
 			redirectUrl,
 		});
 
-		// With password auth, we go directly to the redirect URL instead of verify page
-		return redirect(redirectUrl || "/");
+		// Redirect to dashboard with session
+		return redirect(redirectUrl);
 	};
 }
