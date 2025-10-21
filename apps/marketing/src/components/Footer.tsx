@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { Container } from "@/components/Container";
 import { Logo } from "@/components/Logo";
-import { Potatosaur } from "@/components/Potatosaur";
 
 export function Footer() {
 	return (
@@ -14,9 +13,6 @@ export function Footer() {
 						<p className="mt-4 text-sm text-slate-500">
 							Simple, fast deployment for modern browser-based applications.
 						</p>
-						<div className="mt-4 w-20 opacity-90" aria-hidden="true">
-							<Potatosaur />
-						</div>
 					</div>
 
 					<div>
@@ -60,14 +56,6 @@ export function Footer() {
 					<div>
 						<h3 className="text-sm font-medium text-slate-900">Resources</h3>
 						<ul className="mt-4 space-y-3">
-							<li>
-								<Link
-									href="https://github.com/matsilva/godeploy"
-									className="text-sm text-slate-500 hover:text-slate-700"
-								>
-									GitHub
-								</Link>
-							</li>
 							<li>
 								<Link
 									href="/privacy"

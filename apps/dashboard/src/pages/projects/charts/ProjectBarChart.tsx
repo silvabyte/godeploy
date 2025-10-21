@@ -32,7 +32,10 @@ const AggregateProjects = (projects: Project[]): ChartData[] => {
 				(now.getTime() - createdAtDay.getTime()) / (1000 * 60 * 60 * 24),
 			);
 			if (dayIndex >= 0 && dayIndex < 30) {
-				data[29 - dayIndex].projects += 1;
+				const targetDay = data[29 - dayIndex];
+				if (targetDay) {
+					targetDay.projects += 1;
+				}
 			}
 		}
 	});
@@ -49,10 +52,12 @@ interface CustomTooltipProps {
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 	if (active && payload && payload.length) {
+		const data = payload[0];
+		if (!data) return null;
 		return (
 			<div className="rounded bg-slate-800 p-2 text-xs shadow-lg">
 				<p className="font-medium text-white">{label}</p>
-				<p className="text-emerald-400">{`Projects: ${payload[0].value}`}</p>
+				<p className="text-emerald-400">{`Projects: ${data.value}`}</p>
 			</div>
 		);
 	}

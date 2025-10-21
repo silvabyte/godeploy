@@ -35,6 +35,7 @@ const CustomTooltip = ({
 }: TooltipProps<ValueType, NameType>) => {
 	if (active && payload && payload.length) {
 		const data = payload[0];
+		if (!data) return null;
 		const date = parseISO(data.payload.name);
 		return (
 			<div className="bg-white border border-slate-200 rounded-lg p-3 shadow-lg">

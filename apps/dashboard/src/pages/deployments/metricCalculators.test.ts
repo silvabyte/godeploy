@@ -72,10 +72,12 @@ describe("calculateDeploymentMetrics", () => {
 	it.skip("should filter out deployments older than 30 days", () => {
 		// TODO: Skipped due to memoization caching issues - same as above
 		const testDate = new Date(REFERENCE_DATE.getTime() + 3000); // Unique date to avoid cache
+		const firstDeploy = mockDeployments[0];
+		if (!firstDeploy) return;
 		const oldDeployments = [
 			...mockDeployments,
 			{
-				...mockDeployments[0],
+				...firstDeploy,
 				id: "old-deploy",
 				created_at: "2025-02-20T10:00:00Z", // This is outside the 30-day window
 			},
@@ -100,9 +102,13 @@ describe("getLatestDeploymentsByProject", () => {
 		const latest = getLatestDeploymentsByProject(mockDeployments, 1);
 		expect(latest).toHaveLength(1);
 		// The most recent deployment should be from March 23, 2025
-		expect(new Date(latest[0].created_at).toISOString()).toContain(
-			"2025-03-23",
-		);
+		const firstResult = latest[0];
+		expect(firstResult).toBeDefined();
+		if (firstResult) {
+			expect(new Date(firstResult.created_at).toISOString()).toContain(
+				"2025-03-23",
+			);
+		}
 	});
 
 	it("should handle empty deployments array", () => {

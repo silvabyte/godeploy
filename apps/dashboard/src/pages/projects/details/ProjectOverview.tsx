@@ -35,7 +35,7 @@ export function ProjectOverview({ deployments, status }: ProjectOverviewProps) {
 		deployCount: metrics.totalDeploys,
 		avgDeployTime: formatDuration(metrics.averageDeployTime),
 		lastUpdated:
-			deployments.length > 0
+			deployments.length > 0 && deployments[0]
 				? formatDistanceToNow(new Date(deployments[0].created_at), {
 						addSuffix: true,
 					})

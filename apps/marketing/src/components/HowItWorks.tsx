@@ -10,9 +10,12 @@ export function HowItWorks() {
 		<section className="bg-white py-24">
 			<Container>
 				<div className="mx-auto max-w-4xl text-center">
-					<h2 className="text-base leading-7 font-semibold text-green-600 uppercase tracking-wider">
-						Get started in minutes
-					</h2>
+					<div className="flex justify-center flex-col items-center gap-y-8">
+						<Potatosaur />
+						<h2 className="text-base leading-7 font-semibold text-green-600 uppercase tracking-wider">
+							Get started in minutes
+						</h2>
+					</div>
 					<p
 						id="how-it-works-heading"
 						className="mt-2 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
@@ -27,13 +30,7 @@ export function HowItWorks() {
 				</div>
 
 				<div className="relative mx-auto mt-16 max-w-4xl">
-					<div
-						className="pointer-events-none absolute -top-6 -right-6 w-24 rotate-6 opacity-95"
-						aria-hidden="true"
-					>
-						<Potatosaur />
-					</div>
-					<Terminal className="mt-6" title="CLI Quickstart">
+					<Terminal className="mt-6 h-48" title="CLI Quickstart">
 						<TerminalLine
 							prompt="$"
 							command="curl -sSL https://install.spa.godeploy.app/now.sh | bash"

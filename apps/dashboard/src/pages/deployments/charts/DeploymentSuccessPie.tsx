@@ -25,17 +25,19 @@ interface CustomTooltipProps {
 
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 	if (active && payload && payload.length) {
+		const data = payload[0];
+		if (!data || !data.payload.total) return null;
 		return (
 			<div className="absolute right-full top-full mr-2 bg-white border border-slate-200 rounded-lg p-3 shadow-lg w-48">
-				<p className="text-sm font-medium text-slate-900">{payload[0].name}</p>
+				<p className="text-sm font-medium text-slate-900">{data.name}</p>
 				<p className="text-sm text-slate-500">
 					Count:{" "}
-					<span className="text-green-600 font-medium">{payload[0].value}</span>
+					<span className="text-green-600 font-medium">{data.value}</span>
 				</p>
 				<p className="text-sm text-slate-500">
 					Percentage:{" "}
 					<span className="text-green-600 font-medium">
-						{((payload[0].value / payload[0].payload.total!) * 100).toFixed(1)}%
+						{((data.value / data.payload.total) * 100).toFixed(1)}%
 					</span>
 				</p>
 			</div>

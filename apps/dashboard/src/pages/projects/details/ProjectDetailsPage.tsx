@@ -115,7 +115,9 @@ export function ProjectDetailsPage() {
 												new Date(b.created_at).getTime() -
 												new Date(a.created_at).getTime(),
 										)[0];
-									return ` • Last successful deploy: ${new Date(lastSuccessfulDeploy.created_at).toLocaleDateString()}`;
+									return lastSuccessfulDeploy
+										? ` • Last successful deploy: ${new Date(lastSuccessfulDeploy.created_at).toLocaleDateString()}`
+										: "";
 								})()}
 						</p>
 					</div>

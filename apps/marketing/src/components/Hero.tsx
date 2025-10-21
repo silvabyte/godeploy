@@ -28,9 +28,7 @@ export function Hero() {
 						className="font-display text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl"
 					>
 						Ship Your Frontend
-						<span className="block text-green-600">
-							Without the DevOps Drama
-						</span>
+						<span className="block text-green-600">Without the Lock-in</span>
 					</h1>
 
 					<p className="mt-6 text-xl leading-8 text-slate-700">
@@ -67,7 +65,7 @@ export function Hero() {
 								{ icon: "⚡", label: "Instant HTTPS" },
 								{ icon: "🌍", label: "Global CDN" },
 								{ icon: "🔗", label: "Custom Domains" },
-								{ icon: "↩️", label: "One-Click Rollbacks" },
+								{ icon: "↩", label: "One-Click Rollbacks" },
 							].map((feature) => (
 								<div
 									key={feature.label}
@@ -90,7 +88,7 @@ export function Hero() {
 
 				<div className="relative mt-10 md:mt-0 md:ml-8 w-full max-w-xl lg:max-w-2xl">
 					{/* Potatosaur mascot */}
-					<div className="absolute -top-12 right-2 w-24 rotate-12 z-10">
+					<div className="absolute -top-30 -right-10 -rotate-40 z-0">
 						<Potatosaur />
 					</div>
 

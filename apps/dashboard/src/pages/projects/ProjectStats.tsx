@@ -47,7 +47,7 @@ export function ProjectStats({ projects }: { projects: Project[] }) {
 		{
 			name: "Last Created",
 			value:
-				sortedProjects.length > 0
+				sortedProjects.length > 0 && sortedProjects[0]
 					? formatDistanceToNow(new Date(sortedProjects[0].created_at || ""), {
 							addSuffix: true,
 						})

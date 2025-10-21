@@ -12,8 +12,11 @@ export const getSortFromSearchParams = (
 
 	for (const [key, value] of searchParams.entries()) {
 		if (sortParams[key]) {
-			sortField = key.split("[")[1].split("]")[0];
-			sortOrder = value;
+			const fieldMatch = key.split("[")[1]?.split("]")[0];
+			if (fieldMatch) {
+				sortField = fieldMatch;
+				sortOrder = value;
+			}
 		}
 	}
 	return { sortField, sortOrder: sortOrder as Order };
