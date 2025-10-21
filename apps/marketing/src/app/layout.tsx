@@ -6,20 +6,20 @@ import Script from "next/script";
 import "@/styles/tailwind.css";
 
 export const metadata: Metadata = {
-	title: "GoDeploy — Zero‑Config Static Hosting for SPAs",
+	title: "GoDeploy — Deploy. One command. Everything else is noise.",
 	description:
-		"Deploy React, Vue, Svelte, Angular and static apps with instant HTTPS and a global CDN. No SSR. No pipelines. Just ship.",
+		"Deploy your frontend. No pipelines. No edge functions. No framework lock-in. Just shipping.",
 	openGraph: {
-		title: "GoDeploy — Zero‑Config Static Hosting for SPAs",
+		title: "GoDeploy — Deploy. One command. Everything else is noise.",
 		description:
-			"Deploy React, Vue, Svelte, Angular and static apps with instant HTTPS and a global CDN. No SSR. No pipelines. Just ship.",
+			"Deploy your frontend. No pipelines. No edge functions. No framework lock-in. Just shipping.",
 		type: "website",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "GoDeploy — Zero‑Config Static Hosting for SPAs",
+		title: "GoDeploy — Deploy. One command. Everything else is noise.",
 		description:
-			"Deploy React, Vue, Svelte, Angular and static apps with instant HTTPS and a global CDN. No SSR. No pipelines. Just ship.",
+			"Deploy your frontend. No pipelines. No edge functions. No framework lock-in. Just shipping.",
 	},
 };
 
@@ -60,7 +60,7 @@ export default function RootLayout({
 			<head>
 				<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 			</head>
-			<body className="flex h-full flex-col font-mono">{children}</body>
+			<body className="flex h-full flex-col">{children}</body>
 		</html>
 	);
 }

@@ -17,7 +17,7 @@ export function ProjectDetailsTabs({
 	];
 
 	return (
-		<div className="border-b border-slate-200">
+		<div className="border-b border-slate-100">
 			<nav className="-mb-px flex space-x-8">
 				{tabs.map((tab) => (
 					<button
@@ -26,9 +26,9 @@ export function ProjectDetailsTabs({
 						onClick={() => onChange(tab.id as TabType)}
 						className={clsx(
 							tab.id === activeTab
-								? "border-green-600 text-green-600"
-								: "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700",
-							"whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium cursor-pointer",
+								? "border-green-500 text-slate-900"
+								: "border-transparent text-slate-500 hover:text-slate-900",
+							"whitespace-nowrap border-b-2 py-4 px-1 text-sm font-light cursor-pointer transition",
 						)}
 					>
 						{tab.label}

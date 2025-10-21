@@ -56,7 +56,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
 
 			{/* Desktop sidebar */}
 			<div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col">
-				<div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-50 px-6 border-r border-slate-200">
+				<div className="flex grow flex-col gap-y-8 overflow-y-auto bg-white px-8 py-8 border-r border-slate-100">
 					<SidebarContent />
 				</div>
 			</div>
@@ -67,18 +67,18 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
 function SidebarContent() {
 	return (
 		<>
-			<a href="/">
-				<Logo className="h-16 -ml-8" />
+			<a href="/" className="flex items-center">
+				<Logo className="h-10" />
 			</a>
 			<nav className="flex flex-1 flex-col">
-				<ul className="flex flex-1 flex-col gap-y-7">
+				<ul className="flex flex-1 flex-col gap-y-8">
 					<li>
 						<NavigationList />
 					</li>
 					{/* <li>
             <TeamList />
           </li> */}
-					<li className="-mx-6 mt-auto">
+					<li className="-mx-8 mt-auto">
 						<UserProfile />
 					</li>
 				</ul>

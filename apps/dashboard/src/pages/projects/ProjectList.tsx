@@ -16,30 +16,30 @@ export function ProjectList({ projects }: { projects: Project[] }) {
 
 	return (
 		<main className="lg:pr-96">
-			<header className="flex items-center justify-between border-b border-slate-200 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-				<Heading level={1} className="text-base/7 font-semibold">
+			<header className="flex items-center justify-between border-b border-slate-100 px-6 py-6 sm:px-8 sm:py-8 lg:px-12">
+				<Heading level={1} className="text-lg font-light text-slate-900">
 					{t("projects.title")}
 				</Heading>
 
 				{/* Sort dropdown */}
 				<div className="flex items-center gap-4">
 					<Menu as="div" className="relative">
-						<MenuButton className="flex items-center gap-x-1 text-sm/6 font-medium text-slate-700 hover:text-slate-900">
+						<MenuButton className="flex items-center gap-x-1 text-sm font-light text-slate-500 hover:text-slate-900 transition">
 							{t("projects.sort.label")}
 							<ChevronUpDownIcon
 								aria-hidden="true"
-								className="size-5 text-slate-400"
+								className="size-4 text-slate-400"
 							/>
 						</MenuButton>
 						<MenuItems
 							transition
-							className="absolute right-0 z-10 mt-2.5 w-40 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-slate-200 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+							className="absolute right-0 z-10 mt-2.5 w-40 origin-top-right border border-slate-100 bg-white py-1 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
 						>
 							<MenuItem>
 								{({ close }) => (
 									<button
 										type="button"
-										className="block w-full px-3 py-1 text-left text-sm/6 text-slate-700 hover:bg-slate-50 hover:text-slate-900 data-focus:bg-slate-50 data-focus:outline-hidden"
+										className="block w-full px-3 py-2 text-left text-sm font-light text-slate-700 hover:text-slate-900 data-focus:text-slate-900 data-focus:outline-hidden transition"
 										onClick={(e) => {
 											e.preventDefault();
 											navigate(pushQueryParam("sort[created_at]", "desc"));
@@ -54,7 +54,7 @@ export function ProjectList({ projects }: { projects: Project[] }) {
 								{({ close }) => (
 									<button
 										type="button"
-										className="block w-full px-3 py-1 text-left text-sm/6 text-slate-700 hover:bg-slate-50 hover:text-slate-900 data-focus:bg-slate-50 data-focus:outline-hidden"
+										className="block w-full px-3 py-2 text-left text-sm font-light text-slate-700 hover:text-slate-900 data-focus:text-slate-900 data-focus:outline-hidden transition"
 										onClick={(e) => {
 											e.preventDefault();
 											navigate(pushQueryParam("sort[created_at]", "asc"));
@@ -69,7 +69,7 @@ export function ProjectList({ projects }: { projects: Project[] }) {
 								{({ close }) => (
 									<button
 										type="button"
-										className="block w-full px-3 py-1 text-left text-sm/6 text-slate-700 hover:bg-slate-50 hover:text-slate-900 data-focus:bg-slate-50 data-focus:outline-hidden"
+										className="block w-full px-3 py-2 text-left text-sm font-light text-slate-700 hover:text-slate-900 data-focus:text-slate-900 data-focus:outline-hidden transition"
 										onClick={(e) => {
 											e.preventDefault();
 											navigate(pushQueryParam("sort[name]", "asc"));
@@ -94,9 +94,9 @@ export function ProjectList({ projects }: { projects: Project[] }) {
 			</header>
 
 			{/* Project list */}
-			<ul className="divide-y divide-slate-200">
+			<ul className="divide-y divide-slate-100">
 				{projects.length === 0 && (
-					<li className="p-4 text-center text-sm/6 text-slate-500">
+					<li className="p-6 text-center text-sm font-light text-slate-500">
 						{t("projects.noProjects")}
 					</li>
 				)}

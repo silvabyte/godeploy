@@ -6,13 +6,11 @@ import { useState } from "react";
 import { Button } from "@/components/Button";
 import { Logo, LogoIcon } from "@/components/Logo";
 import { NavLink } from "@/components/NavLink";
-import { Potatosaur as PotatosaurComponent } from "@/components/Potatosaur";
 
 export function ComponentExamples() {
 	return (
 		<div className="space-y-24 py-16">
 			<BrandLogo />
-			<Potatosaur />
 			<ColorPalette />
 			<Typography />
 			<Buttons />
@@ -232,81 +230,6 @@ function BrandLogo() {
 	);
 }
 
-function Potatosaur() {
-	return (
-		<section>
-			<h2 className="text-base leading-7 font-semibold text-green-500">
-				MASCOT
-			</h2>
-			<p className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-				Potatosaur
-			</p>
-			<p className="mt-6 text-lg text-slate-700">
-				Our beloved mascot character - a wonderful freak of nature that
-				represents our playful approach to developer tooling.
-			</p>
-
-			<div className="mt-12">
-				<h3 className="text-xl font-semibold text-slate-900">
-					Official Potatosaur
-				</h3>
-				<div className="mt-6 flex flex-col items-center gap-12 rounded-lg border border-slate-200 bg-white p-12 sm:flex-row">
-					<div className="flex items-center">
-						<PotatosaurComponent />
-					</div>
-
-					{/* Specifications */}
-					<div className="space-y-3 text-left text-sm text-slate-700 sm:ml-8">
-						<p>• Potato-like body with minimal details</p>
-						<p>• Simple black outline (3px stroke width)</p>
-						<p>
-							• Characteristics: wonderfully ambiguous form where you can't tell
-							where its body begins and ends
-						</p>
-						<p>• Green accents (Green 500, #4ADE80) for spikes/plates</p>
-						<p>• Friendly, slightly awkward stance</p>
-					</div>
-				</div>
-			</div>
-
-			<div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2">
-				<div>
-					<h3 className="text-xl font-semibold text-slate-900">
-						Symbolic Meaning
-					</h3>
-					<div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
-						<p className="text-sm text-slate-700">
-							Every tech company seems to need an adorable animal mascot to
-							prove their legitimacy. Some have crabs, others have gophers, a
-							few have actual dinosaurs. We have... whatever this is. Is it a
-							potato? Is it a dinosaur? Yes.
-						</p>
-						<p className="mt-3 text-sm text-slate-700">
-							Let's just say we're not taking ourselves too seriously here. But
-							our code? That we take very seriously.
-						</p>
-					</div>
-				</div>
-
-				<div>
-					<h3 className="text-xl font-semibold text-slate-900">
-						Usage Guidelines
-					</h3>
-					<div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
-						<ul className="list-disc space-y-2 pl-5 text-sm text-slate-700">
-							<li>Maintain proportions when resizing</li>
-							<li>
-								Use in marketing materials, documentation, and error pages
-							</li>
-							<li>Can be displayed in full color or monochrome</li>
-							<li>Always portray in its friendly, awkward stance</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</section>
-	);
-}
 
 function ColorPalette() {
 	const primaryColors = [

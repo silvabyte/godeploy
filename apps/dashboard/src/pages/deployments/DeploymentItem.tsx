@@ -47,13 +47,13 @@ function DeployDateText({ deployment }: { deployment: Deployment }) {
 
 export function DeploymentItem({ deployment }: DeploymentItemProps) {
 	return (
-		<li className="group relative flex items-center space-x-4 px-4 py-4 transition-colors hover:bg-slate-50 sm:px-6">
+		<li className="group relative flex items-center space-x-4 px-6 py-6 transition-colors sm:px-8 lg:px-12">
 			<div className="min-w-0 flex-auto">
 				<div className="flex items-center gap-x-3">
 					<StatusDot status={deployment.status as StatusType} />
-					<Text variant="body" className="min-w-0 font-medium flex gap-x-2">
+					<Text variant="body" className="min-w-0 font-light flex gap-x-2">
 						<span className="whitespace-nowrap">{deployment.projectName}</span>
-						<span className="text-slate-400">
+						<span className="text-slate-300">
 							{t("deployments.list.teamSeparator")}
 						</span>
 						<span className="truncate">
@@ -61,7 +61,7 @@ export function DeploymentItem({ deployment }: DeploymentItemProps) {
 						</span>
 					</Text>
 				</div>
-				<div className="mt-2 flex items-center gap-x-2.5 text-xs">
+				<div className="mt-2 flex items-center gap-x-2.5 text-xs font-light">
 					<DeployDateText deployment={deployment} />
 					<svg
 						aria-hidden="true"
@@ -74,7 +74,7 @@ export function DeploymentItem({ deployment }: DeploymentItemProps) {
 						href={deployment.url}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-emerald-600 hover:text-emerald-700 cursor-pointer"
+						className="text-green-600 hover:text-green-700 cursor-pointer transition"
 						title={t("deployments.list.visitSite")}
 					>
 						{deployment.url}
@@ -83,7 +83,7 @@ export function DeploymentItem({ deployment }: DeploymentItemProps) {
 			</div>
 			<Badge
 				status={deployment.environment as "preview" | "production"}
-				className="flex-none capitalize"
+				className="flex-none capitalize font-light"
 			>
 				{deployment.environment}
 			</Badge>

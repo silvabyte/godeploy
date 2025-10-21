@@ -1,124 +1,21 @@
-"use client";
-
-import {
-	Popover,
-	PopoverBackdrop,
-	PopoverButton,
-	PopoverPanel,
-} from "@headlessui/react";
-import clsx from "clsx";
 import Link from "next/link";
-
-import { Button } from "@/components/Button";
 import { Container } from "@/components/Container";
 import { Logo } from "@/components/Logo";
-import { NavLink } from "@/components/NavLink";
-
-function MobileNavLink({
-	href,
-	children,
-}: {
-	href: string;
-	children: React.ReactNode;
-}) {
-	return (
-		<PopoverButton as={Link} href={href} className="block w-full p-2">
-			{children}
-		</PopoverButton>
-	);
-}
-
-function MobileNavIcon({ open }: { open: boolean }) {
-	return (
-		<svg
-			aria-hidden="true"
-			className="h-3.5 w-3.5 overflow-visible stroke-slate-900"
-			fill="none"
-			strokeWidth={2}
-			strokeLinecap="round"
-		>
-			<path
-				d="M0 1H14M0 7H14M0 13H14"
-				className={clsx(
-					"origin-center transition",
-					open && "scale-90 opacity-0",
-				)}
-			/>
-			<path
-				d="M2 2L12 12M12 2L2 12"
-				className={clsx(
-					"origin-center transition",
-					!open && "scale-90 opacity-0",
-				)}
-			/>
-		</svg>
-	);
-}
-
-function MobileNavigation() {
-	return (
-		<Popover>
-			<PopoverButton
-				className="relative z-10 flex h-8 w-8 items-center justify-center focus:not-data-focus:outline-hidden"
-				aria-label="Toggle Navigation"
-			>
-				{({ open }) => <MobileNavIcon open={open} />}
-			</PopoverButton>
-			<PopoverBackdrop
-				transition
-				className="fixed inset-0 bg-slate-300/50 duration-150 data-closed:opacity-0 data-enter:ease-out data-leave:ease-in"
-			/>
-			<PopoverPanel
-				transition
-				className="absolute inset-x-0 top-full mt-4 flex origin-top flex-col rounded-lg bg-white p-4 text-lg tracking-tight text-slate-900 shadow-lg data-closed:scale-95 data-closed:opacity-0 data-enter:duration-150 data-enter:ease-out data-leave:duration-100 data-leave:ease-in"
-			>
-				<MobileNavLink href="#features">Features</MobileNavLink>
-				<MobileNavLink href="#how-it-works">How It Works</MobileNavLink>
-				<hr className="m-2 border-slate-100" />
-				<MobileNavLink href="#pricing">Pricing</MobileNavLink>
-				<MobileNavLink href="#faq">FAQ</MobileNavLink>
-				<hr className="m-2 border-slate-100" />
-				<MobileNavLink href="https://github.com/matsilva/godeploy">
-					GitHub
-				</MobileNavLink>
-			</PopoverPanel>
-		</Popover>
-	);
-}
 
 export function Header() {
 	return (
-		<header className="border-b border-slate-100 py-5">
+		<header className="py-8 md:py-12">
 			<Container>
-				<nav className="relative z-50 flex items-center justify-between">
-					<div className="flex items-center md:gap-x-8">
-						<Link href="/" aria-label="Home">
-							<Logo className="h-10 w-auto" />
-						</Link>
-						<div className="hidden md:flex md:gap-x-6">
-							<NavLink href="#features">Features</NavLink>
-							<NavLink href="#how-it-works">How It Works</NavLink>
-							<NavLink href="#pricing">Pricing</NavLink>
-							<NavLink href="#faq">FAQ</NavLink>
-
-							<NavLink href="https://github.com/matsilva/godeploy">
-								GitHub
-							</NavLink>
-						</div>
-					</div>
-					<div className="flex items-center gap-x-5">
-						<div className="hidden md:block">
-							<Button href="https://auth.godeploy.app" variant="outline">
-								Login
-							</Button>
-						</div>
-						<Button href="https://auth.godeploy.app" color="green">
-							<span>Get Started</span>
-						</Button>
-						<div className="-mr-1 md:hidden">
-							<MobileNavigation />
-						</div>
-					</div>
+				<nav className="flex items-center justify-between">
+					<Link href="/" aria-label="Home">
+						<Logo className="h-8 w-auto md:h-10" />
+					</Link>
+					<Link
+						href="https://auth.godeploy.app"
+						className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
+					>
+						Sign in
+					</Link>
 				</nav>
 			</Container>
 		</header>

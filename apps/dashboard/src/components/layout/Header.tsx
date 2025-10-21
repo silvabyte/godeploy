@@ -26,14 +26,14 @@ export function Header({ setSidebarOpen }: HeaderProps) {
 
 	return (
 		<div
-			className={`${isDeploymentsPage ? "sticky" : ""} top-0 z-40 flex h-16 shrink-0 items-center gap-x-6 border-b border-slate-200 bg-white px-4 shadow-sm sm:px-6 lg:px-8`}
+			className={`${isDeploymentsPage ? "sticky" : ""} top-0 z-40 flex h-20 shrink-0 items-center gap-x-6 border-b border-slate-100 bg-white px-6 sm:px-8 lg:px-12`}
 		>
 			{isDeploymentsPage && (
 				<>
 					<button
 						type="button"
 						onClick={() => setSidebarOpen(true)}
-						className="-m-2.5 p-2.5 text-slate-900 xl:hidden"
+						className="-m-2.5 p-2.5 text-slate-500 hover:text-slate-900 transition xl:hidden"
 					>
 						<span className="sr-only">Open sidebar</span>
 						<Bars3Icon aria-hidden="true" className="size-5" />
@@ -51,15 +51,15 @@ export function Header({ setSidebarOpen }: HeaderProps) {
 							<input
 								name="search"
 								type="search"
-								placeholder="Search deployments by project name..."
+								placeholder="Search..."
 								onChange={debounce(onChange, 300)}
 								defaultValue={url.searchParams.get("q") ?? ""}
 								aria-label="Search"
-								className="col-start-1 row-start-1 block size-full bg-transparent pl-8 text-base text-slate-900 outline-hidden placeholder:text-slate-500 sm:text-sm/6"
+								className="col-start-1 row-start-1 block size-full border-0 border-b border-transparent bg-transparent pl-8 text-base font-light text-slate-900 outline-hidden placeholder:text-slate-400 focus:border-green-500 sm:text-sm/6"
 							/>
 							<MagnifyingGlassIcon
 								aria-hidden="true"
-								className="pointer-events-none col-start-1 row-start-1 size-5 self-center text-slate-500"
+								className="pointer-events-none col-start-1 row-start-1 size-5 self-center text-slate-400"
 							/>
 						</form>
 					</div>

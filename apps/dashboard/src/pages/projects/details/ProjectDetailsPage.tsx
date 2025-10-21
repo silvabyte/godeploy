@@ -68,8 +68,8 @@ export function ProjectDetailsPage() {
 	return (
 		<div className="min-h-screen bg-white">
 			{/* Project header */}
-			<div className="bg-white border-b border-slate-200">
-				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+			<div className="bg-white border-b border-slate-100">
+				<div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
 					{/* Tabs */}
 					<ProjectDetailsTabs
 						activeTab={activeTab}
@@ -84,24 +84,24 @@ export function ProjectDetailsPage() {
 					/>
 
 					{/* Project title and info */}
-					<div className="py-6">
-						<div className="flex items-center gap-2 mb-1">
+					<div className="py-8">
+						<div className="flex items-center gap-3 mb-2">
 							<StatusDot status="success" />
-							<div className="flex items-center gap-2 text-lg font-medium">
+							<div className="flex items-center gap-2 text-lg font-light">
 								<Link
 									to="/projects"
-									className="text-slate-600 hover:text-slate-900"
+									className="text-slate-500 hover:text-slate-900 transition"
 								>
 									Projects
 								</Link>
-								<span className="text-slate-400">/</span>
+								<span className="text-slate-300">/</span>
 								<span className="text-slate-900">{project.name}</span>
 							</div>
-							<Badge status="production" className="ml-3">
+							<Badge status="production" className="ml-2 font-light">
 								Production
 							</Badge>
 						</div>
-						<p className="text-slate-500 text-sm">
+						<p className="text-slate-500 text-sm font-light">
 							{project.description ||
 								`Created ${new Date(project.created_at).toLocaleDateString()}`}
 							{project.domain && ` • ${project.domain}`}
@@ -125,7 +125,7 @@ export function ProjectDetailsPage() {
 			</div>
 
 			{/* Tab content */}
-			<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+			<div className="mx-auto max-w-7xl px-6 py-8 sm:px-8 lg:px-12">
 				{activeTab === "overview" && (
 					<ProjectOverview
 						project={project}

@@ -57,16 +57,16 @@ export function NavigationList() {
 	const { pathname } = useLocation();
 
 	return (
-		<ul className="-mx-2 space-y-1">
+		<ul className="space-y-2">
 			{navigation.map((item) => (
 				<li key={item.name}>
 					<Link
 						to={item.href}
 						className={classNames(
 							pathname === item.href
-								? "bg-green-50 text-green-700"
-								: "text-slate-700 hover:bg-slate-100 hover:text-slate-900",
-							"group flex items-center justify-between gap-x-3 rounded-md p-2 text-sm/6 font-semibold",
+								? "text-slate-900 font-medium"
+								: "text-slate-500 hover:text-slate-900",
+							"group flex items-center justify-between gap-x-3 py-2 text-sm font-light transition",
 						)}
 					>
 						<div className="flex items-center gap-x-3">
@@ -75,13 +75,13 @@ export function NavigationList() {
 								className={classNames(
 									pathname === item.href
 										? "text-green-500"
-										: "text-slate-500 group-hover:text-slate-700",
-									"size-6 shrink-0",
+										: "text-slate-400 group-hover:text-slate-600",
+									"size-5 shrink-0 transition",
 								)}
 							/>
 							{t(item.name)}
 						</div>
-						<Badge status={item.status} />
+						{item.status !== "beta" && <Badge status={item.status} />}
 					</Link>
 				</li>
 			))}

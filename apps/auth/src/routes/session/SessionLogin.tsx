@@ -1,8 +1,5 @@
-import { t } from "@matsilva/xtranslate";
 import { useEffect } from "react";
 import { useFetcher, useLocation, useNavigation } from "react-router-dom";
-import { Alert } from "../../components/alerts/Alert";
-import { Button } from "../../components/Button";
 import { REDIRECT_URL_PARAM } from "../../constants/auth.constants";
 import { Logo } from "../../logo/Logo";
 import { trackEvent } from "../../router/telemetry/telemetry";
@@ -32,98 +29,88 @@ export default function Login() {
 	}, [location, sessionManager]);
 
 	return (
-		<div className="min-h-screen bg-white flex items-center justify-center px-4 sm:px-6 lg:px-8">
-			<div className="w-full max-w-md space-y-8">
+		<div className="min-h-screen bg-white flex items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
+			<div className="w-full max-w-md space-y-16">
 				<div className="text-center">
-					<div className="flex justify-center">
-						<Logo className="h-16" />
+					<div className="flex justify-center mb-16">
+						<Logo className="h-10" />
 					</div>
-					<h2 className="mt-8 text-2xl font-bold tracking-tight text-slate-900">
-						{t("session.signin.title")}
-					</h2>
-					<p className="mt-2 text-sm text-slate-600">Sign in to your account</p>
+					<h1 className="text-6xl font-light tracking-tight text-slate-900 sm:text-7xl md:text-8xl">
+						Sign in.
+					</h1>
 				</div>
 
-				<div className="bg-white shadow sm:rounded-lg">
-					{error ? (
-						<div className="px-4 pt-5 sm:px-6">
-							<Alert type="danger" title={error.message} />
-						</div>
-					) : null}
+				{error ? (
+					<div className="text-center">
+						<p className="text-sm font-light text-red-600">
+							{error.message}
+						</p>
+					</div>
+				) : null}
 
-					<fetcher.Form
-						id="session-submit"
-						method="POST"
-						action={LOGIN_ACTION_PATH}
-					>
-						<div className="px-4 py-5 sm:p-6">
-							<div className="space-y-6">
-								<div>
-									<label
-										htmlFor="email"
-										className="block text-sm font-medium text-slate-700"
-									>
-										{t("session.inputs.email.label")}
-									</label>
-									<div className="mt-1">
-										<input
-											id="email"
-											name="email"
-											type="email"
-											autoComplete="email"
-											required
-											placeholder={t("session.inputs.email.placeholder")}
-											className="block w-full rounded-md border-slate-200 bg-slate-50 py-2 px-3 text-slate-900 shadow-sm focus:border-green-600 focus:ring-green-600 sm:text-sm"
-										/>
-									</div>
-								</div>
-
-								<div>
-									<label
-										htmlFor="password"
-										className="block text-sm font-medium text-slate-700"
-									>
-										{t("session.inputs.password.label")}
-									</label>
-									<div className="mt-1">
-										<input
-											id="password"
-											name="password"
-											type="password"
-											autoComplete="current-password"
-											required
-											placeholder={t("session.inputs.password.placeholder")}
-											className="block w-full rounded-md border-slate-200 bg-slate-50 py-2 px-3 text-slate-900 shadow-sm focus:border-green-600 focus:ring-green-600 sm:text-sm"
-										/>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						{/* Hidden input for redirect URL */}
-						{sessionManager.getStoredRedirectUrlOrDefault() && (
-							<input
-								type="hidden"
-								name={REDIRECT_URL_PARAM}
-								value={sessionManager.getStoredRedirectUrlOrDefault()}
-							/>
-						)}
-
-						<div className="px-4 py-3 text-right sm:px-6 border-t border-slate-200">
-							<Button
-								type="submit"
-								disabled={nav.state === "submitting"}
-								variant="primary"
-								color="green"
-								className="w-full justify-center"
+				<fetcher.Form
+					id="session-submit"
+					method="POST"
+					action={LOGIN_ACTION_PATH}
+					className="space-y-8"
+				>
+					<div className="space-y-8">
+						<div>
+							<label
+								htmlFor="email"
+								className="block text-sm font-light text-slate-500 mb-3"
 							>
-								{nav.state === "submitting"
-									? "Signing in..."
-									: t("session.signin.loginButton")}
-							</Button>
+								Email
+							</label>
+							<input
+								id="email"
+								name="email"
+								type="email"
+								autoComplete="email"
+								required
+								placeholder="you@example.com"
+								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+							/>
 						</div>
-					</fetcher.Form>
-				</div>
+
+						<div>
+							<label
+								htmlFor="password"
+								className="block text-sm font-light text-slate-500 mb-3"
+							>
+								Password
+							</label>
+							<input
+								id="password"
+								name="password"
+								type="password"
+								autoComplete="current-password"
+								required
+								placeholder="••••••••"
+								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+							/>
+						</div>
+					</div>
+
+					{/* Hidden input for redirect URL */}
+					{sessionManager.getStoredRedirectUrlOrDefault() && (
+						<input
+							type="hidden"
+							name={REDIRECT_URL_PARAM}
+							value={sessionManager.getStoredRedirectUrlOrDefault()}
+						/>
+					)}
+
+					<div className="pt-8">
+						<button
+							type="submit"
+							disabled={nav.state === "submitting"}
+							className="text-sm font-medium text-slate-900 underline decoration-green-500 decoration-2 underline-offset-4 transition hover:text-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							{nav.state === "submitting" ? "Signing in..." : "Continue"}
+						</button>
+					</div>
+				</fetcher.Form>
 			</div>
 		</div>
 	);
