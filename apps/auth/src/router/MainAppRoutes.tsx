@@ -5,7 +5,10 @@ import {
 } from "react-router-dom";
 import { AppErrorOutlet } from "../components/errors/AppErrorOutlet";
 import { config } from "../config";
-import { createLoginAction, createSignupAction } from "../routes/session/actions";
+import {
+	createLoginAction,
+	createSignupAction,
+} from "../routes/session/actions";
 import { createSessionAuthenticateLoader } from "../routes/session/loaders";
 import SessionAuthenticate, {
 	type SessionAuthenticateLoaderResponse,

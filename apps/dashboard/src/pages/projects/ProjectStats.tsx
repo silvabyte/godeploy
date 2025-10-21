@@ -64,22 +64,22 @@ export function ProjectStats({ projects }: { projects: Project[] }) {
 	];
 
 	return (
-		<aside className="bg-white lg:fixed lg:top-16 lg:right-0 lg:bottom-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-slate-200">
-			<header className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+		<aside className="bg-white lg:fixed lg:top-20 lg:right-0 lg:bottom-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-slate-100">
+			<header className="flex items-center justify-between border-b border-slate-100 px-8 py-6">
 				<div>
-					<Heading level={2} className="text-lg font-semibold">
+					<Heading level={2} className="text-lg font-light">
 						Project Metrics
 					</Heading>
-					<Text variant="small" className="text-slate-500">
+					<Text variant="small" className="text-slate-500 font-light">
 						Last 30 days
 					</Text>
 				</div>
 			</header>
 
-			<div className="space-y-6 p-6">
+			<div className="space-y-8 p-8">
 				{/* Charts Section */}
-				<div className="rounded-lg bg-slate-50 p-4">
-					<Heading level={3} className="mb-4 text-sm font-medium">
+				<div className="border border-slate-100 p-6">
+					<Heading level={3} className="mb-6 text-sm font-light">
 						Project Activity
 					</Heading>
 					<ProjectBarChart projects={projects} />
@@ -90,22 +90,22 @@ export function ProjectStats({ projects }: { projects: Project[] }) {
 					{stats.map((stat) => (
 						<div
 							key={stat.name}
-							className="relative rounded-lg bg-slate-50 p-4 transition-colors hover:bg-slate-100"
+							className="relative border border-slate-100 p-4 transition"
 						>
-							<div className="flex items-start space-x-3">
-								<stat.icon className="h-5 w-5 text-emerald-600" />
+							<div className="flex items-start space-x-2">
+								<stat.icon className="h-4 w-4 text-green-500" />
 								<div>
 									<Text
 										variant="body"
 										size="sm"
-										className="font-medium text-slate-500"
+										className="font-light text-slate-500"
 									>
 										{stat.name}
 									</Text>
 									<Text
 										variant="body"
 										size="2xl"
-										className="mt-1 font-semibold tracking-tight text-slate-900"
+										className="mt-1 font-light tracking-tight text-slate-900"
 									>
 										{stat.value}
 									</Text>

@@ -12,7 +12,7 @@
 		--font-mono:
 			"Fira Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
 			"Liberation Mono", "Courier New", monospace;
-			
+
 		/* Brutalist typography scale */
 		--text-7xl: 4.5rem;
 		--text-7xl--line-height: 1.1;

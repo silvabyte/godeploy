@@ -55,25 +55,25 @@ export function DeploymentStats({
 	];
 
 	return (
-		<aside className="bg-white lg:fixed lg:top-16 lg:right-0 lg:bottom-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-slate-200">
-			<header className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+		<aside className="bg-white lg:fixed lg:top-20 lg:right-0 lg:bottom-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-slate-100">
+			<header className="flex items-center justify-between border-b border-slate-100 px-8 py-6">
 				<div>
-					<Heading level={2} className="text-lg font-semibold">
+					<Heading level={2} className="text-lg font-light">
 						{t("deployments.stats.title")}
 					</Heading>
-					<Text variant="small" className="text-slate-500">
+					<Text variant="small" className="text-slate-500 font-light">
 						{t("deployments.stats.timeframe")}
 					</Text>
 				</div>
-				<div className="w-26 h-26 rounded-lg bg-slate-50 transition-colors hover:bg-slate-100">
+				<div className="w-26 h-26">
 					<DeploymentSuccessPie deployments={deployments} />
 				</div>
 			</header>
 
-			<div className="space-y-6 p-6">
+			<div className="space-y-8 p-8">
 				{/* Charts Section */}
-				<div className="rounded-lg bg-slate-50 p-4">
-					<Heading level={3} className="mb-4 text-sm font-medium">
+				<div className="border border-slate-100 p-6">
+					<Heading level={3} className="mb-6 text-sm font-light">
 						{t("deployments.stats.charts.daily")}
 					</Heading>
 					<DeploymentBarChart deployments={deployments} />
@@ -84,23 +84,23 @@ export function DeploymentStats({
 					{stats.map((stat) => (
 						<div
 							key={stat.name}
-							className="relative rounded-lg bg-slate-50 p-4 transition-colors hover:bg-slate-100"
+							className="relative border border-slate-100 p-4 transition"
 						>
 							<Tooltip content={stat.tooltip}>
-								<div className="flex items-start space-x-3">
-									<stat.icon className="h-5 w-5 text-emerald-600" />
+								<div className="flex items-start space-x-2">
+									<stat.icon className="h-4 w-4 text-green-500" />
 									<div>
 										<Text
 											variant="body"
 											size="sm"
-											className="font-medium text-slate-500"
+											className="font-light text-slate-500"
 										>
 											{stat.name}
 										</Text>
 										<Text
 											variant="body"
 											size="2xl"
-											className="mt-1 font-semibold tracking-tight text-slate-900"
+											className="mt-1 font-light tracking-tight text-slate-900"
 										>
 											{stat.value}
 										</Text>
@@ -112,30 +112,30 @@ export function DeploymentStats({
 				</div>
 
 				{/* Latest Project Deployments */}
-				<div className="rounded-lg bg-slate-50">
+				<div className="border border-slate-100">
 					<Heading
 						level={3}
-						className="border-b border-slate-200 px-4 py-3 text-sm font-medium"
+						className="border-b border-slate-100 px-4 py-3 text-sm font-light"
 					>
 						{t("deployments.stats.latestProjects.title")}
 					</Heading>
-					<ul className="divide-y divide-slate-200">
+					<ul className="divide-y divide-slate-100">
 						{latestProjectDeployments.map((deployment) => (
 							<li
 								key={deployment.id}
-								className="group px-4 py-3 transition-colors hover:bg-slate-100"
+								className="group px-4 py-3 transition-colors"
 							>
 								<div className="flex items-center gap-x-3">
 									<StatusDot status={deployment.status as StatusType} />
 									<Text
 										variant="body"
-										className="flex-auto truncate font-medium"
+										className="flex-auto truncate font-light"
 									>
 										{deployment.projectName}
 									</Text>
 									<time
 										dateTime={deployment.created_at}
-										className="flex-none text-xs text-slate-500"
+										className="flex-none text-xs font-light text-slate-500"
 									>
 										{new Date(deployment.created_at).toLocaleDateString()}
 									</time>

@@ -146,7 +146,9 @@ export function DomainsPage() {
 									<div className="w-1/3 text-sm font-light text-slate-900">
 										{d.projectName}
 									</div>
-									<div className="w-1/3 text-sm font-light text-slate-700">{d.domain}</div>
+									<div className="w-1/3 text-sm font-light text-slate-700">
+										{d.domain}
+									</div>
 									<div className="w-1/3 flex items-center gap-2">
 										<StatusDot status={d.verified ? "success" : "failed"} />
 										<span className="text-sm font-light text-slate-700">

@@ -10,10 +10,7 @@ export function Footer() {
 						&copy; {new Date().getFullYear()} GoDeploy
 					</p>
 					<div className="flex gap-8 text-sm font-medium text-slate-600">
-						<Link
-							href="#pricing"
-							className="transition hover:text-slate-900"
-						>
+						<Link href="#pricing" className="transition hover:text-slate-900">
 							Pricing
 						</Link>
 						<Link

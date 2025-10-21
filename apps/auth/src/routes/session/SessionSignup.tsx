@@ -65,17 +65,13 @@ export default function Signup() {
 
 				{error ? (
 					<div className="text-center">
-						<p className="text-sm font-light text-red-600">
-							{error.message}
-						</p>
+						<p className="text-sm font-light text-red-600">{error.message}</p>
 					</div>
 				) : null}
 
 				{passwordError ? (
 					<div className="text-center">
-						<p className="text-sm font-light text-red-600">
-							{passwordError}
-						</p>
+						<p className="text-sm font-light text-red-600">{passwordError}</p>
 					</div>
 				) : null}
 
@@ -169,5 +165,3 @@ export default function Signup() {
 		</div>
 	);
 }
-
-

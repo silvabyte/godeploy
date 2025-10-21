@@ -51,9 +51,7 @@ export default function Login() {
 
 				{error ? (
 					<div className="text-center">
-						<p className="text-sm font-light text-red-600">
-							{error.message}
-						</p>
+						<p className="text-sm font-light text-red-600">{error.message}</p>
 					</div>
 				) : null}
 

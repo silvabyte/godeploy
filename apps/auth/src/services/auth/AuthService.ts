@@ -187,16 +187,12 @@ export class AuthService {
 
 	async signUp(email: string | null, password: string | null) {
 		if (!email) {
-			debug.log(
-				"[AuthService] signUp failed because email is empty",
-			);
+			debug.log("[AuthService] signUp failed because email is empty");
 			return { data: null, error: new Error(`email cannot be empty`) };
 		}
 
 		if (!password) {
-			debug.log(
-				"[AuthService] signUp failed because password is empty",
-			);
+			debug.log("[AuthService] signUp failed because password is empty");
 			return { data: null, error: new Error(`password cannot be empty`) };
 		}
 

@@ -230,7 +230,6 @@ function BrandLogo() {
 	);
 }
 
-
 function ColorPalette() {
 	const primaryColors = [
 		{ name: "Black", color: "#000000", className: "bg-black text-white" },
