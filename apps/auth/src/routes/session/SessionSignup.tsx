@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Link, useFetcher, useLocation, useNavigation } from "react-router-dom";
 import { REDIRECT_URL_PARAM } from "../../constants/auth.constants";
 import { Logo } from "../../logo/Logo";
@@ -8,6 +8,10 @@ import { SessionManager } from "../../services/auth/SessionManager";
 export const SIGNUP_ACTION_PATH = "/api/ui/v1/session/signup";
 
 export default function Signup() {
+	const formId = useId();
+	const emailId = useId();
+	const passwordId = useId();
+	const confirmPasswordId = useId();
 	const fetcher = useFetcher();
 	const nav = useNavigation();
 	const { error } = fetcher.data || { error: null };
@@ -75,69 +79,69 @@ export default function Signup() {
 					</div>
 				) : null}
 
-				<fetcher.Form
-					id="signup-submit"
-					method="POST"
-					action={SIGNUP_ACTION_PATH}
-					className="space-y-8"
-					onSubmit={handleSubmit}
-				>
-					<div className="space-y-8">
-						<div>
-							<label
-								htmlFor="email"
-								className="block text-sm font-light text-slate-500 mb-3"
-							>
-								Email
-							</label>
-							<input
-								id="email"
-								name="email"
-								type="email"
-								autoComplete="email"
-								required
-								placeholder="you@example.com"
-								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
-							/>
-						</div>
+			<fetcher.Form
+				id={formId}
+				method="POST"
+				action={SIGNUP_ACTION_PATH}
+				className="space-y-8"
+				onSubmit={handleSubmit}
+			>
+				<div className="space-y-8">
+					<div>
+						<label
+							htmlFor={emailId}
+							className="block text-sm font-light text-slate-500 mb-3"
+						>
+							Email
+						</label>
+						<input
+							id={emailId}
+							name="email"
+							type="email"
+							autoComplete="email"
+							required
+							placeholder="you@example.com"
+							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+						/>
+					</div>
 
-						<div>
-							<label
-								htmlFor="password"
-								className="block text-sm font-light text-slate-500 mb-3"
-							>
-								Password
-							</label>
-							<input
-								id="password"
-								name="password"
-								type="password"
-								autoComplete="new-password"
-								required
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								placeholder="••••••••"
-								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
-							/>
-						</div>
+					<div>
+						<label
+							htmlFor={passwordId}
+							className="block text-sm font-light text-slate-500 mb-3"
+						>
+							Password
+						</label>
+						<input
+							id={passwordId}
+							name="password"
+							type="password"
+							autoComplete="new-password"
+							required
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							placeholder="••••••••"
+							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+						/>
+					</div>
 
-						<div>
-							<label
-								htmlFor="confirmPassword"
-								className="block text-sm font-light text-slate-500 mb-3"
-							>
-								Confirm password
-							</label>
-							<input
-								id="confirmPassword"
-								name="confirmPassword"
-								type="password"
-								autoComplete="new-password"
-								required
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
-								placeholder="••••••••"
-								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+					<div>
+						<label
+							htmlFor={confirmPasswordId}
+							className="block text-sm font-light text-slate-500 mb-3"
+						>
+							Confirm password
+						</label>
+						<input
+							id={confirmPasswordId}
+							name="confirmPassword"
+							type="password"
+							autoComplete="new-password"
+							required
+							value={confirmPassword}
+							onChange={(e) => setConfirmPassword(e.target.value)}
+							placeholder="••••••••"
+							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
 							/>
 						</div>
 					</div>

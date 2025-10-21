@@ -1,4 +1,8 @@
+import { useId } from "react";
+
 export function Logo(props: React.ComponentPropsWithoutRef<"svg">) {
+	const gradientId = useId();
+
 	return (
 		<svg
 			viewBox="0 0 200 50"
@@ -7,7 +11,7 @@ export function Logo(props: React.ComponentPropsWithoutRef<"svg">) {
 			{...props}
 		>
 			<defs>
-				<linearGradient id="godeploy-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+				<linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
 					<stop offset="0%" style={{ stopColor: "#1F9D55", stopOpacity: 1 }} />
 					<stop
 						offset="100%"
@@ -35,17 +39,3 @@ export function Logo(props: React.ComponentPropsWithoutRef<"svg">) {
 		</svg>
 	);
 }
-
-const _LogoIcon = () => {
-	return (
-		<svg
-			width="40"
-			height="40"
-			viewBox="0 0 40 40"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<rect x="10" y="10" width="20" height="20" rx="2" fill="#000" />
-			<path d="M15 17 L25 17 L20 25 Z" fill="#4ADE80" stroke="none" />
-		</svg>
-	);
-};

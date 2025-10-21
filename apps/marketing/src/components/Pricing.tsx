@@ -3,6 +3,7 @@ import { Container } from "@/components/Container";
 
 export function Pricing() {
 	return (
+		// biome-ignore lint/correctness/useUniqueElementIds: Static ID used for anchor navigation
 		<section
 			id="pricing"
 			aria-label="Pricing"

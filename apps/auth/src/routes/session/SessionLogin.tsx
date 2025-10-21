@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import { Link, useFetcher, useLocation, useNavigation } from "react-router-dom";
 import { REDIRECT_URL_PARAM } from "../../constants/auth.constants";
 import { Logo } from "../../logo/Logo";
@@ -8,6 +8,9 @@ import { SessionManager } from "../../services/auth/SessionManager";
 export const LOGIN_ACTION_PATH = "/api/ui/v1/session/login";
 
 export default function Login() {
+	const formId = useId();
+	const emailId = useId();
+	const passwordId = useId();
 	const fetcher = useFetcher();
 	const nav = useNavigation();
 	const { error } = fetcher.data || { error: null };
@@ -55,49 +58,49 @@ export default function Login() {
 					</div>
 				) : null}
 
-				<fetcher.Form
-					id="session-submit"
-					method="POST"
-					action={LOGIN_ACTION_PATH}
-					className="space-y-8"
-				>
-					<div className="space-y-8">
-						<div>
-							<label
-								htmlFor="email"
-								className="block text-sm font-light text-slate-500 mb-3"
-							>
-								Email
-							</label>
-							<input
-								id="email"
-								name="email"
-								type="email"
-								autoComplete="email"
-								required
-								placeholder="you@example.com"
-								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
-							/>
-						</div>
-
-						<div>
-							<label
-								htmlFor="password"
-								className="block text-sm font-light text-slate-500 mb-3"
-							>
-								Password
-							</label>
-							<input
-								id="password"
-								name="password"
-								type="password"
-								autoComplete="current-password"
-								required
-								placeholder="••••••••"
-								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
-							/>
-						</div>
+			<fetcher.Form
+				id={formId}
+				method="POST"
+				action={LOGIN_ACTION_PATH}
+				className="space-y-8"
+			>
+				<div className="space-y-8">
+					<div>
+						<label
+							htmlFor={emailId}
+							className="block text-sm font-light text-slate-500 mb-3"
+						>
+							Email
+						</label>
+						<input
+							id={emailId}
+							name="email"
+							type="email"
+							autoComplete="email"
+							required
+							placeholder="you@example.com"
+							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+						/>
 					</div>
+
+					<div>
+						<label
+							htmlFor={passwordId}
+							className="block text-sm font-light text-slate-500 mb-3"
+						>
+							Password
+						</label>
+						<input
+							id={passwordId}
+							name="password"
+							type="password"
+							autoComplete="current-password"
+							required
+							placeholder="••••••••"
+							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+						/>
+					</div>
+				</div>
 
 					{/* Hidden input for redirect URL */}
 					{sessionManager.getStoredRedirectUrlOrDefault() && (
