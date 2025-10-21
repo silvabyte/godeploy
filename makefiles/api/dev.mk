@@ -7,7 +7,7 @@ API_PACKAGE := @godeploy/api
 
 api.dev: ## Start API in development mode with hot reload
 	$(call print_header,Starting API dev server)
-	@cd $(PROJECT_ROOT) && $(BUN) --watch $(API_DIR)/src/main.ts
+	@cd $(PROJECT_ROOT) && NODE_ENV=local $(BUN) --watch $(API_DIR)/src/main.ts
 
 api.start: ## Start API in production mode
 	$(call print_header,Starting API server)

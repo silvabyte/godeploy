@@ -3,19 +3,11 @@ import pino from "pino";
 import { AppName } from "../global";
 
 export namespace Log {
-	const targets: any[] = [
-		{
-			target: "pino-pretty",
-		},
-	];
-
-	export const transport = pino.transport({
+	// Base logger instance - simplified for Bun compatibility
+	// Pino transports use worker threads which can be problematic with Bun
+	const baseInstance = pino({
 		level: process.env.LOG_LEVEL ?? "debug",
-		targets,
-	});
-
-	// Base logger instance
-	const baseInstance = pino(Log.transport).child({
+	}).child({
 		app: AppName,
 	});
 

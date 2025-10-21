@@ -11,19 +11,15 @@ import { registerPluginsAndRoutes } from "./register.js";
 declare module "fastify" {
 	interface FastifyInstance {
 		supabase: SupabaseClient;
-		/* biome-ignore lint/style/useNamingConvention: allow underscored private decorator name */
 		_telemetry: Logger;
 		telemetry: Logger;
-		/* biome-ignore lint/style/useNamingConvention: allow underscored private decorator name */
 		_measure: ActionTelemetry;
 		measure: ActionTelemetry;
 		resetMeasure: () => void;
 	}
 	interface FastifyRequest {
-		/* biome-ignore lint/style/useNamingConvention: allow underscored private decorator name */
 		_telemetry: Logger;
 		telemetry: Logger;
-		/* biome-ignore lint/style/useNamingConvention: allow underscored private decorator name */
 		_measure: ActionTelemetry;
 		measure: ActionTelemetry;
 		resetMeasure: () => void;

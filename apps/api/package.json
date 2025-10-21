@@ -8,7 +8,7 @@
 		"test:watch": "vitest watch",
 		"test:coverage": "vitest run --coverage",
 		"start": "bun run src/main.ts",
-		"dev": "bun --watch src/main.ts",
+		"dev": "NODE_ENV=development bun --watch src/main.ts",
 		"fmt": "bunx biome format --write .",
 		"format": "bunx biome format --write .",
 		"lint": "bunx biome lint .",
