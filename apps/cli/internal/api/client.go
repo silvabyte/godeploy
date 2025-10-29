@@ -26,18 +26,30 @@ const (
 
 // Client represents an API client
 type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
+	BaseURL      string
+	HTTPClient   *http.Client
+	tokenManager *auth.TokenManager
 }
 
 // NewClient creates a new API client
 func NewClient() *Client {
-	return &Client{
+	client := &Client{
 		BaseURL: DefaultAPIBaseURL,
 		HTTPClient: &http.Client{
 			Timeout: DefaultTimeout,
 		},
 	}
+
+	// Initialize token manager with a refresh function that calls this client
+	client.tokenManager = auth.NewTokenManager(func(refreshToken string) (string, string, error) {
+		resp, err := client.RefreshToken(refreshToken)
+		if err != nil {
+			return "", "", err
+		}
+		return resp.Token, resp.RefreshToken, nil
+	})
+
+	return client
 }
 
 // AuthInitRequest represents a request to initialize the authentication flow
@@ -61,9 +73,10 @@ type SignInRequest struct {
 
 // SignInResponse represents a response from the signin endpoint
 type SignInResponse struct {
-	Success bool   `json:"success"`
-	Token   string `json:"token"`
-	User    struct {
+	Success      bool   `json:"success"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+	User         struct {
 		ID       string `json:"id"`
 		Email    string `json:"email"`
 		TenantID string `json:"tenant_id"`
@@ -79,9 +92,10 @@ type SignUpRequest struct {
 
 // SignUpResponse represents a response from the signup endpoint
 type SignUpResponse struct {
-	Success bool   `json:"success"`
-	Token   string `json:"token"`
-	User    struct {
+	Success      bool   `json:"success"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+	User         struct {
 		ID       string `json:"id"`
 		Email    string `json:"email"`
 		TenantID string `json:"tenant_id"`
@@ -98,6 +112,14 @@ type VerifyResponse struct {
 		TenantID string `json:"tenant_id"`
 	} `json:"user,omitempty"`
 	Error string `json:"error,omitempty"`
+}
+
+// RefreshResponse represents a response from the refresh endpoint
+type RefreshResponse struct {
+	Success      bool   `json:"success"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+	Error        string `json:"error,omitempty"`
 }
 
 // ErrorResponse represents an error response from the API
@@ -238,19 +260,60 @@ func (c *Client) AuthenticatedRequest(req *http.Request, token string) {
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 }
 
-// DoAuthenticatedRequest performs an authenticated request
+// DoAuthenticatedRequest performs an authenticated request with automatic token refresh
 func (c *Client) DoAuthenticatedRequest(req *http.Request) (*http.Response, error) {
-	// Get the auth token
-	token, err := c.GetAuthToken()
+	// Get a valid token (automatically refreshes if expired)
+	token, err := c.tokenManager.EnsureValidToken()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get auth token: %w", err)
+		return nil, fmt.Errorf("failed to get valid auth token: %w", err)
 	}
 
 	// Add the auth token to the request
 	c.AuthenticatedRequest(req, token)
 
 	// Send the request
-	return c.HTTPClient.Do(req)
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return resp, err
+	}
+
+	// If we get a 401, try to refresh the token and retry once
+	if resp.StatusCode == http.StatusUnauthorized {
+		_ = resp.Body.Close() // Close the first response body
+
+		// Attempt to refresh the token
+		if refreshErr := c.tokenManager.RefreshAccessToken(); refreshErr != nil {
+			// Refresh failed, return the original 401 response
+			return resp, fmt.Errorf("authentication failed and token refresh failed: %w", refreshErr)
+		}
+
+		// Get the new token
+		newToken, err := c.tokenManager.EnsureValidToken()
+		if err != nil {
+			return resp, fmt.Errorf("failed to get token after refresh: %w", err)
+		}
+
+		// Clone the request for retry (we need to create a new request because the body may have been consumed)
+		retryReq, err := cloneRequest(req)
+		if err != nil {
+			return resp, fmt.Errorf("failed to clone request for retry: %w", err)
+		}
+
+		// Add the new token
+		c.AuthenticatedRequest(retryReq, newToken)
+
+		// Retry the request
+		return c.HTTPClient.Do(retryReq)
+	}
+
+	return resp, err
+}
+
+// cloneRequest creates a copy of the HTTP request for retry
+func cloneRequest(req *http.Request) (*http.Request, error) {
+	newReq := req.Clone(req.Context())
+	// The Clone method handles copying the body if it's seekable
+	return newReq, nil
 }
 
 // GetAuthToken gets the auth token from the auth package
@@ -395,6 +458,71 @@ func (c *Client) SignUp(email, password string) (*SignUpResponse, error) {
 	}
 
 	return &signUpResp, nil
+}
+
+// RefreshToken exchanges a refresh token for a new access token
+func (c *Client) RefreshToken(refreshToken string) (*RefreshResponse, error) {
+	// Create the request body
+	reqBody := map[string]string{
+		"refresh_token": refreshToken,
+	}
+
+	// Marshal the request body
+	reqData, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request body: %w", err)
+	}
+
+	// Create the request
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/auth/refresh", c.BaseURL), bytes.NewBuffer(reqData))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// Set the headers
+	req.Header.Set("Content-Type", "application/json")
+
+	// Send the request
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	// Check the status code (401 for invalid/expired refresh token)
+	if resp.StatusCode == http.StatusUnauthorized {
+		return nil, fmt.Errorf("refresh token is invalid or expired, please login again")
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		// Try to parse the error response
+		var errResp ErrorResponse
+		if err := json.Unmarshal(body, &errResp); err == nil && errResp.Error != "" {
+			return nil, fmt.Errorf("%s", errResp.Error)
+		}
+		return nil, fmt.Errorf("unexpected status code: %d, body: %s", resp.StatusCode, string(body))
+	}
+
+	// Decode the response
+	var refreshResp RefreshResponse
+	if err := json.Unmarshal(body, &refreshResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	// Check for errors
+	if !refreshResp.Success {
+		return nil, fmt.Errorf("refresh failed: %s", refreshResp.Error)
+	}
+
+	return &refreshResp, nil
 }
 
 // Deploy deploys a SPA to the GoDeploy service

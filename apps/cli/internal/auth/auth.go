@@ -6,20 +6,30 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+
+	"github.com/adrg/xdg"
 )
 
 // Config represents the authentication configuration stored on disk
 type Config struct {
-	AuthToken string `json:"auth_token"`
-	Email     string `json:"email"`
+	AuthToken    string `json:"auth_token"`
+	RefreshToken string `json:"refresh_token"`
+	Email        string `json:"email"`
 }
 
 // ConfigDirFunc is a function type for getting the config directory
 type ConfigDirFunc func() (string, error)
 
 // GetConfigDir returns the directory where the config file should be stored
-// based on the user's operating system
+// using XDG Base Directory specification
 var GetConfigDir ConfigDirFunc = func() (string, error) {
+	return filepath.Join(xdg.ConfigHome, "godeploy"), nil
+}
+
+// GetLegacyConfigDir returns the legacy (pre-XDG) config directory path
+// This is used for automatic migration of existing configurations
+// Exported as a variable to allow mocking in tests
+var GetLegacyConfigDir ConfigDirFunc = func() (string, error) {
 	var configDir string
 
 	switch runtime.GOOS {
@@ -53,8 +63,72 @@ func GetConfigFilePath() (string, error) {
 	return filepath.Join(configDir, "config.json"), nil
 }
 
+// migrateFromLegacyLocation migrates the config file from the legacy location
+// to the XDG-compliant location. This is called automatically and is idempotent.
+func migrateFromLegacyLocation() error {
+	// Get the XDG config path
+	xdgConfigPath, err := GetConfigFilePath()
+	if err != nil {
+		return err
+	}
+
+	// If XDG config already exists, no migration needed
+	if _, err := os.Stat(xdgConfigPath); err == nil {
+		return nil
+	}
+
+	// Get the legacy config directory
+	legacyConfigDir, err := GetLegacyConfigDir()
+	if err != nil {
+		// If we can't determine legacy location, just return nil
+		// This allows the system to work on unsupported platforms
+		return nil
+	}
+
+	legacyConfigPath := filepath.Join(legacyConfigDir, "config.json")
+
+	// Check if legacy config exists
+	if _, err := os.Stat(legacyConfigPath); os.IsNotExist(err) {
+		// No legacy config to migrate
+		return nil
+	}
+
+	// Read the legacy config
+	data, err := os.ReadFile(legacyConfigPath)
+	if err != nil {
+		return fmt.Errorf("failed to read legacy config file: %w", err)
+	}
+
+	// Create the XDG config directory
+	xdgConfigDir, err := GetConfigDir()
+	if err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(xdgConfigDir, 0o755); err != nil {
+		return fmt.Errorf("failed to create XDG config directory: %w", err)
+	}
+
+	// Write the config to the XDG location
+	if err := os.WriteFile(xdgConfigPath, data, 0o644); err != nil {
+		return fmt.Errorf("failed to write config to XDG location: %w", err)
+	}
+
+	// Migration successful - we don't delete the legacy file for safety
+	// Users can manually remove it if they wish
+	return nil
+}
+
 // LoadAuthConfig loads the authentication configuration from the config file
+// It automatically migrates from legacy locations to XDG-compliant paths
 func LoadAuthConfig() (*Config, error) {
+	// Attempt migration from legacy location if needed
+	if err := migrateFromLegacyLocation(); err != nil {
+		// Log migration error but don't fail - we can still try to load
+		// from the current location
+		fmt.Fprintf(os.Stderr, "Warning: failed to migrate config from legacy location: %v\n", err)
+	}
+
 	configPath, err := GetConfigFilePath()
 	if err != nil {
 		return nil, err
@@ -171,5 +245,26 @@ func ClearAuthToken() error {
 		return err
 	}
 	config.AuthToken = ""
+	config.RefreshToken = ""
+	return SaveAuthConfig(config)
+}
+
+// GetRefreshToken returns the refresh token
+func GetRefreshToken() (string, error) {
+	config, err := LoadAuthConfig()
+	if err != nil {
+		return "", err
+	}
+	return config.RefreshToken, nil
+}
+
+// SetTokens sets both access and refresh tokens and saves to config file
+func SetTokens(accessToken, refreshToken string) error {
+	config, err := LoadAuthConfig()
+	if err != nil {
+		return err
+	}
+	config.AuthToken = accessToken
+	config.RefreshToken = refreshToken
 	return SaveAuthConfig(config)
 }

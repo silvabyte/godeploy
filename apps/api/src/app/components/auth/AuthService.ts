@@ -99,7 +99,7 @@ export class AuthService {
 	async signUp(
 		email: string,
 		password: string,
-	): Promise<Result<{ token: string; user: AuthUser }>> {
+	): Promise<Result<{ token: string; refresh_token: string; user: AuthUser }>> {
 		try {
 			const { data, error } = await this.supabase.auth.signUp({
 				email,
@@ -145,6 +145,7 @@ export class AuthService {
 				error: null,
 				data: {
 					token: data.session.access_token,
+					refresh_token: data.session.refresh_token,
 					user: {
 						id: data.user.id,
 						email: data.user.email,
@@ -163,7 +164,7 @@ export class AuthService {
 	async signIn(
 		email: string,
 		password: string,
-	): Promise<Result<{ token: string; user: AuthUser }>> {
+	): Promise<Result<{ token: string; refresh_token: string; user: AuthUser }>> {
 		try {
 			const { data, error } = await this.supabase.auth.signInWithPassword({
 				email,
@@ -209,6 +210,7 @@ export class AuthService {
 				error: null,
 				data: {
 					token: data.session.access_token,
+					refresh_token: data.session.refresh_token,
 					user: {
 						id: data.user.id,
 						email: data.user.email,
@@ -219,6 +221,43 @@ export class AuthService {
 		} catch (error) {
 			return {
 				error: error instanceof Error ? error.message : "Sign in failed",
+				data: null,
+			};
+		}
+	}
+
+	async refreshSession(
+		refreshToken: string,
+	): Promise<Result<{ token: string; refresh_token: string }>> {
+		try {
+			const { data, error } = await this.supabase.auth.refreshSession({
+				refresh_token: refreshToken,
+			});
+
+			if (error) {
+				return {
+					error: error.message,
+					data: null,
+				};
+			}
+
+			if (!data.session) {
+				return {
+					error: "Failed to refresh session",
+					data: null,
+				};
+			}
+
+			return {
+				error: null,
+				data: {
+					token: data.session.access_token,
+					refresh_token: data.session.refresh_token,
+				},
+			};
+		} catch (error) {
+			return {
+				error: error instanceof Error ? error.message : "Refresh failed",
 				data: null,
 			};
 		}

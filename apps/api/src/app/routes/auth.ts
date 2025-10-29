@@ -3,6 +3,7 @@ import {
 	type AuthInitBody,
 	type ChangePasswordBody,
 	type MagicLinkQuerystring,
+	type RefreshTokenBody,
 	type ResetPasswordConfirmBody,
 	type ResetPasswordRequestBody,
 	routeSchemas,
@@ -104,7 +105,7 @@ export default async function (fastify: FastifyInstance) {
 					}
 
 					request.measure.success();
-					return reply.redirect(urlResult.data?.toString());
+					return reply.redirect(urlResult.data!.toString());
 				}
 
 				// If no token found anywhere, redirect without token
@@ -152,6 +153,7 @@ export default async function (fastify: FastifyInstance) {
 			return reply.code(201).send({
 				success: true,
 				token: result.data?.token,
+				refresh_token: result.data?.refresh_token,
 				user: result.data?.user,
 			});
 		},
@@ -188,7 +190,42 @@ export default async function (fastify: FastifyInstance) {
 			return reply.code(200).send({
 				success: true,
 				token: result.data?.token,
+				refresh_token: result.data?.refresh_token,
 				user: result.data?.user,
+			});
+		},
+	});
+
+	// Refresh access token using refresh token
+	fastify.post("/api/auth/refresh", {
+		...routeSchemas.refreshToken,
+		config: {
+			auth: false, // Skip auth for this route
+		},
+		handler: async (
+			request: FastifyRequest<{
+				Body: RefreshTokenBody;
+			}>,
+			reply: FastifyReply,
+		) => {
+			request.measure.start("auth_refresh");
+
+			const { refresh_token } = request.body;
+			const result = await request.db.auth.refreshSession(refresh_token);
+
+			if (result.error) {
+				request.measure.failure(result.error);
+				return reply.code(401).send({
+					success: false,
+					error: result.error,
+				});
+			}
+
+			request.measure.success();
+			return reply.code(200).send({
+				success: true,
+				token: result.data?.token,
+				refresh_token: result.data?.refresh_token,
 			});
 		},
 	});

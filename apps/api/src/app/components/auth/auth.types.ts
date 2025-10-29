@@ -39,6 +39,10 @@ export const resetPasswordConfirmSchema = z.object({
 	newPassword: z.string().min(8, "New password must be at least 8 characters"),
 });
 
+export const refreshTokenSchema = z.object({
+	refresh_token: z.string().min(1, "Refresh token is required"),
+});
+
 // Response schemas
 export const authInitSuccessSchema = z.object({
 	success: z.literal(true),
@@ -68,6 +72,7 @@ export const authVerifyErrorSchema = z.object({
 export const authTokenResponseSchema = z.object({
 	success: z.literal(true),
 	token: z.string(),
+	refresh_token: z.string(),
 	user: z.object({
 		id: z.string(),
 		email: z.string(),
@@ -78,6 +83,12 @@ export const authTokenResponseSchema = z.object({
 export const authErrorResponseSchema = z.object({
 	success: z.literal(false),
 	error: z.string(),
+});
+
+export const refreshTokenResponseSchema = z.object({
+	success: z.literal(true),
+	token: z.string(),
+	refresh_token: z.string(),
 });
 
 // Generate JSON schemas
@@ -105,6 +116,10 @@ export const authTokenResponseJsonSchema = zodToJsonSchema(
 );
 export const authErrorResponseJsonSchema = zodToJsonSchema(
 	authErrorResponseSchema,
+);
+export const refreshTokenJsonSchema = zodToJsonSchema(refreshTokenSchema);
+export const refreshTokenResponseJsonSchema = zodToJsonSchema(
+	refreshTokenResponseSchema,
 );
 
 // Route schemas
@@ -189,6 +204,16 @@ export const routeSchemas = {
 			},
 		},
 	},
+	refreshToken: {
+		schema: {
+			body: refreshTokenJsonSchema,
+			response: {
+				200: refreshTokenResponseJsonSchema,
+				401: authErrorResponseJsonSchema,
+				500: commonResponseSchemas.error,
+			},
+		},
+	},
 };
 
 // Type exports
@@ -202,6 +227,7 @@ export type ChangePasswordBody = z.infer<typeof changePasswordSchema>;
 export type ResetPasswordRequestBody = z.infer<
 	typeof resetPasswordRequestSchema
 >;
+export type RefreshTokenBody = z.infer<typeof refreshTokenSchema>;
 export type ResetPasswordConfirmBody = z.infer<
 	typeof resetPasswordConfirmSchema
 >;

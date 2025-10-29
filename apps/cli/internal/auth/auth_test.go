@@ -7,7 +7,7 @@ import (
 )
 
 func TestConfigPath(t *testing.T) {
-	// Test that the config directory path is correctly generated
+	// Test that the config directory path is correctly generated using XDG
 	configDir, err := GetConfigDir()
 	if err != nil {
 		t.Fatalf("Failed to get config directory: %v", err)
@@ -16,6 +16,15 @@ func TestConfigPath(t *testing.T) {
 	// Check that the path is not empty
 	if configDir == "" {
 		t.Fatal("Config directory path is empty")
+	}
+
+	// Check that the path contains "godeploy"
+	if !filepath.IsAbs(configDir) {
+		t.Fatalf("Expected absolute path, got %s", configDir)
+	}
+
+	if filepath.Base(configDir) != "godeploy" {
+		t.Fatalf("Expected config directory to end with 'godeploy', got %s", configDir)
 	}
 
 	// Test that the config file path is correctly generated
@@ -32,6 +41,11 @@ func TestConfigPath(t *testing.T) {
 	// Check that the path ends with config.json
 	if filepath.Base(configPath) != "config.json" {
 		t.Fatalf("Expected config file path to end with config.json, got %s", configPath)
+	}
+
+	// Check that the config path is under the config directory
+	if filepath.Dir(configPath) != configDir {
+		t.Fatalf("Expected config path to be under %s, got %s", configDir, filepath.Dir(configPath))
 	}
 }
 

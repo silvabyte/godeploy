@@ -15,6 +15,7 @@ import (
 	"github.com/silvabyte/godeploy/internal/api"
 	"github.com/silvabyte/godeploy/internal/archive"
 	"github.com/silvabyte/godeploy/internal/auth"
+	"github.com/silvabyte/godeploy/internal/cache"
 	"github.com/silvabyte/godeploy/internal/config"
 	"github.com/silvabyte/godeploy/internal/version"
 	"github.com/yarlson/pin"
@@ -150,34 +151,12 @@ func (i *InitCmd) Run() error {
 
 // Run executes the login command
 func (l *LoginCmd) Run() error {
-	// Check if already authenticated
-	isAuth, err := auth.IsAuthenticated()
-	if err != nil {
-		return fmt.Errorf("error checking authentication: %w", err)
-	}
-
-	// Get token if it exists
-	existingToken, err := auth.GetAuthToken()
-	if err != nil {
-		return fmt.Errorf("error retrieving authentication token: %w", err)
-	}
-
-	// Only proceed with token verification if we have a token
-	if isAuth && existingToken != "" {
-		// Verify the token with the API
-		apiClient := api.NewClient()
-		verifyResp, err := apiClient.VerifyToken(existingToken)
-
-		// If token is valid, inform user and exit
-		if err == nil && verifyResp.Valid {
-			fmt.Println("You are already authenticated. To log out, run 'godeploy auth logout'.")
-			return nil
-		}
-
-		// If we get here, the token is invalid, so we should clear it and continue with login
-		if err := auth.ClearAuthToken(); err != nil {
-			return fmt.Errorf("failed to clear invalid authentication token: %w", err)
-		}
+	// Check if already authenticated with a simple token check using TokenManager
+	apiClient := api.NewClient()
+	tokenManager := createTokenManager(apiClient)
+	if token, err := tokenManager.EnsureValidToken(); err == nil && token != "" {
+		fmt.Println("You are already authenticated. To log out, run 'godeploy auth logout'.")
+		return nil
 	}
 
 	// Get email from argument or stored config
@@ -232,8 +211,7 @@ func (l *LoginCmd) Run() error {
 	)
 	authCancel := authSpinner.Start(ctx)
 
-	// Authenticate with email and password
-	apiClient := api.NewClient()
+	// Authenticate with email and password (reuse apiClient from above)
 	signInResp, err := apiClient.SignIn(email, password)
 
 	authCancel()
@@ -261,11 +239,11 @@ func (l *LoginCmd) Run() error {
 	)
 	saveCancel := saveSpinner.Start(ctx)
 
-	// Save the token
-	if err := auth.SetAuthToken(signInResp.Token); err != nil {
+	// Save both tokens
+	if err := auth.SetTokens(signInResp.Token, signInResp.RefreshToken); err != nil {
 		saveCancel()
-		saveSpinner.Fail("Failed to save token")
-		return fmt.Errorf("failed to save authentication token: %w", err)
+		saveSpinner.Fail("Failed to save tokens")
+		return fmt.Errorf("failed to save authentication tokens: %w", err)
 	}
 
 	// Save email for future authentication
@@ -288,34 +266,12 @@ func (l *LoginCmd) Run() error {
 
 // Run executes the signup command
 func (s *SignUpCmd) Run() error {
-	// Check if already authenticated
-	isAuth, err := auth.IsAuthenticated()
-	if err != nil {
-		return fmt.Errorf("error checking authentication: %w", err)
-	}
-
-	// Get token if it exists
-	existingToken, err := auth.GetAuthToken()
-	if err != nil {
-		return fmt.Errorf("error retrieving authentication token: %w", err)
-	}
-
-	// Only proceed with token verification if we have a token
-	if isAuth && existingToken != "" {
-		// Verify the token with the API
-		apiClient := api.NewClient()
-		verifyResp, err := apiClient.VerifyToken(existingToken)
-
-		// If token is valid, inform user and exit
-		if err == nil && verifyResp.Valid {
-			fmt.Println("You are already authenticated. To log out, run 'godeploy auth logout'.")
-			return nil
-		}
-
-		// If we get here, the token is invalid, so we should clear it and continue with signup
-		if err := auth.ClearAuthToken(); err != nil {
-			return fmt.Errorf("failed to clear invalid authentication token: %w", err)
-		}
+	// Check if already authenticated with a simple token check using TokenManager
+	apiClient := api.NewClient()
+	tokenManager := createTokenManager(apiClient)
+	if token, err := tokenManager.EnsureValidToken(); err == nil && token != "" {
+		fmt.Println("You are already authenticated. To log out, run 'godeploy auth logout'.")
+		return nil
 	}
 
 	// Get email
@@ -376,8 +332,7 @@ func (s *SignUpCmd) Run() error {
 	)
 	signUpCancel := signUpSpinner.Start(ctx)
 
-	// Create account with email and password
-	apiClient := api.NewClient()
+	// Create account with email and password (reuse apiClient from above)
 	signUpResp, err := apiClient.SignUp(email, password)
 
 	signUpCancel()
@@ -407,11 +362,11 @@ func (s *SignUpCmd) Run() error {
 	)
 	saveCancel := saveSpinner.Start(ctx)
 
-	// Save the token
-	if err := auth.SetAuthToken(signUpResp.Token); err != nil {
+	// Save both tokens
+	if err := auth.SetTokens(signUpResp.Token, signUpResp.RefreshToken); err != nil {
 		saveCancel()
-		saveSpinner.Fail("Failed to save token")
-		return fmt.Errorf("failed to save authentication token: %w", err)
+		saveSpinner.Fail("Failed to save tokens")
+		return fmt.Errorf("failed to save authentication tokens: %w", err)
 	}
 
 	// Save email for future authentication
@@ -477,31 +432,16 @@ func (l *LogoutCmd) Run() error {
 
 // Run executes the status command
 func (s *StatusCmd) Run() error {
-	// Create a context
-	ctx := context.Background()
-
-	// Create a spinner for checking status
-	statusSpinner := pin.New("Checking authentication status...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	statusCancel := statusSpinner.Start(ctx)
-
-	// Check if we have a token locally
-	token, err := auth.GetAuthToken()
-	if err != nil {
-		statusCancel()
-		statusSpinner.Fail("Failed to check status")
-		return fmt.Errorf("error checking authentication: %w", err)
-	}
-
 	// Get saved email if available
 	savedEmail, _ := auth.GetUserEmail()
 
-	// If there's no token, the user is not authenticated
-	if token == "" {
-		statusCancel()
-		statusSpinner.Stop("Status checked")
+	// Check authentication using TokenManager (which handles refresh automatically)
+	apiClient := api.NewClient()
+	tokenManager := createTokenManager(apiClient)
+	token, err := tokenManager.EnsureValidToken()
+
+	if err != nil || token == "" {
+		// Not authenticated or token refresh failed
 		fmt.Println("❌ You are not authenticated with GoDeploy.")
 		if savedEmail != "" {
 			fmt.Printf("Run 'godeploy auth login' to authenticate with saved email: %s\n", savedEmail)
@@ -511,45 +451,24 @@ func (s *StatusCmd) Run() error {
 		return nil
 	}
 
-	// We have a token, now verify it with the API
-	apiClient := api.NewClient()
-	verifyResp, err := apiClient.VerifyToken(token)
-	// Handle API connection errors
-	if err != nil {
-		statusCancel()
-		statusSpinner.Fail("Failed to verify token")
-		fmt.Println("⚠️ Could not verify authentication status with the server.")
-		fmt.Println("Error:", err)
-		fmt.Println("Your local token may still be valid.")
-		return nil
-	}
-
-	statusCancel()
-	statusSpinner.Stop("Status checked")
-
-	// Check if the token is valid
-	if verifyResp.Valid {
-		fmt.Println("✅ You are authenticated with GoDeploy.")
-		if verifyResp.User.Email != "" {
-			fmt.Printf("Logged in as: %s\n", verifyResp.User.Email)
-		} else if savedEmail != "" {
-			fmt.Printf("Logged in with email: %s\n", savedEmail)
-		}
-	} else {
-		fmt.Println("❌ Your authentication token is invalid or expired.")
-		if savedEmail != "" {
-			fmt.Printf("Run 'godeploy auth login' to authenticate with saved email: %s\n", savedEmail)
-		} else {
-			fmt.Println("Run 'godeploy auth login' to authenticate.")
-		}
-
-		// Clear the invalid token
-		if err := auth.ClearAuthToken(); err != nil {
-			fmt.Println("⚠️ Warning: Failed to clear invalid token:", err)
-		}
+	// Token is valid (automatically refreshed if it was expiring)
+	fmt.Println("✅ You are authenticated with GoDeploy.")
+	if savedEmail != "" {
+		fmt.Printf("Logged in as: %s\n", savedEmail)
 	}
 
 	return nil
+}
+
+// createTokenManager creates a TokenManager with the given API client
+func createTokenManager(apiClient *api.Client) *auth.TokenManager {
+	return auth.NewTokenManager(func(refreshToken string) (string, string, error) {
+		resp, err := apiClient.RefreshToken(refreshToken)
+		if err != nil {
+			return "", "", err
+		}
+		return resp.Token, resp.RefreshToken, nil
+	})
 }
 
 // gitOutput runs a git command and returns its trimmed string output.
@@ -802,76 +721,16 @@ func (d *DeployCmd) Run() error {
 	// Create a context
 	ctx := context.Background()
 
-	// Create a spinner for checking authentication
-	authSpinner := pin.New("Checking authentication status...",
-		pin.WithSpinnerColor(pin.ColorMagenta),
-		pin.WithTextColor(pin.ColorMagenta),
-	)
-	authCancel := authSpinner.Start(ctx)
-
-	// Check if we have a token locally
-	token, err := auth.GetAuthToken()
-	if err != nil {
-		authCancel()
-		authSpinner.Fail("Failed to check authentication")
-		return fmt.Errorf("error checking authentication: %w", err)
-	}
-
-	// If there's no token, the user is not authenticated
-	if token == "" {
-		authCancel()
-		authSpinner.Fail("Not authenticated")
-
-		// Inform user they need to authenticate
+	// Quick authentication check - token refresh will happen automatically during deploy
+	apiClient := api.NewClient()
+	tokenManager := createTokenManager(apiClient)
+	if _, err := tokenManager.EnsureValidToken(); err != nil {
 		savedEmail, _ := auth.GetUserEmail()
 		if savedEmail != "" {
 			return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login' to authenticate with saved email: %s", savedEmail)
-		} else {
-			return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login' to authenticate")
 		}
+		return fmt.Errorf("you must be authenticated to use this command. Run 'godeploy auth login' to authenticate")
 	}
-
-	// We have a token, now verify it with the API
-	apiClient := api.NewClient()
-	verifyResp, err := apiClient.VerifyToken(token)
-	// Handle API connection errors
-	if err != nil {
-		authCancel()
-		authSpinner.Fail("Failed to verify token")
-
-		// Clear invalid token and inform user to re-authenticate
-		if clearErr := auth.ClearAuthToken(); clearErr != nil {
-			fmt.Printf("Warning: Failed to clear invalid token: %v\n", clearErr)
-		}
-
-		savedEmail, _ := auth.GetUserEmail()
-		if savedEmail != "" {
-			return fmt.Errorf("authentication token verification failed. Run 'godeploy auth login' to re-authenticate with saved email: %s", savedEmail)
-		} else {
-			return fmt.Errorf("authentication token verification failed. Run 'godeploy auth login' to re-authenticate")
-		}
-	}
-
-	// Check if the token is valid
-	if !verifyResp.Valid {
-		authCancel()
-		authSpinner.Fail("Invalid authentication")
-
-		// Clear invalid token and inform user to re-authenticate
-		if clearErr := auth.ClearAuthToken(); clearErr != nil {
-			fmt.Printf("Warning: Failed to clear invalid token: %v\n", clearErr)
-		}
-
-		savedEmail, _ := auth.GetUserEmail()
-		if savedEmail != "" {
-			return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login' to re-authenticate with saved email: %s", savedEmail)
-		} else {
-			return fmt.Errorf("your authentication token is invalid or expired. Run 'godeploy auth login' to re-authenticate")
-		}
-	}
-
-	authCancel()
-	authSpinner.Stop("Authentication verified")
 
 	// Load the SPA configuration
 	configSpinner := pin.New("Loading SPA configuration...",
@@ -914,13 +773,13 @@ func (d *DeployCmd) Run() error {
 		return fmt.Errorf("project '%s' is disabled in SPA configuration", projectName)
 	}
 
-	// Create a temporary directory for the zip file
-	tempDir, err := os.MkdirTemp("", "godeploy-*")
+	// Create a cache directory for the deployment using XDG Base Directory
+	tempDir, err := cache.GetDeploymentCacheDir(projectName)
 	if err != nil {
-		return fmt.Errorf("failed to create temporary directory: %w", err)
+		return fmt.Errorf("failed to create deployment cache directory: %w", err)
 	}
 	defer func() {
-		_ = os.RemoveAll(tempDir)
+		_ = cache.RemoveDeploymentCache(tempDir)
 	}()
 
 	// Create the zip file path
