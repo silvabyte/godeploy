@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.10] - 2025-11-01
+
+* feat: update file size limit
+* chore: release v1.0.9
+
 ## [1.0.9] - 2025-11-01
 
 * chore: release v1.0.8
