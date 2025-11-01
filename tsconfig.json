@@ -1,19 +1,9 @@
 {
-  "compilerOptions": {
-    "lib": ["es2022"],
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "module": "preserve",
-    "noEmit": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "target": "es2022",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "moduleDetection": "force",
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true
-  },
-  "include": ["src/**/*"]
+	"files": [],
+	"references": [
+		{ "path": "./apps/api" },
+		{ "path": "./apps/dashboard" },
+		{ "path": "./apps/marketing" },
+		{ "path": "./apps/auth" }
+	]
 }

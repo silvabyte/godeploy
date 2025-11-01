@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@plugin '@tailwindcss/forms';
+
+@font-face {
+	font-family: "Fira Mono";
+	src: url("https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500&display=swap");
+	font-weight: 400 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@theme {
+	/* Brutalist Typography Scale - Enhanced for extreme sizes */
+	--text-xs: 0.75rem;
+	--text-xs--line-height: 1.25rem;
+	--text-sm: 0.875rem;
+	--text-sm--line-height: 1.5rem;
+	--text-base: 1rem;
+	--text-base--line-height: 1.75rem;
+	--text-lg: 1.125rem;
+	--text-lg--line-height: 2rem;
+	--text-xl: 1.25rem;
+	--text-xl--line-height: 2.25rem;
+	--text-2xl: 1.5rem;
+	--text-2xl--line-height: 2.5rem;
+	--text-3xl: 2rem;
+	--text-3xl--line-height: 2.75rem;
+	--text-4xl: 2.5rem;
+	--text-4xl--line-height: 3.5rem;
+	--text-5xl: 3rem;
+	--text-5xl--line-height: 4rem;
+	--text-6xl: 3.75rem;
+	--text-6xl--line-height: 1.1;
+	--text-7xl: 4.5rem;
+	--text-7xl--line-height: 1.1;
+	--text-8xl: 6rem;
+	--text-8xl--line-height: 1.05;
+	--text-9xl: 8rem;
+	--text-9xl--line-height: 1;
+
+	/* Minimal design system */
+	--radius-4xl: 2rem;
+
+	/* Font stacks - prioritize light/thin weights */
+	--font-sans: var(--font-inter);
+	--font-display: var(--font-lexend);
+
+	/* Container constraints */
+	--container-2xl: 40rem;
+
+	/* Minimal color palette */
+	--color-slate-50: #fafafa;
+	--color-slate-100: #f4f4f5;
+	--color-slate-500: #737373;
+	--color-slate-600: #525252;
+	--color-slate-900: #171717;
+}

@@ -1,0 +1,120 @@
+{
+	"common": {
+		"actions": {
+			"processing": "Processing",
+			"add": "Add",
+			"cancel": "Cancel",
+			"save": "Save",
+			"delete": "Delete"
+		},
+		"errors": {
+			"oops": "Uh oh!",
+			"generic": "An unexpected error occurred",
+			"unauthorized": "You are not authorized to perform this action"
+		},
+		"support": {
+			"contact": "contact support"
+		},
+		"refresh": {
+			"title": "Refresh",
+			"description": "Please refresh the page to continue."
+		}
+	},
+	"deployments": {
+		"title": "Deployments",
+		"error": {
+			"title": "Error Loading Deployments",
+			"description": "There was a problem loading your deployments. Please try again later."
+		},
+		"whenStatus": {
+			"pending": "Initiated",
+			"success": "Deployed",
+			"failed": "Failed"
+		},
+		"status": {
+			"pending": "Pending",
+			"success": "Success",
+			"failed": "Failed"
+		},
+		"environment": {
+			"preview": "Preview",
+			"production": "Production"
+		},
+		"list": {
+			"teamSeparator": "/",
+			"visitSite": "Visit site",
+			"sort": {
+				"label": "Sort by",
+				"options": {
+					"dateDesc": "Date Desc",
+					"dateAsc": "Date Asc",
+					"environment": "Environment"
+				}
+			}
+		},
+		"stats": {
+			"title": "Deployment Metrics",
+			"timeframe": "Last 30 days",
+			"charts": {
+				"daily": "Daily Deployments"
+			},
+			"metrics": {
+				"totalDeploys": {
+					"label": "Total Deploys",
+					"tooltip": "Total number of deployments in the last 30 days"
+				},
+				"avgPerDay": {
+					"label": "Avg. Deploys/Day",
+					"tooltip": "Average number of deployments per day over the last 30 days"
+				},
+				"successRate": {
+					"label": "Success Rate",
+					"tooltip": "Percentage of successful deployments in the last 30 days"
+				},
+				"avgTime": {
+					"label": "Avg. Deploy Time",
+					"tooltip": "Average time taken to complete a deployment"
+				}
+			},
+			"latestProjects": {
+				"title": "Latest Project Deployments"
+			}
+		}
+	},
+	"session": {
+		"authenticate": {
+			"oops": "Uh oh!",
+			"signingIn": "signing in",
+			"please": "Please try",
+			"again": "again or",
+			"contact": "contact support"
+		},
+		"inputs": {
+			"email": {
+				"label": "Email",
+				"placeholder": "Enter your email to proceed"
+			}
+		},
+		"signin": {
+			"title": "Sign In to GoDeploy",
+			"loginLink": "Email a Login Link",
+			"details": "Just enter your email, and we'll send you a link to get started. Whether you're new here or coming back, you're only a click away from joining the <span class=\"font-bold italic\">Audetic <s>revolution</s> resolution.</span>"
+		},
+		"verify": {
+			"emailSent": "Email sent!",
+			"checkInbox": "Check your inbox! If we found your email address you'll have a link to login waiting for you.",
+			"spam": " Sometimes this can land in SPAM! While we hope that isn't the case if it doesn't arrive in a minute or three, please check."
+		}
+	},
+	"nav": {
+		"goHome": "Go back home",
+		"items": {
+			"deployments": "Deployments",
+			"projects": "Projects",
+			"activity": "Activity",
+			"domains": "Domains",
+			"usage": "Usage",
+			"settings": "Settings"
+		}
+	}
+}

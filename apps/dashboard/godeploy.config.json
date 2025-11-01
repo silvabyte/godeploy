@@ -1,0 +1,11 @@
+{
+	"apps": [
+		{
+			"name": "godeploy-dashboard",
+			"source_dir": "dist",
+			"path": "/",
+			"description": "Godeploy Dashboard",
+			"enabled": true
+		}
+	]
+}

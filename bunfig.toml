@@ -1,14 +1,8 @@
 # Bun configuration
 
-[test]
-# Preload test setup
-# preload = ["./src/test/setup.ts"]
-
-# Enable coverage reporting
-coverage = false # Set to true when needed
-
-# Test file patterns
-# Bun automatically finds *.test.ts, *.spec.ts files
+# Note: This project uses Vitest 4 beta with Bun runtime for testing
+# See vitest.config.ts files in each app for test configuration
+# Run tests with: bun run test (runs all apps) or bun run test:api, test:auth, test:dashboard
 
 [install]
 # Lockfile settings

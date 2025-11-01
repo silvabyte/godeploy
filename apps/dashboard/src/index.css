@@ -1,0 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500&display=swap");
+@import "tailwindcss";
+
+@layer theme {
+	:root {
+		--font-sans:
+			"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+		--font-display:
+			"Lexend", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+		--font-mono:
+			"Fira Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+			"Liberation Mono", "Courier New", monospace;
+
+		/* Minimalist color palette */
+		--color-slate-50: #fafafa;
+		--color-slate-100: #f4f4f5;
+		--color-slate-200: #e5e7eb;
+		--color-slate-500: #737373;
+		--color-slate-600: #525252;
+		--color-slate-900: #171717;
+	}
+}

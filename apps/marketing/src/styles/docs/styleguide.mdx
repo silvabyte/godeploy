@@ -1,0 +1,362 @@
+# GoDeploy Design System
+
+This style guide defines the visual language and component patterns for GoDeploy products. It ensures consistency across our applications while maintaining a clean, modern aesthetic.
+
+## Brand Logo
+
+The GoDeploy logo represents our brand's core values of simplicity, reliability, and developer-friendliness. It consists of two main elements:
+
+### Logo Mark
+
+The logo mark features a minimal, geometric design:
+
+- A black square with slightly rounded corners (2px radius)
+- A green triangle (Green 500, #4ADE80) pointing downward, symbolizing deployment
+- The downward-pointing triangle intentionally contrasts with Vercel's upward triangle, symbolizing our philosophy of "ejecting out of SSR and framework lock-in"
+- The vibrant green color represents "go" or "active" status, reinforcing our focus on smooth, active deployments
+- The mark should maintain its proportions at all sizes
+
+### Logo Type
+
+The logotype "GoDeploy" is set in a clean, modern sans-serif font:
+
+- Font: System UI (system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif)
+- Weight: Semibold (600)
+- Size: 20px (relative to viewBox)
+- Letter Spacing: -0.02em
+- Case: Title case with no space between "Go" and "Deploy"
+
+### SVG Details
+
+Our logo is implemented as a responsive SVG with these specifications:
+
+- ViewBox: "0 0 200 50"
+- Square dimensions: 20x20px at x:20, y:15
+- Triangle path: "M25 22 L35 22 L30 30 Z"
+- Optional gradient definition: Linear gradient from Green 700 (#1F9D55) to Green 500 (#4ADE80)
+
+### Color Variations
+
+- **Standard**: Black square with green (#4ADE80) triangle, black text
+- **Reversed**: White square with green (#4ADE80) triangle, white text
+- **Monochrome**: Black or white only depending on background
+
+### Clear Space
+
+Maintain a minimum clear space around the logo equal to the height of the capital "G" in the logotype.
+
+### Minimum Size
+
+- Minimum width for digital: 24px (icon only) or 80px (full logo)
+- Minimum width for print: 0.25 inches (icon only) or 1 inch (full logo)
+
+### Improper Usage
+
+- Do not stretch or distort the logo
+- Do not change the logo colors outside of approved variations
+- Do not rotate or flip the logo
+- Do not add effects (shadows, gradients, etc.) to the logo
+- Do not alter the proportional relationship between the mark and type
+- Do not place the logo on busy backgrounds that reduce legibility
+
+## Brand Colors
+
+### Primary Colors
+
+- **Black** - `#000000` - Primary text, main logo color
+- **Green 500** - `#4ADE80` - Primary accent color, buttons, logo highlights
+- **Green 600** - `#22C55E` - Button hover states
+- **Green 700** - `#16A34A` - Button active states
+- **Green 50** - `#F0FDF4` - Background for icons, subtle highlights
+
+### Neutral Colors
+
+- **White** - `#FFFFFF` - Background, cards
+- **Slate 50** - `#F8FAFC` - Alternative background, section dividers
+- **Slate 100** - `#F1F5F9` - Borders, dividers
+- **Slate 200** - `#E2E8F0` - Separators, form controls
+- **Slate 500** - `#64748B` - Secondary text
+- **Slate 600** - `#475569` - Body text
+- **Slate 700** - `#334155` - Strong body text
+- **Slate 800** - `#1E293B` - Sub-headings
+- **Slate 900** - `#0F172A` - Headings, button text
+
+## Typography
+
+### Font Families
+
+- **Headings**: System font stack with semibold/bold weights
+
+  ```css
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  ```
+
+- **Body**: Same system font stack with regular weight
+
+  ```css
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  ```
+
+- **Monospace**: For code samples and terminal examples
+  ```css
+  font-family: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'Ubuntu Mono',
+    'Roboto Mono', Menlo, Monaco, Consolas, monospace;
+  ```
+
+### Font Sizes
+
+- **Display/Hero**: 48px/3rem (mobile), 60px/3.75rem (desktop)
+- **H1**: 36px/2.25rem (mobile), 48px/3rem (desktop)
+- **H2**: 30px/1.875rem (mobile), 36px/2.25rem (desktop)
+- **H3**: 24px/1.5rem (mobile), 30px/1.875rem (desktop)
+- **H4**: 20px/1.25rem (mobile), 24px/1.5rem (desktop)
+- **Body**: 16px/1rem
+- **Small**: 14px/0.875rem
+- **XSmall**: 12px/0.75rem
+
+### Font Weights
+
+- **Regular**: 400
+- **Medium**: 500
+- **Semibold**: 600
+- **Bold**: 700
+
+### Line Heights
+
+- **Tight**: 1.2 (headings)
+- **Snug**: 1.375 (subheadings)
+- **Normal**: 1.5 (body text)
+- **Relaxed**: 1.625 (larger body text)
+- **Loose**: 2 (spaced text)
+
+## Components
+
+### Buttons
+
+#### Primary Button (Green)
+
+```jsx
+<Button href="/register" color="green">
+  Get Started
+</Button>
+```
+
+- **Background**: Green 500 (`#4ADE80`)
+- **Text**: White
+- **Border radius**: Fully rounded (9999px)
+- **Padding**: 8px 16px (py-2 px-4)
+- **Font**: Medium weight, 14px
+- **Hover state**: Green 600 (`#22C55E`)
+- **Active state**: Green 700 (`#16A34A`)
+
+#### Secondary Button (Outline)
+
+```jsx
+<Button href="/github" variant="outline" color="slate">
+  GitHub
+</Button>
+```
+
+- **Border**: 1px Slate 900
+- **Text**: Slate 900
+- **Border radius**: Fully rounded (9999px)
+- **Padding**: 8px 16px (py-2 px-4)
+- **Font**: Medium weight, 14px
+- **Hover state**: Background Slate 900, Text White
+- **Active state**: Background Slate 800, Text White
+
+### Navigation
+
+#### Desktop Navigation
+
+```jsx
+<NavLink href="#features">Features</NavLink>
+```
+
+- **Text color**: Slate 800
+- **Font size**: 14px
+- **Font weight**: Regular/Medium
+- **Padding**: 4px 8px (py-1 px-2)
+- **Hover state**: Text Slate 500
+
+#### Mobile Navigation
+
+- **Hamburger icon**: Slate 900
+- **Menu background**: White
+- **Menu shadow**: Light shadow
+- **Border radius**: 8px (rounded-lg)
+- **Dividers**: Slate 100
+
+### Cards
+
+#### Feature Card
+
+- **Background**: White
+- **Border**: 1px Slate 200
+- **Border radius**: 8px (rounded-lg)
+- **Shadow**: Very light shadow (shadow-sm)
+- **Padding**: 32px (p-8)
+- **Icon background**: Green 50
+- **Icon color**: Green 500
+
+#### Installation Card
+
+- **Background**: White
+- **Container background**: Slate 900
+- **Border radius**: 8px (rounded-lg)
+- **Shadow**: Medium shadow (shadow-xl)
+- **Code background**: Slate 100
+
+### Typography Components
+
+#### Section Headers
+
+```jsx
+<h2 className="text-base font-semibold leading-7 text-green-500">
+  FEATURES
+</h2>
+<p className="mt-2 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+  Native TypeScript support
+</p>
+```
+
+- **Kicker text**: Green 500, ALL CAPS, 16px, Semibold
+- **Main heading**: Slate 900, 36-48px, Bold, Tight tracking
+
+#### Body Copy
+
+```jsx
+<p className="mt-6 text-lg leading-8 text-slate-700">
+  Descriptive text goes here
+</p>
+```
+
+- **Color**: Slate 700
+- **Size**: 18px (text-lg)
+- **Line height**: 2rem (leading-8)
+
+### FAQ Component
+
+- **Question**: Slate 900, 16px, Semibold
+- **Answer**: Slate 600, 16px, Regular
+- **Dividers**: Slate 200
+- **Icon**: Slate 600, transitions on open/close
+
+### Footer
+
+- **Background**: Slate 50
+- **Headings**: Slate 900, 14px, Medium
+- **Links**: Slate 500, 14px
+- **Hover state**: Slate 700
+- **Copyright**: Slate 500, 12px
+- **Social icons**: Slate 400, 20px
+- **Social hover**: Slate 500
+
+## Spacing System
+
+- **xs**: 4px (0.25rem)
+- **sm**: 8px (0.5rem)
+- **md**: 16px (1rem)
+- **lg**: 24px (1.5rem)
+- **xl**: 32px (2rem)
+- **2xl**: 48px (3rem)
+- **3xl**: 64px (4rem)
+- **4xl**: 96px (6rem)
+- **5xl**: 128px (8rem)
+
+## Border Radius
+
+- **None**: 0px
+- **Small**: 4px (0.25rem)
+- **Medium**: 8px (0.5rem)
+- **Large**: 12px (0.75rem)
+- **XLarge**: 16px (1rem)
+- **2XLarge**: 24px (1.5rem)
+- **Full**: 9999px (fully rounded, for buttons)
+
+## Illustrations
+
+### Dinosaur
+
+The GoDeploy dinosaur mascot uses:
+
+- **Outline**: Black, 3px stroke width
+- **Fill**: White for body
+- **Accent**: Green 500 (`#4ADE80`) for spikes/special features
+
+### Potatosaur Mascot
+
+The Potatosaur is GoDeploy's beloved mascot character - a wonderful freak of nature that embodies our brand's playful approach to development tooling.
+
+#### Design Elements
+
+- **Potato-like body**: A rounded, irregular shape with minimal details
+- **Wonderfully ambiguous form**: An intentional design where you can't tell where its body begins and ends
+- **Green accents**: Green 500 (`#4ADE80`) spikes/plates that match our brand color
+- **Simple black outline**: 3px stroke width maintaining our clean aesthetic
+
+#### Symbolic Meaning
+
+Every tech company seems to need an adorable animal mascot to prove their legitimacy. Some have crabs, others have gophers, a few have actual dinosaurs. We have... whatever this is. Is it a potato? Is it a dinosaur? Yes.
+
+Let's just say we're not taking ourselves too seriously here. But our code? That we take very seriously.
+
+#### Usage Guidelines
+
+- The Potatosaur should maintain its proportions when resized
+- May be used in marketing materials, documentation, and error pages
+- Can be displayed in full color or as a monochrome silhouette when appropriate
+- Should always be portrayed in its friendly, slightly awkward stance
+
+### Icons
+
+- **Feature Icons**: Green 500, outlined style, 24px
+- **UI Icons**: Context-dependent color, outlined style
+- **GitHub Icon**: Current text color (currentColor)
+
+## Code Examples
+
+- **Background**: Slate 900
+- **Text**: White
+- **Font**: Monospace
+- **Border radius**: 8px (rounded-lg)
+- **Padding**: 16px
+
+## Page Layouts
+
+### Section Patterns
+
+- **White background** for main content sections
+- **Slate 50 background** for alternating sections
+- **Slate 900 background** for call-to-action sections
+
+### Container Widths
+
+- **Max width**: 80rem (1280px) for page
+- **Content max width**: 65rem (1040px) for main content
+- **Narrow content**: 48rem (768px) for focused reading
+
+### Responsive Breakpoints
+
+- **sm**: 640px
+- **md**: 768px
+- **lg**: 1024px
+- **xl**: 1280px
+- **2xl**: 1536px
+
+## Animation
+
+- **Button hover**: Fast transition (150ms)
+- **Nav hover**: Mid-speed transition (200ms)
+- **Mobile menu**: Smooth entrance/exit (300ms)
+- **FAQ accordion**: Smooth rotate/expand (200ms)

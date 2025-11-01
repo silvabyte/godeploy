@@ -1,0 +1,11 @@
+{
+	"apps": [
+		{
+			"name": "spa-devs",
+			"source_dir": "dist",
+			"path": "/",
+			"description": "SPA Devs landing page",
+			"enabled": true
+		}
+	]
+}

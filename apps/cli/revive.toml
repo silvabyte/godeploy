@@ -1,0 +1,18 @@
+ignoreGeneratedHeader = true
+severity = "warning"
+confidence = 0.8
+
+[rule.blank-imports]
+[rule.context-as-argument]
+[rule.context-keys-type]
+[rule.error-naming]
+[rule.error-return]
+[rule.error-strings]
+[rule.exported]
+[rule.if-return]
+[rule.increment-decrement]
+[rule.range]
+[rule.range-val-in-closure]
+[rule.receiver-naming]
+[rule.time-naming]
+[rule.var-declaration]

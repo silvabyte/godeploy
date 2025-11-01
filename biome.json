@@ -1,134 +1,31 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true,
-    "defaultBranch": "main"
-  },
-  "formatter": {
-    "enabled": true,
-    "formatWithErrors": false,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineEnding": "lf",
-    "lineWidth": 120,
-    "attributePosition": "auto"
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "style": {
-        "noNonNullAssertion": "off",
-        "useNamingConvention": {
-          "level": "warn",
-          "options": {
-            "conventions": [
-              {
-                "selector": {
-                  "kind": "any"
-                },
-                "formats": ["camelCase", "snake_case", "PascalCase", "CONSTANT_CASE"]
-              },
-
-              {
-                "selector": {
-                  "kind": "objectLiteralMember"
-                },
-                "formats": ["camelCase", "snake_case", "PascalCase", "CONSTANT_CASE"]
-              },
-              {
-                "selector": {
-                  "kind": "classMethod"
-                },
-                "formats": ["camelCase", "PascalCase"]
-              }
-            ]
-          }
-        },
-        "useImportType": "error",
-        "useExportType": "error",
-        "useNodejsImportProtocol": "error",
-        "useNumberNamespace": "error",
-        "useAsConstAssertion": "warn"
-      },
-      "correctness": {
-        "noUnusedVariables": "error",
-        "noUnusedImports": "error",
-        "useExhaustiveDependencies": "warn",
-        "useHookAtTopLevel": "error",
-        "noUndeclaredVariables": "error"
-      },
-      "suspicious": {
-        "noExplicitAny": "warn",
-        "noConsole": "warn",
-        "noDebugger": "error",
-        "noDoubleEquals": "error",
-        "noAssignInExpressions": "error",
-        "noConfusingVoidType": "error"
-      },
-      "complexity": {
-        "noBannedTypes": "warn",
-        "noForEach": "off",
-        "noStaticOnlyClass": "warn",
-        "noThisInStatic": "error",
-        "noUselessConstructor": "error",
-        "noUselessFragments": "error",
-        "noUselessLabel": "error",
-        "noUselessRename": "error",
-        "noUselessSwitchCase": "error",
-        "noUselessTypeConstraint": "error",
-        "noVoid": "error",
-        "useArrowFunction": "off",
-        "useLiteralKeys": "error",
-        "useOptionalChain": "error"
-      },
-      "performance": {
-        "noAccumulatingSpread": "warn",
-        "noDelete": "warn"
-      },
-      "security": {
-        "noDangerouslySetInnerHtml": "error",
-        "noDangerouslySetInnerHtmlWithChildren": "error"
-      },
-      "a11y": {
-        "recommended": false
-      }
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "enabled": true,
-      "quoteStyle": "single",
-      "jsxQuoteStyle": "double",
-      "quoteProperties": "asNeeded",
-      "trailingCommas": "all",
-      "semicolons": "asNeeded",
-      "arrowParentheses": "always",
-      "bracketSpacing": true,
-      "bracketSameLine": false,
-      "indentStyle": "space",
-      "indentWidth": 2,
-      "lineEnding": "lf",
-      "attributePosition": "auto"
-    },
-    "globals": ["Bun", "describe", "test", "expect", "beforeEach", "afterEach", "beforeAll", "afterAll", "it"]
-  },
-  "json": {
-    "formatter": {
-      "enabled": true,
-      "indentStyle": "space",
-      "indentWidth": 2,
-      "lineEnding": "lf",
-      "trailingCommas": "none"
-    },
-    "linter": {
-      "enabled": true
-    }
-  },
-  "files": {
-    "ignoreUnknown": false,
-    "maxSize": 5242880
-  }
+	"$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true,
+		"defaultBranch": "main"
+	},
+	"formatter": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"suspicious": {
+				"noUnknownAtRules": "off"
+			},
+			"correctness": {
+				"useUniqueElementIds": "warn"
+			},
+			"a11y": {
+				"noSvgWithoutTitle": "warn"
+			}
+		}
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"maxSize": 5242880
+	}
 }

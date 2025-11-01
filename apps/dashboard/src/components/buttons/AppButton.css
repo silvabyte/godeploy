@@ -1,0 +1,20 @@
+button.brand {
+	background: linear-gradient(90deg, #1f9d55 0%, #4ade80 100%);
+	transition: filter 0.3s ease; /* Smooth transition for the filter effect */
+}
+
+button.brand:hover {
+	filter: brightness(1.1); /* Slightly brighten on hover */
+}
+
+button.brand-outline {
+	background: transparent;
+	border: 1px solid #4ade80;
+	color: #4ade80;
+	transition: all 0.3s ease;
+}
+
+button.brand-outline:hover {
+	background: #4ade80;
+	color: white;
+}

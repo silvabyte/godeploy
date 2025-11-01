@@ -1,0 +1,37 @@
+{
+	"name": "@godeploy/marketing",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"deploy": "bun run build && godeploy deploy",
+		"typecheck": "tsc --noEmit --project tsconfig.json",
+		"fmt": "bunx biome format --write .",
+		"format": "bunx biome format --write .",
+		"lint": "bunx biome lint .",
+		"lint:fix": "bunx biome lint --write .",
+		"lint:next": "next lint",
+		"check": "bunx biome check .",
+		"check:fix": "bunx biome check --write ."
+	},
+	"browserslist": "defaults, not ie <= 11",
+	"dependencies": {
+		"@hyperdx/browser": "^0.21.2",
+		"@opentelemetry/api": "^1.9.0",
+		"@tailwindcss/postcss": "^4.0.6",
+		"@types/node": "^20.10.8",
+		"@types/react": "^18.2.47",
+		"@types/react-dom": "^18.2.18",
+		"clsx": "^2.1.0",
+		"next": "^14.0.4",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"tailwindcss": "^4.0.6",
+		"typescript": "^5.3.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.2"
+	}
+}

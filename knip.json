@@ -1,9 +1,30 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["src/**/*.test.ts", "src/**/*.spec.ts"],
-  "project": ["src/**/*.ts", "!src/**/*.d.ts"],
-  "ignore": ["supabase/migrations/**", "docs/**"],
-  "ignoreDependencies": ["husky", "@biomejs/biome"],
-  "ignoreExportsUsedInFile": true,
-  "ignoreBinaries": ["xrelease"]
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"workspaces": {
+		"apps/api": {
+			"project": ["src/**/*.ts", "tests/**/*.ts", "!src/**/*.d.ts"]
+		},
+		"apps/auth": {
+			"entry": ["src/main.tsx"],
+			"project": ["src/**/*.{ts,tsx}"]
+		},
+		"apps/dashboard": {
+			"entry": ["src/main.tsx"],
+			"project": ["src/**/*.{ts,tsx}"]
+		},
+		"apps/marketing": {
+			"entry": ["src/app/**/*.{ts,tsx}"],
+			"project": ["src/**/*.{ts,tsx}"]
+		}
+	},
+	"ignore": [
+		"supabase/migrations/**",
+		"docs/**",
+		"**/dist/**",
+		"**/node_modules/**",
+		"commitlint.config.js"
+	],
+	"ignoreDependencies": ["husky", "@biomejs/biome", "tailwindcss", "postcss"],
+	"ignoreExportsUsedInFile": true,
+	"ignoreBinaries": ["xrelease", "godeploy"]
 }

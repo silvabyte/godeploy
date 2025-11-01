@@ -1,0 +1,48 @@
+{
+	"name": "@godeploy/auth",
+	"version": "0.1.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"deploy": "MODE=production bun run build && godeploy deploy",
+		"typecheck": "tsc --noEmit --project tsconfig.app.json",
+		"fmt": "bunx biome format --write .",
+		"format": "bunx biome format --write .",
+		"lint": "bunx biome lint .",
+		"lint:fix": "bunx biome lint --write .",
+		"check": "bunx biome check .",
+		"check:fix": "bunx biome check --write .",
+		"preview": "vite preview",
+		"test": "vitest run",
+		"test:watch": "vitest watch",
+		"clean": "rm -rf dist && rm -rf deploy",
+		"knip": "bunx knip"
+	},
+	"dependencies": {
+		"@hyperdx/browser": "^0.21.2",
+		"@matsilva/xtranslate": "^0.1.5",
+		"@opentelemetry/api": "^1.9.0",
+		"@supabase/auth-js": "^2.76.1",
+		"@supabase/supabase-js": "^2.49.1",
+		"mobx": "^6.13.7",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"react-router-dom": "6.11.2",
+		"tailwindcss": "^4.0.14"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.2",
+		"@tailwindcss/vite": "^4.0.13",
+		"@testing-library/dom": "^10.4.0",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/react": "^16.2.0",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
+		"@vitejs/plugin-react": "^4.3.4",
+		"jsdom": "^26.0.0",
+		"typescript": "~5.7.2",
+		"vite": "^6.2.0",
+		"vitest": "^4.0.0-beta.18"
+	}
+}

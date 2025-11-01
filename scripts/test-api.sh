@@ -23,7 +23,7 @@ response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health)
 
 if [ "$response" != "200" ]; then
   echo -e "${RED}Server is not running. Please start the server with:${NC}"
-  echo -e "${BLUE}npm run dev${NC}"
+  echo -e "${BLUE}bun run dev${NC}"
   exit 1
 fi
 
