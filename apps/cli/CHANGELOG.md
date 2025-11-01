@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.7] - 2025-11-01
+
+* chore: release v1.0.6
+
 ## [1.0.6] - 2025-11-01
 
 * feat: add download script to landing

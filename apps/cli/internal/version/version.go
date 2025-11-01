@@ -4,7 +4,7 @@ package version
 var (
 	// Version is the current version of the application
 	// If not set at build time, a default "0.0.0-development" value is used
-	Version = "1.0.6"
+	Version = "1.0.7"
 )
 
 // GetVersion returns the current version of the application
