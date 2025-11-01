@@ -7,6 +7,7 @@ import {
 	type DeployQuerystring,
 	routeSchemas,
 } from "../components/deploys/deploys.types";
+import { DigitalOceanAppPlatformService } from "../components/digitalocean/AppPlatformService";
 import { validateAndTransformProjectName } from "../components/projects/project-utils";
 import type { Project } from "../components/projects/projects.types";
 import { FileProcessor } from "../components/storage/FileProcessor";
@@ -271,6 +272,26 @@ export default async function (fastify: FastifyInstance) {
 				error: "Failed to update deployment status",
 				message: updateResult.error,
 			});
+		}
+
+		// Clear CDN cache if requested
+		if (request.query.clear_cache) {
+			request.measure.add("clear_cdn_cache");
+			const doService = DigitalOceanAppPlatformService.fromEnv();
+			if (doService) {
+				const purgeResult = await doService.purgeCDNCache();
+				if (!purgeResult.ok) {
+					request.log.warn(`Failed to purge CDN cache: ${purgeResult.error}`);
+					// Don't fail the deployment if CDN purge fails
+					request.measure.add("cdn_purge_failed");
+				} else {
+					request.measure.add("cdn_purge_success");
+				}
+			} else {
+				request.log.warn(
+					"DigitalOcean service not configured, skipping CDN cache purge",
+				);
+			}
 		}
 
 		request.measure.success();

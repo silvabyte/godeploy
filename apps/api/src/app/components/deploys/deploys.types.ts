@@ -24,6 +24,10 @@ const DeployQuerystringSchema = z.object({
 	commit_branch: z.string().optional(),
 	commit_message: z.string().optional(),
 	commit_url: z.string().url().optional(),
+	clear_cache: z
+		.string()
+		.optional()
+		.transform((val) => val === "true"),
 });
 
 //TODO: have better generic filter query params

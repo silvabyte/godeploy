@@ -8,7 +8,7 @@ interface SupportLinkProps {
 }
 
 export const SupportLink: React.FC<SupportLinkProps> = ({
-	href = "mailto:info@arcata.ai",
+	href = "mailto:support@silvabyte.com",
 	classes = "",
 }) => {
 	const cx = classNames("text-sm font-semibold text-gray-900", classes);

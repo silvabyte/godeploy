@@ -5,7 +5,7 @@ type MockClient struct {
 	// VerifyTokenFunc is a function that will be called by VerifyToken
 	VerifyTokenFunc func(token string) (*VerifyResponse, error)
 	// DeployFunc is a function that will be called by Deploy
-	DeployFunc func(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string) (*DeployResponse, error)
+	DeployFunc func(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string, clearCache bool) (*DeployResponse, error)
 }
 
 // NewMockClient creates a new mock API client
@@ -25,7 +25,7 @@ func NewMockClient() *MockClient {
 				},
 			}, nil
 		},
-		DeployFunc: func(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string) (*DeployResponse, error) {
+		DeployFunc: func(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string, clearCache bool) (*DeployResponse, error) {
 			return &DeployResponse{
 				Success: true,
 				URL:     "https://" + project + ".godeploy.app",
@@ -40,6 +40,6 @@ func (m *MockClient) VerifyToken(token string) (*VerifyResponse, error) {
 }
 
 // Deploy calls the mock DeployFunc
-func (m *MockClient) Deploy(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string) (*DeployResponse, error) {
-	return m.DeployFunc(project, spaConfigData, archiveData, commitSHA, commitBranch, commitMessage, commitURL)
+func (m *MockClient) Deploy(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string, clearCache bool) (*DeployResponse, error) {
+	return m.DeployFunc(project, spaConfigData, archiveData, commitSHA, commitBranch, commitMessage, commitURL, clearCache)
 }

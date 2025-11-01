@@ -56,15 +56,17 @@ export class DigitalOceanAppPlatformService {
 		const appId =
 			process.env.DIGITAL_OCEAN_NGINX_APP_ID ??
 			process.env.DIGITAL_OCEAN_APP_ID;
+		const cdnId = process.env.DIGITAL_OCEAN_SPACES_CDN_ID;
 
 		if (!token || !appId) return null;
 
-		return new DigitalOceanAppPlatformService(token, appId);
+		return new DigitalOceanAppPlatformService(token, appId, cdnId);
 	}
 
 	private constructor(
 		private readonly token: string,
 		private readonly appId: string,
+		private readonly cdnId?: string,
 	) {}
 
 	async addDomain(domain: string): Promise<ServiceResult> {
@@ -73,6 +75,31 @@ export class DigitalOceanAppPlatformService {
 
 	async removeDomain(domain: string): Promise<ServiceResult> {
 		return this.ensureDomainInSpec(domain, false);
+	}
+
+	/**
+	 * Purge the CDN cache for DigitalOcean Spaces
+	 * @param files Optional array of file paths to purge. If not provided, purges all cache.
+	 * @returns ServiceResult indicating success or error
+	 */
+	async purgeCDNCache(files?: string[]): Promise<ServiceResult> {
+		if (!this.cdnId) {
+			return {
+				ok: false,
+				error:
+					"CDN ID not configured. Set DIGITAL_OCEAN_SPACES_CDN_ID environment variable.",
+			};
+		}
+
+		const endpoint = files
+			? `/cdn/endpoints/${this.cdnId}/cache`
+			: `/cdn/endpoints/${this.cdnId}/cache`;
+
+		const body = files
+			? JSON.stringify({ files })
+			: JSON.stringify({ files: ["*"] });
+
+		return this.request("DELETE", endpoint, { body });
 	}
 
 	private async ensureDomainInSpec(

@@ -75,6 +75,7 @@ type DeployCmd struct {
 	CommitMessage string `name:"commit-message" help:"Commit message" default:""`
 	CommitURL     string `name:"commit-url" help:"URL to the commit (e.g., GitHub commit link)" default:""`
 	NoGit         bool   `name:"no-git" help:"Disable auto-detection of git metadata" default:"false"`
+	ClearCache    bool   `name:"clear-cache" help:"Clear CDN cache after deployment" default:"false"`
 }
 
 // VersionCmd represents the version command
@@ -873,7 +874,7 @@ func (d *DeployCmd) Run() error {
 	}
 
 	// Deploy the SPA
-	deployResp, err := apiClient.Deploy(projectName, configData, zipData, commitSHA, commitBranch, commitMessage, commitURL)
+	deployResp, err := apiClient.Deploy(projectName, configData, zipData, commitSHA, commitBranch, commitMessage, commitURL, d.ClearCache)
 	if err != nil {
 		deployCancel()
 		deploySpinner.Fail("Failed to deploy project")

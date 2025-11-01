@@ -526,7 +526,7 @@ func (c *Client) RefreshToken(refreshToken string) (*RefreshResponse, error) {
 }
 
 // Deploy deploys a SPA to the GoDeploy service
-func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string) (*DeployResponse, error) {
+func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte, commitSHA string, commitBranch string, commitMessage string, commitURL string, clearCache bool) (*DeployResponse, error) {
 	// Create a new multipart writer
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
@@ -573,6 +573,9 @@ func (c *Client) Deploy(project string, spaConfigData []byte, archiveData []byte
 	}
 	if commitURL != "" {
 		q.Set("commit_url", commitURL)
+	}
+	if clearCache {
+		q.Set("clear_cache", "true")
 	}
 
 	// Create the request
