@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.9] - 2025-11-01
+
+* chore: release v1.0.8
+
 ## [1.0.8] - 2025-11-01
 
 * feat: add clear cache support
