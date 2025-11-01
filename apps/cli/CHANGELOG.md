@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.8] - 2025-11-01
+
+* feat: add clear cache support
+* feat: add xreleae to cli release
+* chore: release v1.0.7
+
 ## [1.0.7] - 2025-11-01
 
 * chore: release v1.0.6
