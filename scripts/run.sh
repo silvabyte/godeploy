@@ -1,2 +1,9 @@
 #!/bin/bash
-HYPERDX_API_KEY=$HYPERDX_API_KEY OTEL_SERVICE_NAME=$OTEL_SERVICE_NAME bun --preload '@hyperdx/node-opentelemetry/build/src/tracing' apps/api/src/main.ts
+set -e
+
+echo "Starting GoDeploy API..."
+echo "Environment: ${NODE_ENV:-production}"
+echo "Port: ${PORT:-80}"
+
+# Start the application
+exec bun run apps/api/src/main.ts

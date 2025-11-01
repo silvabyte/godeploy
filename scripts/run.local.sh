@@ -1,4 +1,9 @@
 #!/bin/bash
 # Bun automatically loads .env files
+set -e
 
-HYPERDX_API_KEY=$HYPERDX_API_KEY OTEL_SERVICE_NAME=$OTEL_SERVICE_NAME bun --preload '@hyperdx/node-opentelemetry/build/src/tracing' apps/api/src/main.ts
+echo "Starting GoDeploy API (local)..."
+echo "Environment: ${NODE_ENV:-development}"
+
+# Start the application
+exec bun run apps/api/src/main.ts

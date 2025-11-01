@@ -1,6 +1,7 @@
 FROM oven/bun:1-alpine
 
-ENV APP_URL=https://api.godeploy.app    
+ENV NODE_ENV=production
+ENV APP_URL=https://api.godeploy.app
 ENV PORT=80
 
 RUN apk add --no-cache bash zip unzip

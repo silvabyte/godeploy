@@ -1,8 +1,8 @@
 import { buildApp } from "./app/build/build.js";
 import { Log } from "./logging/logger.js";
 
-// Set NODE_ENV to development if not already set
-process.env.NODE_ENV = process.env.NODE_ENV || "development";
+// Set NODE_ENV to production if not already set
+process.env.NODE_ENV = process.env.NODE_ENV || "production";
 
 /**
  * Starts the server on the specified host and port
