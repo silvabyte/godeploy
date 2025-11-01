@@ -3,36 +3,24 @@
 CLI_DIR := $(APPS_DIR)/cli
 CLI_VERSION := $(shell grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/')
 
-.PHONY: cli.version cli.version.bump.major cli.version.bump.minor cli.version.bump.patch cli.release cli.release.prepare cli.release.publish
+.PHONY: cli.version cli.release.create cli.release.create.patch cli.release.create.minor cli.release.create.major cli.release cli.release.prepare cli.release.publish
 
 cli.version: ## Show CLI version
 	@printf "v$(CLI_VERSION)\n"
 
-cli.version.bump.patch: ## Bump patch version (x.x.X)
-	$(call print_header,Bumping CLI patch version)
-	@cd $(CLI_DIR) && npm version patch --no-git-tag-version 2>&1 | grep -v "npm error" || true
-	@$(MAKE) cli.version.sync
-	@NEW_VERSION=$$(grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'); \
-	printf "$(COLOR_GREEN)✓ Version bumped to v$$NEW_VERSION$(COLOR_RESET)\n"
+cli.release.create.patch: ## Create patch release (x.x.X) with xrelease
+	$(call print_header,Creating CLI patch release with xrelease)
+	@cd $(CLI_DIR) && xrelease create -p
 
-cli.version.bump.minor: ## Bump minor version (x.X.0)
-	$(call print_header,Bumping CLI minor version)
-	@cd $(CLI_DIR) && npm version minor --no-git-tag-version 2>&1 | grep -v "npm error" || true
-	@$(MAKE) cli.version.sync
-	@NEW_VERSION=$$(grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'); \
-	printf "$(COLOR_GREEN)✓ Version bumped to v$$NEW_VERSION$(COLOR_RESET)\n"
+cli.release.create.minor: ## Create minor release (x.X.0) with xrelease
+	$(call print_header,Creating CLI minor release with xrelease)
+	@cd $(CLI_DIR) && xrelease create -m
 
-cli.version.bump.major: ## Bump major version (X.0.0)
-	$(call print_header,Bumping CLI major version)
-	@cd $(CLI_DIR) && npm version major --no-git-tag-version 2>&1 | grep -v "npm error" || true
-	@$(MAKE) cli.version.sync
-	@NEW_VERSION=$$(grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'); \
-	printf "$(COLOR_GREEN)✓ Version bumped to v$$NEW_VERSION$(COLOR_RESET)\n"
+cli.release.create.major: ## Create major release (X.0.0) with xrelease
+	$(call print_header,Creating CLI major release with xrelease)
+	@cd $(CLI_DIR) && xrelease create -M
 
-cli.version.sync: ## Sync version from package.json to version.go
-	@NEW_VERSION=$$(grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'); \
-	sed -i 's/Version = "[^"]*"/Version = "'$$NEW_VERSION'"/' $(CLI_DIR)/internal/version/version.go; \
-	echo "Synced version to $$NEW_VERSION in version.go"
+cli.release.create: cli.release.create.patch ## Create release (alias for patch)
 
 cli.release.prepare: cli.build.all ## Prepare release: build all platforms and copy to install/releases/
 	$(call print_header,Preparing CLI release v$(CLI_VERSION))
@@ -48,6 +36,6 @@ cli.release.publish: cli.build ## Publish release: deploy install directory to i
 	@cd $(CLI_DIR) && ./out/$(BINARY_NAME) deploy
 	$(call print_success,Release v$(CLI_VERSION) published to install.godeploy.com)
 
-cli.release: cli.release.prepare cli.release.publish ## Complete release workflow: prepare and publish
+cli.release: cli.release.create.patch cli.release.prepare cli.release.publish ## Complete release workflow: prepare and publish
 	$(call print_success,CLI v$(CLI_VERSION) released successfully!)
 

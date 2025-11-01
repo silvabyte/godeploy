@@ -140,21 +140,28 @@ make cli.build.mac.arm64   # Build for macOS Apple Silicon
 make cli.build.windows     # Build for Windows
 make cli.build.all         # Build all platforms (creates archives in dist/)
 
-# Version Management
-make cli.version                # Show current version (e.g., v1.0.5)
-make cli.version.bump.patch     # Bump patch version (1.0.5 → 1.0.6)
-make cli.version.bump.minor     # Bump minor version (1.0.5 → 1.1.0)
-make cli.version.bump.major     # Bump major version (1.0.5 → 2.0.0)
+# Version Management & Releasing (using xrelease)
+make cli.version                  # Show current version (e.g., v1.0.5)
+make cli.release.create.patch     # Create patch release (1.0.5 → 1.0.6)
+make cli.release.create.minor     # Create minor release (1.0.5 → 1.1.0)
+make cli.release.create.major     # Create major release (1.0.5 → 2.0.0)
+make cli.release.create           # Create release (defaults to patch)
 
-# Releasing (after version bump)
-make cli.release.prepare   # Build all platforms and copy to install/releases/
-make cli.release.publish   # Deploy install directory to install.godeploy.com
-make cli.release           # Complete release workflow (prepare + publish)
+# What xrelease does automatically:
+# - Bumps version in package.json AND version.go
+# - Generates changelog from conventional commits
+# - Creates git tag
+# - Commits and pushes changes
+# - Creates GitHub release
+
+# Publishing Release Binaries
+make cli.release.prepare     # Build all platforms and copy to install/releases/
+make cli.release.publish     # Deploy install directory to install.godeploy.com
 
 # Complete Release Workflow Example:
-# 1. make cli.version.bump.patch  # Bump version
-# 2. git add apps/cli && git commit -m "chore(cli): bump version to vX.X.X"
-# 3. make cli.release             # Build and publish
+# 1. make cli.release.create.patch  # xrelease handles version, changelog, tag, GitHub release
+# 2. make cli.release.prepare       # Build binaries for all platforms
+# 3. make cli.release.publish       # Deploy to install.godeploy.app
 ```
 
 ## Architecture
