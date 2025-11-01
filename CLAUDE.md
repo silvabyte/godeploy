@@ -43,7 +43,7 @@ make api.dev               # Alternative via Makefile
 ```bash
 # Run all tests
 bun test
-make test-all
+make all.test
 
 # Run specific app tests
 bun run test:api           # API only
@@ -62,23 +62,25 @@ make api.test.coverage
 
 ### Linting & Formatting
 ```bash
-# Lint
-bun lint                   # Workspace-level
-bun run lint:workspaces    # All apps
-make api.lint              # API only
+# Lint workspace
+make all.lint              # Biome lint on entire workspace
 
-# Format
-bun fmt                    # Format entire workspace
-make api.fmt               # API only
+# Format workspace
+make all.fmt               # Biome format on entire workspace
 
-# Check + fix (lint + format combined)
-bun check:fix              # Fix workspace
-make api.check.fix         # API only
+# Check workspace (lint + format combined)
+make all.check             # Check workspace
+make all.check.fix         # Check and fix workspace
+
+# App-specific operations
+make api.lint              # Lint API only
+make api.fmt               # Format API only
+make api.check.fix         # Check and fix API only
 ```
 
 ### Type Checking
 ```bash
-bun typecheck              # All TypeScript apps
+make all.typecheck         # All TypeScript apps
 make api.typecheck         # API only
 ```
 
@@ -102,7 +104,7 @@ make db.reset
 ### Building
 ```bash
 # Build all apps
-make build-all
+make all.build
 
 # Build specific apps
 make api.build
@@ -124,7 +126,7 @@ bun docker:start           # Build + run
 cd apps/cli
 make test                  # Run tests
 make build                 # Build for current platform
-make build-all             # Build for all platforms
+make build.all             # Build for all platforms
 make lint                  # Run golangci-lint
 make fmt                   # Format Go code
 ```

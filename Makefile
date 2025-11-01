@@ -31,7 +31,7 @@ include makefiles/cli/build.mk
 include makefiles/cli/deploy.mk
 
 # Global targets
-.PHONY: help install clean-all test-all lint-all typecheck-all fmt-all build-all
+.PHONY: help install all.clean all.test all.lint all.typecheck all.fmt all.build all.check all.check.fix all.knip
 
 help: ## Show this help message
 	@printf "$(COLOR_BOLD)$(COLOR_CYAN)GoDeploy Monorepo - Available Commands$(COLOR_RESET)\n"
@@ -58,7 +58,7 @@ help: ## Show this help message
 	@printf "  make auth.build       Build auth app\n"
 	@printf "  make dashboard.test   Run dashboard tests\n"
 	@printf "  make cli.build.all    Build CLI for all platforms\n"
-	@printf "  make test-all         Run all tests\n"
+	@printf "  make all.test         Run all tests\n"
 	@printf "\n"
 
 install: ## Install all dependencies
@@ -67,12 +67,12 @@ install: ## Install all dependencies
 	@cd $(CLI_DIR) && go mod download
 	$(call print_success,All dependencies installed)
 
-clean-all: api.clean auth.clean dashboard.clean marketing.clean cli.clean ## Clean all build artifacts
+all.clean: api.clean auth.clean dashboard.clean marketing.clean cli.clean ## Clean all build artifacts
 	$(call print_header,Cleaning all build artifacts)
 	@rm -rf node_modules
 	$(call print_success,All artifacts cleaned)
 
-test-all: ## Run all tests (API, Auth, Dashboard)
+all.test: ## Run all tests (API, Auth, Dashboard, CLI)
 	$(call print_header,Running all tests)
 	@$(MAKE) api.test
 	@$(MAKE) auth.test
@@ -80,16 +80,12 @@ test-all: ## Run all tests (API, Auth, Dashboard)
 	@$(MAKE) cli.test
 	$(call print_success,All tests completed)
 
-lint-all: ## Lint all apps
-	$(call print_header,Linting all apps)
-	@$(MAKE) api.lint
-	@$(MAKE) auth.lint
-	@$(MAKE) dashboard.lint
-	@$(MAKE) marketing.lint
-	@$(MAKE) cli.lint
-	$(call print_success,All lint checks passed)
+all.lint: ## Lint workspace with biome
+	$(call print_header,Linting workspace)
+	@$(BUNX) biome lint .
+	$(call print_success,Workspace lint passed)
 
-typecheck-all: ## Type check all TypeScript apps
+all.typecheck: ## Type check all TypeScript apps
 	$(call print_header,Type checking all apps)
 	@$(MAKE) api.typecheck
 	@$(MAKE) auth.typecheck
@@ -97,16 +93,12 @@ typecheck-all: ## Type check all TypeScript apps
 	@$(MAKE) marketing.typecheck
 	$(call print_success,All type checks passed)
 
-fmt-all: ## Format all apps
-	$(call print_header,Formatting all apps)
-	@$(MAKE) api.fmt
-	@$(MAKE) auth.fmt
-	@$(MAKE) dashboard.fmt
-	@$(MAKE) marketing.fmt
-	@$(MAKE) cli.fmt
-	$(call print_success,All code formatted)
+all.fmt: ## Format workspace with biome
+	$(call print_header,Formatting workspace)
+	@$(BUNX) biome format --write .
+	$(call print_success,Workspace formatted)
 
-build-all: ## Build all apps
+all.build: ## Build all apps
 	$(call print_header,Building all apps)
 	@$(MAKE) api.build
 	@$(MAKE) auth.build
@@ -115,38 +107,17 @@ build-all: ## Build all apps
 	@$(MAKE) cli.build
 	$(call print_success,All apps built)
 
-check-all: ## Run biome check on all apps
-	$(call print_header,Running biome check on all apps)
-	@$(MAKE) api.check
-	@$(MAKE) auth.check
-	@$(MAKE) dashboard.check
-	@$(MAKE) marketing.check
-	$(call print_success,All checks passed)
-
-# Workspace-level operations
-.PHONY: workspace.lint workspace.fmt workspace.check workspace.knip
-
-workspace.lint: ## Lint at workspace level with biome
-	$(call print_header,Linting workspace)
-	@$(BUNX) biome lint .
-	$(call print_success,Workspace lint passed)
-
-workspace.fmt: ## Format at workspace level with biome
-	$(call print_header,Formatting workspace)
-	@$(BUNX) biome format --write .
-	$(call print_success,Workspace formatted)
-
-workspace.check: ## Check at workspace level with biome
+all.check: ## Check workspace with biome
 	$(call print_header,Checking workspace)
 	@$(BUNX) biome check .
 	$(call print_success,Workspace check passed)
 
-workspace.check.fix: ## Check and fix at workspace level with biome
+all.check.fix: ## Check and fix workspace with biome
 	$(call print_header,Checking and fixing workspace)
 	@$(BUNX) biome check --write .
 	$(call print_success,Workspace fixes applied)
 
-workspace.knip: ## Run knip on entire workspace
+all.knip: ## Run knip on entire workspace
 	$(call print_header,Running knip on workspace)
 	@$(BUNX) knip
 	$(call print_success,Knip analysis complete)

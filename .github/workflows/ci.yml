@@ -22,13 +22,13 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Lint and Format Check
-        run: make workspace.check
+        run: make all.check
 
       - name: Type Check
-        run: bun run typecheck
+        run: make all.typecheck
 
       - name: Test
-        run: make test-all
+        run: make all.test
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://test.supabase.co' }}
           SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY || 'test-key' }}
