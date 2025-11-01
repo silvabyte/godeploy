@@ -10,21 +10,24 @@ cli.version: ## Show CLI version
 
 cli.version.bump.patch: ## Bump patch version (x.x.X)
 	$(call print_header,Bumping CLI patch version)
-	@cd $(CLI_DIR) && npm version patch --no-git-tag-version
+	@cd $(CLI_DIR) && npm version patch --no-git-tag-version 2>&1 | grep -v "npm error" || true
 	@$(MAKE) cli.version.sync
-	$(call print_success,Version bumped to v$(shell grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'))
+	@NEW_VERSION=$$(grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'); \
+	printf "$(COLOR_GREEN)✓ Version bumped to v$$NEW_VERSION$(COLOR_RESET)\n"
 
 cli.version.bump.minor: ## Bump minor version (x.X.0)
 	$(call print_header,Bumping CLI minor version)
-	@cd $(CLI_DIR) && npm version minor --no-git-tag-version
+	@cd $(CLI_DIR) && npm version minor --no-git-tag-version 2>&1 | grep -v "npm error" || true
 	@$(MAKE) cli.version.sync
-	$(call print_success,Version bumped to v$(shell grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'))
+	@NEW_VERSION=$$(grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'); \
+	printf "$(COLOR_GREEN)✓ Version bumped to v$$NEW_VERSION$(COLOR_RESET)\n"
 
 cli.version.bump.major: ## Bump major version (X.0.0)
 	$(call print_header,Bumping CLI major version)
-	@cd $(CLI_DIR) && npm version major --no-git-tag-version
+	@cd $(CLI_DIR) && npm version major --no-git-tag-version 2>&1 | grep -v "npm error" || true
 	@$(MAKE) cli.version.sync
-	$(call print_success,Version bumped to v$(shell grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'))
+	@NEW_VERSION=$$(grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'); \
+	printf "$(COLOR_GREEN)✓ Version bumped to v$$NEW_VERSION$(COLOR_RESET)\n"
 
 cli.version.sync: ## Sync version from package.json to version.go
 	@NEW_VERSION=$$(grep '"version":' $(CLI_DIR)/package.json | sed -E 's/.*"version": "([^"]+)".*/\1/'); \

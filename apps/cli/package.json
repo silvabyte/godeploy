@@ -1,12 +1,12 @@
 {
-	"name": "godeploy",
-	"version": "1.0.5",
-	"type": "module",
-	"scripts": {
-		"test": "echo \"add your test command here\""
-	},
-	"private": true,
-	"devDependencies": {
-		"husky": "^9.1.7"
-	}
+  "name": "godeploy",
+  "version": "1.0.6",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"add your test command here\""
+  },
+  "private": true,
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
 }

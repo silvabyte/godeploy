@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.0.6] - 2025-11-01
+
+* feat: add download script to landing
+* feat: change cli deploy
+* chore: remoove docs
+* chore: update default env variables
+* Restructure to monorepo with Bun runtime (#14)
+* fix: app platform
+* feat: add domain spec
+* feat: add hook domain registration
+* fix: lint issues
+* chore: add tupes
+* feat: add dynamically add domain
+* storage: set default file concurrency to 1; default part size to 5MiB; validate Spaces config before upload
+* storage: cap concurrency for memory safety during large deploys; add defensive route try/catch and cleanup streams
+* fix: allow W3C trace context headers (traceparent,tracestate) in preflight for *.godeploy.app
+* feat: allow any *.godeploy.app origin in production via regex matcher
+* fix: align error handling with schemas and harden dir.close() in StorageService
+* feat: add initial error fix
+* perf(streaming): minimize memory across deploy pipeline
+* feat: public metrics pages + daily deploy frequency (#13)
+* feat: stream multipart file parts to disk to avoid memory spikes\n\n- Introduce saveStreamToTemp helper using pipeline()\n- Refactor FileProcessor to use streams instead of toBuffer()\n- Update tests to use Readable streams for parts
+* fix: replace execa unzip with stream-based unzipper to prevent hard crashes during archive upload\n\n- Use pure JS unzipper to avoid child_process instability under Bun\n- Add unit tests for zip extraction and file processing\n- Add unzipper and @types/unzipper; add dev dep fflate for test zip creation
+* feat: relax SPA validation to accept any static file archive (#12)
+* feat: add custom domain support with CNAME validation (#11)
+* docs: refresh README with indie hacker vibes (#10)
+* feat: modernize codebase with Biome formatter/linter and Knip dead code detection (#9)
+* chore: release v0.1.2
+
 ## [1.0.5] - 2025-09-09
 
 * feat: enhance output formatting with lipgloss (#14)

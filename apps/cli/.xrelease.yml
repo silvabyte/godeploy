@@ -1,0 +1,38 @@
+version: 1
+release:
+  # Branch configuration
+  branch: main
+
+  # Version bump type
+  defaultBump: patch
+
+  # Version file updates - Update both package.json and version.go
+  version:
+    files:
+      - path: 'package.json'
+        pattern: "\"version\":\\s*\"(?<version>[^\"]+)\""
+        template: '"version": "${version}"'
+
+      - path: 'internal/version/version.go'
+        pattern: 'Version\s*=\s*"(?<version>[^"]+)"'
+        template: 'Version = "${version}"'
+
+  # Changelog configuration
+  changelog:
+    enabled: true
+    template: conventional
+
+  # Pre-release checks (optional - uncomment if needed)
+  # checks:
+  #   - type: lint
+  #     command: 'make lint'
+  #   - type: test
+  #     command: 'make test'
+  #   - type: build
+  #     command: 'make build'
+
+  # Release actions
+  actions:
+    - type: git-tag
+    - type: commit-push
+    - type: github-release
