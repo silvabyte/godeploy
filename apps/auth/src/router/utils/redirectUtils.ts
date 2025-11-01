@@ -1,17 +1,9 @@
-import type { Session } from "@supabase/supabase-js";
 import { redirect } from "react-router-dom";
 import { config } from "../../config";
 import { REDIRECT_URL_STORAGE_KEY } from "../../constants/auth.constants";
 import type { AuthService } from "../../services/auth/AuthService";
 
 import { debug } from "../../utils/debug";
-
-/**
- * Encodes a session token as a URL-safe string
- */
-function _urlencodeJsonToken(jsonToken: Session) {
-	return encodeURIComponent(JSON.stringify(jsonToken));
-}
 
 /**
  * Creates a function that handles redirection logic based on authentication state

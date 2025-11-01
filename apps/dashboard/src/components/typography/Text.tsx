@@ -59,20 +59,3 @@ export function Text({
 		</p>
 	);
 }
-
-/**
- * Code component for inline code snippets
- */
-function _Code({
-	className,
-	children,
-	...props
-}: Omit<React.HTMLAttributes<HTMLElement>, "color">) {
-	const styles = typography.code.className;
-
-	return (
-		<code className={clsx(styles, className)} {...props}>
-			{children}
-		</code>
-	);
-}

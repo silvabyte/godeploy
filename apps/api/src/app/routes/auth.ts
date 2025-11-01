@@ -105,7 +105,7 @@ export default async function (fastify: FastifyInstance) {
 					}
 
 					request.measure.success();
-					return reply.redirect(urlResult.data!.toString());
+					return reply.redirect(urlResult.data?.toString() ?? redirect_to);
 				}
 
 				// If no token found anywhere, redirect without token

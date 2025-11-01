@@ -27,37 +27,3 @@ export function Heading({
 		</Tag>
 	);
 }
-
-/**
- * Display heading component for hero sections.
- */
-function _DisplayHeading({
-	className,
-	children,
-	...props
-}: Omit<HeadingProps, "level">) {
-	const styles = typography.display.className;
-
-	return (
-		<h1 className={clsx(styles, className)} {...props}>
-			{children}
-		</h1>
-	);
-}
-
-/**
- * Section kicker text (small heading above main heading)
- */
-function _Kicker({
-	className,
-	children,
-	...props
-}: Omit<React.HTMLAttributes<HTMLParagraphElement>, "color">) {
-	const styles = typography.kicker.className;
-
-	return (
-		<p className={clsx(styles, className)} {...props}>
-			{children}
-		</p>
-	);
-}

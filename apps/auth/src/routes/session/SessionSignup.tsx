@@ -79,69 +79,69 @@ export default function Signup() {
 					</div>
 				) : null}
 
-			<fetcher.Form
-				id={formId}
-				method="POST"
-				action={SIGNUP_ACTION_PATH}
-				className="space-y-8"
-				onSubmit={handleSubmit}
-			>
-				<div className="space-y-8">
-					<div>
-						<label
-							htmlFor={emailId}
-							className="block text-sm font-light text-slate-500 mb-3"
-						>
-							Email
-						</label>
-						<input
-							id={emailId}
-							name="email"
-							type="email"
-							autoComplete="email"
-							required
-							placeholder="you@example.com"
-							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
-						/>
-					</div>
+				<fetcher.Form
+					id={formId}
+					method="POST"
+					action={SIGNUP_ACTION_PATH}
+					className="space-y-8"
+					onSubmit={handleSubmit}
+				>
+					<div className="space-y-8">
+						<div>
+							<label
+								htmlFor={emailId}
+								className="block text-sm font-light text-slate-500 mb-3"
+							>
+								Email
+							</label>
+							<input
+								id={emailId}
+								name="email"
+								type="email"
+								autoComplete="email"
+								required
+								placeholder="you@example.com"
+								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+							/>
+						</div>
 
-					<div>
-						<label
-							htmlFor={passwordId}
-							className="block text-sm font-light text-slate-500 mb-3"
-						>
-							Password
-						</label>
-						<input
-							id={passwordId}
-							name="password"
-							type="password"
-							autoComplete="new-password"
-							required
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							placeholder="••••••••"
-							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
-						/>
-					</div>
+						<div>
+							<label
+								htmlFor={passwordId}
+								className="block text-sm font-light text-slate-500 mb-3"
+							>
+								Password
+							</label>
+							<input
+								id={passwordId}
+								name="password"
+								type="password"
+								autoComplete="new-password"
+								required
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								placeholder="••••••••"
+								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+							/>
+						</div>
 
-					<div>
-						<label
-							htmlFor={confirmPasswordId}
-							className="block text-sm font-light text-slate-500 mb-3"
-						>
-							Confirm password
-						</label>
-						<input
-							id={confirmPasswordId}
-							name="confirmPassword"
-							type="password"
-							autoComplete="new-password"
-							required
-							value={confirmPassword}
-							onChange={(e) => setConfirmPassword(e.target.value)}
-							placeholder="••••••••"
-							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+						<div>
+							<label
+								htmlFor={confirmPasswordId}
+								className="block text-sm font-light text-slate-500 mb-3"
+							>
+								Confirm password
+							</label>
+							<input
+								id={confirmPasswordId}
+								name="confirmPassword"
+								type="password"
+								autoComplete="new-password"
+								required
+								value={confirmPassword}
+								onChange={(e) => setConfirmPassword(e.target.value)}
+								placeholder="••••••••"
+								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
 							/>
 						</div>
 					</div>

@@ -289,7 +289,7 @@ export type Tables<
 				Row: infer R;
 			}
 			? R
-		: never
-	: never;
+			: never
+		: never;
 
 // Removed unused helper generics to satisfy TS noUnusedLocals

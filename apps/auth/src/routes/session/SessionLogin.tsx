@@ -58,49 +58,49 @@ export default function Login() {
 					</div>
 				) : null}
 
-			<fetcher.Form
-				id={formId}
-				method="POST"
-				action={LOGIN_ACTION_PATH}
-				className="space-y-8"
-			>
-				<div className="space-y-8">
-					<div>
-						<label
-							htmlFor={emailId}
-							className="block text-sm font-light text-slate-500 mb-3"
-						>
-							Email
-						</label>
-						<input
-							id={emailId}
-							name="email"
-							type="email"
-							autoComplete="email"
-							required
-							placeholder="you@example.com"
-							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
-						/>
-					</div>
+				<fetcher.Form
+					id={formId}
+					method="POST"
+					action={LOGIN_ACTION_PATH}
+					className="space-y-8"
+				>
+					<div className="space-y-8">
+						<div>
+							<label
+								htmlFor={emailId}
+								className="block text-sm font-light text-slate-500 mb-3"
+							>
+								Email
+							</label>
+							<input
+								id={emailId}
+								name="email"
+								type="email"
+								autoComplete="email"
+								required
+								placeholder="you@example.com"
+								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+							/>
+						</div>
 
-					<div>
-						<label
-							htmlFor={passwordId}
-							className="block text-sm font-light text-slate-500 mb-3"
-						>
-							Password
-						</label>
-						<input
-							id={passwordId}
-							name="password"
-							type="password"
-							autoComplete="current-password"
-							required
-							placeholder="••••••••"
-							className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
-						/>
+						<div>
+							<label
+								htmlFor={passwordId}
+								className="block text-sm font-light text-slate-500 mb-3"
+							>
+								Password
+							</label>
+							<input
+								id={passwordId}
+								name="password"
+								type="password"
+								autoComplete="current-password"
+								required
+								placeholder="••••••••"
+								className="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-3 text-slate-900 placeholder-slate-400 focus:border-green-500 focus:ring-0 text-lg font-light"
+							/>
+						</div>
 					</div>
-				</div>
 
 					{/* Hidden input for redirect URL */}
 					{sessionManager.getStoredRedirectUrlOrDefault() && (
