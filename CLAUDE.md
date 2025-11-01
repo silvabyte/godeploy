@@ -123,12 +123,28 @@ bun docker:start           # Build + run
 
 ### CLI Development (Go)
 ```bash
-cd apps/cli
-make test                  # Run tests
-make build                 # Build for current platform
-make build.all             # Build for all platforms
-make lint                  # Run golangci-lint
-make fmt                   # Format Go code
+# Development
+make cli.test              # Run tests
+make cli.test.coverage     # Run tests with coverage
+make cli.lint              # Lint code
+make cli.fmt               # Format code
+make cli.deps              # Install/update dependencies
+make cli.clean             # Clean build artifacts
+
+# Building
+make cli.build             # Build for current platform (in out/)
+make cli.build.linux       # Build for Linux x86_64
+make cli.build.arm64       # Build for Linux ARM64
+make cli.build.mac         # Build for macOS Intel
+make cli.build.mac.arm64   # Build for macOS Apple Silicon
+make cli.build.windows     # Build for Windows
+make cli.build.all         # Build all platforms (creates archives in dist/)
+
+# Releasing
+make cli.version           # Show current version
+make cli.release.prepare   # Build all platforms and copy to install/releases/
+make cli.release.publish   # Deploy install directory to install.godeploy.com
+make cli.release           # Complete release workflow (prepare + publish)
 ```
 
 ## Architecture

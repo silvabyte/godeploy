@@ -28,7 +28,7 @@ include makefiles/marketing/deploy.mk
 
 include makefiles/cli/dev.mk
 include makefiles/cli/build.mk
-include makefiles/cli/deploy.mk
+include makefiles/cli/release.mk
 
 # Global targets
 .PHONY: help install all.clean all.test all.lint all.typecheck all.fmt all.build all.check all.check.fix all.knip
