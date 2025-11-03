@@ -29,10 +29,35 @@ var CLI struct {
 	VersionFlag bool   `name:"version" short:"v" help:"Display the version of godeploy"`
 
 	// Commands
-	Init    InitCmd    `cmd:"init" help:"Initialize a new godeploy.config.json file"`
-	Auth    AuthCmd    `cmd:"auth" help:"Authentication commands"`
-	Deploy  DeployCmd  `cmd:"deploy" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
-	Version VersionCmd `cmd:"version" help:"Display the version of godeploy"`
+	Init        InitCmd        `cmd:"init" help:"Initialize a new godeploy.config.json file"`
+	Auth        AuthCmd        `cmd:"auth" help:"Authentication commands"`
+	Deploy      DeployCmd      `cmd:"deploy" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
+	Version     VersionCmd     `cmd:"version" help:"Display the version of godeploy"`
+	Projects    ProjectsCmd    `cmd:"projects" help:"List all deployed projects" aliases:"list"`
+	Status      StatusProjectCmd `cmd:"status" help:"Check deployment status for a project"`
+	Logs        LogsCmd        `cmd:"logs" help:"View deployment logs"`
+	Deployments DeploymentsCmd `cmd:"deployments" help:"View deployment history for a project"`
+	Whoami      WhoamiCmd      `cmd:"whoami" help:"Display current user information"`
+	Rollback    RollbackCmd    `cmd:"rollback" help:"Rollback project to a previous deployment"`
+	Delete      DeleteCmd      `cmd:"delete" help:"Delete a deployed project"`
+	Open        OpenCmd        `cmd:"open" help:"Open project URL in browser"`
+	Validate    ValidateCmd    `cmd:"validate" help:"Validate configuration file"`
+	Link        LinkCmd        `cmd:"link" help:"Link local directory to remote project"`
+	Preview     PreviewCmd     `cmd:"preview" help:"Create a preview deployment"`
+	Diff        DiffCmd        `cmd:"diff" help:"Show differences between local and deployed version"`
+	Env         EnvCmd         `cmd:"env" help:"Manage environment variables"`
+	CLIConfig   CLIConfigCmd   `cmd:"cli-config" help:"Manage CLI configuration"`
+	Domains     DomainsCmd     `cmd:"domains" help:"Manage custom domains"`
+	Aliases     AliasesCmd     `cmd:"aliases" help:"Manage URL aliases"`
+	Metrics     MetricsCmd     `cmd:"metrics" help:"View project metrics"`
+	Analytics   AnalyticsCmd   `cmd:"analytics" help:"Open analytics dashboard"`
+	Health      HealthCmd      `cmd:"health" help:"Check project health"`
+	Teams       TeamsCmd       `cmd:"teams" help:"Manage teams"`
+	Tokens      TokensCmd      `cmd:"tokens" help:"Manage API tokens"`
+	Promote     PromoteCmd     `cmd:"promote" help:"Promote deployment between projects"`
+	Compare     CompareCmd     `cmd:"compare" help:"Compare two deployments"`
+	Cache       CacheCmd       `cmd:"cache" help:"Manage CDN cache"`
+	Builds      BuildsCmd      `cmd:"builds" help:"Manage build configuration"`
 }
 
 // InitCmd represents the init command
@@ -76,6 +101,10 @@ type DeployCmd struct {
 	CommitURL     string `name:"commit-url" help:"URL to the commit (e.g., GitHub commit link)" default:""`
 	NoGit         bool   `name:"no-git" help:"Disable auto-detection of git metadata" default:"false"`
 	ClearCache    bool   `name:"clear-cache" help:"Clear CDN cache after deployment" default:"false"`
+	DryRun        bool   `name:"dry-run" help:"Preview deployment without actually deploying" default:"false"`
+	Wait          bool   `name:"wait" help:"Wait for deployment to complete" default:"false"`
+	Timeout       string `name:"timeout" help:"Timeout for wait (e.g., 5m, 10m)" default:"10m"`
+	JSON          bool   `name:"json" help:"Output in JSON format for CI/CD" default:"false"`
 }
 
 // VersionCmd represents the version command
@@ -895,6 +924,544 @@ func (d *DeployCmd) Run() error {
 	// Display formatted success message
 	fmt.Println(formatDeploymentSuccess(projectName, deployResp.URL, zipStats))
 
+	return nil
+}
+
+// ===== Priority 1: Core Project Management =====
+
+// ProjectsCmd lists all deployed projects
+type ProjectsCmd struct {
+	Filter string `help:"Filter projects (enabled/disabled/all)" default:"all"`
+	JSON   bool   `help:"Output in JSON format" default:"false"`
+}
+
+func (p *ProjectsCmd) Run() error {
+	fmt.Println("🚧 Not implemented yet: projects list")
+	fmt.Println("This will list all your deployed projects with their URLs and status")
+	return nil
+}
+
+// StatusProjectCmd checks deployment status for a project
+type StatusProjectCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+}
+
+func (s *StatusProjectCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: status for project '%s'\n", s.Project)
+	fmt.Println("This will show deployment state, last deployment info, and current URL")
+	return nil
+}
+
+// LogsCmd views deployment logs
+type LogsCmd struct {
+	Project      string `arg:"" help:"Project name" required:"true"`
+	Follow       bool   `help:"Follow log output" short:"f" default:"false"`
+	Lines        int    `help:"Number of lines to show" short:"n" default:"100"`
+	DeploymentID string `help:"Specific deployment ID" default:""`
+}
+
+func (l *LogsCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: logs for project '%s'\n", l.Project)
+	if l.Follow {
+		fmt.Println("Follow mode will stream logs in real-time")
+	}
+	return nil
+}
+
+// DeploymentsCmd views deployment history
+type DeploymentsCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Limit   int    `help:"Number of deployments to show" default:"10"`
+	JSON    bool   `help:"Output in JSON format" default:"false"`
+}
+
+func (d *DeploymentsCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: deployment history for '%s'\n", d.Project)
+	fmt.Println("This will show past deployments with timestamps, commit info, and status")
+	return nil
+}
+
+// WhoamiCmd displays current user information
+type WhoamiCmd struct {
+	JSON bool `help:"Output in JSON format" default:"false"`
+}
+
+func (w *WhoamiCmd) Run() error {
+	fmt.Println("🚧 Not implemented yet: whoami")
+	fmt.Println("This will show your email, tenant ID, and subscription status")
+	return nil
+}
+
+// ===== Priority 2: Deployment Operations =====
+
+// RollbackCmd rolls back to a previous deployment
+type RollbackCmd struct {
+	Project      string `arg:"" help:"Project name" required:"true"`
+	DeploymentID string `help:"Deployment ID to rollback to (defaults to last successful)" default:""`
+	Force        bool   `help:"Skip confirmation prompt" short:"f" default:"false"`
+}
+
+func (r *RollbackCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: rollback for project '%s'\n", r.Project)
+	if r.DeploymentID != "" {
+		fmt.Printf("Will rollback to deployment: %s\n", r.DeploymentID)
+	} else {
+		fmt.Println("Will rollback to last successful deployment")
+	}
+	return nil
+}
+
+// DeleteCmd deletes a deployed project
+type DeleteCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Force   bool   `help:"Skip confirmation prompt" short:"f" default:"false"`
+}
+
+func (d *DeleteCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: delete project '%s'\n", d.Project)
+	fmt.Println("This will remove the project from the platform with confirmation")
+	return nil
+}
+
+// OpenCmd opens project URL in browser
+type OpenCmd struct {
+	Project   string `arg:"" help:"Project name" required:"true"`
+	Dashboard bool   `help:"Open dashboard page instead of project URL" default:"false"`
+}
+
+func (o *OpenCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: open project '%s'\n", o.Project)
+	if o.Dashboard {
+		fmt.Println("Will open dashboard page")
+	} else {
+		fmt.Println("Will open project URL in browser")
+	}
+	return nil
+}
+
+// ValidateCmd validates configuration file
+type ValidateCmd struct {
+	Verbose bool `help:"Show detailed validation output" default:"false"`
+}
+
+func (v *ValidateCmd) Run() error {
+	fmt.Println("🚧 Not implemented yet: validate config")
+	fmt.Println("This will check config syntax, verify source directories, and validate file sizes")
+	return nil
+}
+
+// ===== Priority 3: Developer Experience =====
+
+// LinkCmd links local directory to remote project
+type LinkCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+}
+
+func (l *LinkCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: link to project '%s'\n", l.Project)
+	fmt.Println("This will associate this directory with the remote project")
+	return nil
+}
+
+// PreviewCmd creates a preview deployment
+type PreviewCmd struct {
+	Name string `help:"Preview name" default:""`
+	TTL  string `help:"Time to live (e.g., 7d)" default:"7d"`
+}
+
+func (p *PreviewCmd) Run() error {
+	fmt.Println("🚧 Not implemented yet: preview deployment")
+	fmt.Println("This will create a temporary deployment with auto-cleanup")
+	return nil
+}
+
+// DiffCmd shows differences between local and deployed
+type DiffCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+}
+
+func (d *DiffCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: diff for project '%s'\n", d.Project)
+	fmt.Println("This will compare local build with deployed version")
+	return nil
+}
+
+// ===== Priority 4: Environment & Configuration =====
+
+// EnvCmd manages environment variables
+type EnvCmd struct {
+	List  EnvListCmd  `cmd:"list" help:"List environment variables"`
+	Set   EnvSetCmd   `cmd:"set" help:"Set an environment variable"`
+	Unset EnvUnsetCmd `cmd:"unset" help:"Remove an environment variable"`
+	Pull  EnvPullCmd  `cmd:"pull" help:"Download environment variables to .env file"`
+}
+
+type EnvListCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+}
+
+func (e *EnvListCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: env list for '%s'\n", e.Project)
+	return nil
+}
+
+type EnvSetCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Key     string `arg:"" help:"Variable name" required:"true"`
+	Value   string `arg:"" help:"Variable value" required:"true"`
+}
+
+func (e *EnvSetCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: env set %s=%s for '%s'\n", e.Key, e.Value, e.Project)
+	return nil
+}
+
+type EnvUnsetCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Key     string `arg:"" help:"Variable name" required:"true"`
+}
+
+func (e *EnvUnsetCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: env unset %s for '%s'\n", e.Key, e.Project)
+	return nil
+}
+
+type EnvPullCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Output  string `help:"Output file" default:".env"`
+}
+
+func (e *EnvPullCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: env pull for '%s' to %s\n", e.Project, e.Output)
+	return nil
+}
+
+// CLIConfigCmd manages CLI configuration
+type CLIConfigCmd struct {
+	Get    CLIConfigGetCmd    `cmd:"get" help:"Get a configuration value"`
+	Set    CLIConfigSetCmd    `cmd:"set" help:"Set a configuration value"`
+	List   CLIConfigListCmd   `cmd:"list" help:"List all configuration values"`
+	APIUrl CLIConfigAPIUrlCmd `cmd:"api-url" help:"Set API URL"`
+}
+
+type CLIConfigGetCmd struct {
+	Key string `arg:"" help:"Configuration key" required:"true"`
+}
+
+func (c *CLIConfigGetCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: cli-config get %s\n", c.Key)
+	return nil
+}
+
+type CLIConfigSetCmd struct {
+	Key   string `arg:"" help:"Configuration key" required:"true"`
+	Value string `arg:"" help:"Configuration value" required:"true"`
+}
+
+func (c *CLIConfigSetCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: cli-config set %s=%s\n", c.Key, c.Value)
+	return nil
+}
+
+type CLIConfigListCmd struct{}
+
+func (c *CLIConfigListCmd) Run() error {
+	fmt.Println("🚧 Not implemented yet: cli-config list")
+	return nil
+}
+
+type CLIConfigAPIUrlCmd struct {
+	URL string `arg:"" help:"API URL" required:"true"`
+}
+
+func (c *CLIConfigAPIUrlCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: cli-config api-url %s\n", c.URL)
+	return nil
+}
+
+// ===== Priority 5: Domain & URL Management =====
+
+// DomainsCmd manages custom domains
+type DomainsCmd struct {
+	List   DomainsListCmd   `cmd:"list" help:"List domains for a project"`
+	Add    DomainsAddCmd    `cmd:"add" help:"Add a custom domain"`
+	Remove DomainsRemoveCmd `cmd:"remove" help:"Remove a custom domain"`
+	Verify DomainsVerifyCmd `cmd:"verify" help:"Verify DNS configuration"`
+}
+
+type DomainsListCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+}
+
+func (d *DomainsListCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: domains list for '%s'\n", d.Project)
+	return nil
+}
+
+type DomainsAddCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Domain  string `arg:"" help:"Domain name" required:"true"`
+}
+
+func (d *DomainsAddCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: domains add %s to '%s'\n", d.Domain, d.Project)
+	return nil
+}
+
+type DomainsRemoveCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Domain  string `arg:"" help:"Domain name" required:"true"`
+}
+
+func (d *DomainsRemoveCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: domains remove %s from '%s'\n", d.Domain, d.Project)
+	return nil
+}
+
+type DomainsVerifyCmd struct {
+	Domain string `arg:"" help:"Domain name" required:"true"`
+}
+
+func (d *DomainsVerifyCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: domains verify %s\n", d.Domain)
+	return nil
+}
+
+// AliasesCmd manages URL aliases
+type AliasesCmd struct {
+	List   AliasesListCmd   `cmd:"list" help:"List aliases for a project"`
+	Create AliasesCreateCmd `cmd:"create" help:"Create an alias"`
+	Remove AliasesRemoveCmd `cmd:"remove" help:"Remove an alias"`
+}
+
+type AliasesListCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+}
+
+func (a *AliasesListCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: aliases list for '%s'\n", a.Project)
+	return nil
+}
+
+type AliasesCreateCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Alias   string `arg:"" help:"Alias name" required:"true"`
+}
+
+func (a *AliasesCreateCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: aliases create %s for '%s'\n", a.Alias, a.Project)
+	return nil
+}
+
+type AliasesRemoveCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Alias   string `arg:"" help:"Alias name" required:"true"`
+}
+
+func (a *AliasesRemoveCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: aliases remove %s from '%s'\n", a.Alias, a.Project)
+	return nil
+}
+
+// ===== Priority 6: Analytics & Monitoring =====
+
+// MetricsCmd views project metrics
+type MetricsCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Period  string `help:"Time period (e.g., 7d, 30d)" default:"7d"`
+	JSON    bool   `help:"Output in JSON format" default:"false"`
+}
+
+func (m *MetricsCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: metrics for '%s' (period: %s)\n", m.Project, m.Period)
+	return nil
+}
+
+// AnalyticsCmd opens analytics dashboard
+type AnalyticsCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+}
+
+func (a *AnalyticsCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: analytics for '%s'\n", a.Project)
+	fmt.Println("This will open the analytics dashboard in your browser")
+	return nil
+}
+
+// HealthCmd checks project health
+type HealthCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Verbose bool   `help:"Show detailed health information" default:"false"`
+}
+
+func (h *HealthCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: health check for '%s'\n", h.Project)
+	fmt.Println("This will ping deployment, check CDN, and verify SSL certificate")
+	return nil
+}
+
+// ===== Priority 7: Team & Collaboration =====
+
+// TeamsCmd manages teams
+type TeamsCmd struct {
+	List   TeamsListCmd   `cmd:"list" help:"List teams"`
+	Switch TeamsSwitchCmd `cmd:"switch" help:"Switch team context"`
+	Create TeamsCreateCmd `cmd:"create" help:"Create a new team"`
+	Invite TeamsInviteCmd `cmd:"invite" help:"Invite a team member"`
+}
+
+type TeamsListCmd struct{}
+
+func (t *TeamsListCmd) Run() error {
+	fmt.Println("🚧 Not implemented yet: teams list")
+	return nil
+}
+
+type TeamsSwitchCmd struct {
+	Team string `arg:"" help:"Team name" required:"true"`
+}
+
+func (t *TeamsSwitchCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: switch to team '%s'\n", t.Team)
+	return nil
+}
+
+type TeamsCreateCmd struct {
+	Name string `arg:"" help:"Team name" required:"true"`
+}
+
+func (t *TeamsCreateCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: create team '%s'\n", t.Name)
+	return nil
+}
+
+type TeamsInviteCmd struct {
+	Email string `arg:"" help:"Email address" required:"true"`
+}
+
+func (t *TeamsInviteCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: invite %s to team\n", t.Email)
+	return nil
+}
+
+// TokensCmd manages API tokens
+type TokensCmd struct {
+	List   TokensListCmd   `cmd:"list" help:"List API tokens"`
+	Create TokensCreateCmd `cmd:"create" help:"Create a new API token"`
+	Revoke TokensRevokeCmd `cmd:"revoke" help:"Revoke an API token"`
+}
+
+type TokensListCmd struct{}
+
+func (t *TokensListCmd) Run() error {
+	fmt.Println("🚧 Not implemented yet: tokens list")
+	return nil
+}
+
+type TokensCreateCmd struct {
+	Name    string `help:"Token name" default:""`
+	Expires string `help:"Expiration duration (e.g., 90d)" default:"90d"`
+}
+
+func (t *TokensCreateCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: create token (expires: %s)\n", t.Expires)
+	return nil
+}
+
+type TokensRevokeCmd struct {
+	ID string `arg:"" help:"Token ID" required:"true"`
+}
+
+func (t *TokensRevokeCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: revoke token %s\n", t.ID)
+	return nil
+}
+
+// ===== Priority 8: Advanced Features =====
+
+// PromoteCmd promotes deployment between projects
+type PromoteCmd struct {
+	Source string `arg:"" help:"Source project name" required:"true"`
+	Target string `arg:"" help:"Target project name" required:"true"`
+	Force  bool   `help:"Skip confirmation prompt" short:"f" default:"false"`
+}
+
+func (p *PromoteCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: promote from '%s' to '%s'\n", p.Source, p.Target)
+	return nil
+}
+
+// CompareCmd compares two deployments
+type CompareCmd struct {
+	DeploymentA string `arg:"" help:"First deployment ID" required:"true"`
+	DeploymentB string `arg:"" help:"Second deployment ID" required:"true"`
+}
+
+func (c *CompareCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: compare %s vs %s\n", c.DeploymentA, c.DeploymentB)
+	return nil
+}
+
+// CacheCmd manages CDN cache
+type CacheCmd struct {
+	Clear CacheClearCmd `cmd:"clear" help:"Clear CDN cache for a project"`
+	Purge CachePurgeCmd `cmd:"purge" help:"Purge specific path from cache"`
+	Stats CacheStatsCmd `cmd:"stats" help:"View cache statistics"`
+}
+
+type CacheClearCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+}
+
+func (c *CacheClearCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: cache clear for '%s'\n", c.Project)
+	return nil
+}
+
+type CachePurgeCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+	Path    string `arg:"" help:"Path to purge" required:"true"`
+}
+
+func (c *CachePurgeCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: cache purge %s for '%s'\n", c.Path, c.Project)
+	return nil
+}
+
+type CacheStatsCmd struct {
+	Project string `arg:"" help:"Project name" required:"true"`
+}
+
+func (c *CacheStatsCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: cache stats for '%s'\n", c.Project)
+	return nil
+}
+
+// BuildsCmd manages build configuration
+type BuildsCmd struct {
+	Run    BuildsRunCmd    `cmd:"run" help:"Run build before deploy"`
+	Config BuildsConfigCmd `cmd:"config" help:"Configure build settings"`
+}
+
+type BuildsRunCmd struct {
+	BuildCmd string `help:"Build command to run" default:""`
+}
+
+func (b *BuildsRunCmd) Run() error {
+	if b.BuildCmd != "" {
+		fmt.Printf("🚧 Not implemented yet: builds run with command '%s'\n", b.BuildCmd)
+	} else {
+		fmt.Println("🚧 Not implemented yet: builds run (auto-detect)")
+	}
+	return nil
+}
+
+type BuildsConfigCmd struct {
+	Command string `help:"Set build command" default:""`
+}
+
+func (b *BuildsConfigCmd) Run() error {
+	fmt.Printf("🚧 Not implemented yet: builds config (command: %s)\n", b.Command)
 	return nil
 }
 

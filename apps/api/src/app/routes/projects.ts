@@ -297,4 +297,186 @@ export default async function (fastify: FastifyInstance) {
 			return reply.code(200).send(projectWithUrl);
 		},
 	});
+
+	// ===== STUB ENDPOINTS - Priority 1 =====
+
+	// Get project status
+	fastify.get("/api/projects/:projectId/status", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Project status endpoint coming soon",
+			});
+		},
+	});
+
+	// Get project deployments history
+	fastify.get("/api/projects/:projectId/deployments", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Deployment history endpoint coming soon",
+			});
+		},
+	});
+
+	// Get project logs
+	fastify.get("/api/projects/:projectId/logs", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Project logs endpoint coming soon",
+			});
+		},
+	});
+
+	// ===== STUB ENDPOINTS - Priority 2 =====
+
+	// Rollback project to previous deployment
+	fastify.post("/api/projects/:projectId/rollback", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Rollback endpoint coming soon",
+			});
+		},
+	});
+
+	// Delete project
+	fastify.delete("/api/projects/:projectId", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Delete project endpoint coming soon",
+			});
+		},
+	});
+
+	// Get project diff
+	fastify.get("/api/projects/:projectId/diff", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Project diff endpoint coming soon",
+			});
+		},
+	});
+
+	// ===== STUB ENDPOINTS - Priority 5 =====
+
+	// List project aliases
+	fastify.get("/api/projects/:projectId/aliases", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Aliases list endpoint coming soon",
+			});
+		},
+	});
+
+	// Create project alias
+	fastify.post("/api/projects/:projectId/aliases", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Create alias endpoint coming soon",
+			});
+		},
+	});
+
+	// Delete project alias
+	fastify.delete("/api/projects/:projectId/aliases/:alias", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{
+				Params: { projectId: string; alias: string };
+			}>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Delete alias endpoint coming soon",
+			});
+		},
+	});
+
+	// ===== STUB ENDPOINTS - Priority 6 =====
+
+	// Get project metrics
+	fastify.get("/api/projects/:projectId/metrics", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Project metrics endpoint coming soon",
+			});
+		},
+	});
+
+	// Get project health
+	fastify.get("/api/projects/:projectId/health", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Project health endpoint coming soon",
+			});
+		},
+	});
+
+	// ===== STUB ENDPOINTS - Priority 8 =====
+
+	// Promote deployment
+	fastify.post("/api/projects/:sourceId/promote/:targetId", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{
+				Params: { sourceId: string; targetId: string };
+			}>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Promote deployment endpoint coming soon",
+			});
+		},
+	});
 }

@@ -323,4 +323,30 @@ export default async function (fastify: FastifyInstance) {
 			return reply.code(200).send(deploy.data);
 		},
 	});
+
+	// ===== STUB ENDPOINTS - Priority 3 =====
+
+	// Preview deployment
+	fastify.post("/api/deploys/preview", {
+		config: { auth: true },
+		handler: async (request: FastifyRequest, reply: FastifyReply) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Preview deployment endpoint coming soon",
+			});
+		},
+	});
+
+	// ===== STUB ENDPOINTS - Priority 8 =====
+
+	// Compare two deployments
+	fastify.get("/api/deploys/compare", {
+		config: { auth: true },
+		handler: async (request: FastifyRequest, reply: FastifyReply) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Compare deployments endpoint coming soon",
+			});
+		},
+	});
 }

@@ -1,0 +1,33 @@
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+
+export default async function (fastify: FastifyInstance) {
+	// ===== STUB ENDPOINTS - Priority 6: Analytics =====
+
+	// Get analytics dashboard URL
+	fastify.get("/api/projects/:projectId/analytics", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Analytics dashboard endpoint coming soon",
+			});
+		},
+	});
+
+	// Get analytics data
+	fastify.get("/api/projects/:projectId/analytics/data", {
+		config: { auth: true },
+		handler: async (
+			request: FastifyRequest<{ Params: { projectId: string } }>,
+			reply: FastifyReply,
+		) => {
+			return reply.code(501).send({
+				error: "Not implemented yet",
+				message: "Analytics data endpoint coming soon",
+			});
+		},
+	});
+}
