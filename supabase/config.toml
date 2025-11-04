@@ -23,7 +23,8 @@ enabled = false
 
 [db]
 # Port to use for the local database URL.
-port = 55432
+port = 55431
+
 # Port used by db diff command to initialize the shadow database.
 shadow_port = 55430
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
