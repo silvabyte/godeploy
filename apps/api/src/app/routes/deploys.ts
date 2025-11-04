@@ -330,7 +330,7 @@ export default async function (fastify: FastifyInstance) {
 	// Preview deployment
 	fastify.post("/api/deploys/preview", {
 		config: { auth: true },
-		handler: async (request: FastifyRequest, reply: FastifyReply) => {
+		handler: async (_request: FastifyRequest, reply: FastifyReply) => {
 			return reply.code(501).send({
 				error: "Not implemented yet",
 				message: "Preview deployment endpoint coming soon",
@@ -343,7 +343,7 @@ export default async function (fastify: FastifyInstance) {
 	// Compare two deployments
 	fastify.get("/api/deploys/compare", {
 		config: { auth: true },
-		handler: async (request: FastifyRequest, reply: FastifyReply) => {
+		handler: async (_request: FastifyRequest, reply: FastifyReply) => {
 			return reply.code(501).send({
 				error: "Not implemented yet",
 				message: "Compare deployments endpoint coming soon",

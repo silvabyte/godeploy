@@ -6,7 +6,7 @@ export default async function (fastify: FastifyInstance) {
 	// List all API tokens for user
 	fastify.get("/api/tokens", {
 		config: { auth: true },
-		handler: async (request: FastifyRequest, reply: FastifyReply) => {
+		handler: async (_request: FastifyRequest, reply: FastifyReply) => {
 			return reply.code(501).send({
 				error: "Not implemented yet",
 				message: "List API tokens endpoint coming soon",
@@ -17,7 +17,7 @@ export default async function (fastify: FastifyInstance) {
 	// Create a new API token
 	fastify.post("/api/tokens", {
 		config: { auth: true },
-		handler: async (request: FastifyRequest, reply: FastifyReply) => {
+		handler: async (_request: FastifyRequest, reply: FastifyReply) => {
 			return reply.code(501).send({
 				error: "Not implemented yet",
 				message: "Create API token endpoint coming soon",
@@ -29,7 +29,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/tokens/:tokenId", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { tokenId: string } }>,
+			_request: FastifyRequest<{ Params: { tokenId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -43,7 +43,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.delete("/api/tokens/:tokenId", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { tokenId: string } }>,
+			_request: FastifyRequest<{ Params: { tokenId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -57,7 +57,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.patch("/api/tokens/:tokenId", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { tokenId: string } }>,
+			_request: FastifyRequest<{ Params: { tokenId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({

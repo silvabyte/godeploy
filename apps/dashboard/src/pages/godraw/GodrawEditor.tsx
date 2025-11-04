@@ -1,28 +1,28 @@
 import { Excalidraw } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
+import type {
+	AppState,
+	BinaryFiles,
+	ExcalidrawElement,
+	ExcalidrawImperativeAPI,
+} from "@excalidraw/excalidraw/types";
 import {
 	Bars3Icon,
 	CheckCircleIcon,
 	ClockIcon,
 } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useState } from "react";
-import type {
-	ExcalidrawImperativeAPI,
-	ExcalidrawElement,
-	AppState,
-	BinaryFiles,
-} from "@excalidraw/excalidraw/types";
 import { NewPageDialog } from "./components/NewPageDialog";
 import { PageManager } from "./components/PageManager";
 import { PageSelector } from "./components/PageSelector";
 import { useAutoSave } from "./hooks/useAutoSave";
-import type { GodrawPage, GodrawProject } from "./hooks/useGodrawProject";
 import {
 	useCreatePage,
 	useDeletePage,
 	useReorderPages,
 	useUpdatePage,
 } from "./hooks/useGodrawPages";
+import type { GodrawPage, GodrawProject } from "./hooks/useGodrawProject";
 
 interface GodrawEditorProps {
 	project: GodrawProject;
@@ -132,7 +132,13 @@ export function GodrawEditor({
 				handlePageChange(homePage);
 			}
 		},
-		[deletePageMutation, pages, project.home_page_id, currentPage, handlePageChange],
+		[
+			deletePageMutation,
+			pages,
+			project.home_page_id,
+			currentPage,
+			handlePageChange,
+		],
 	);
 
 	// Update page (for publish toggle, etc.)
@@ -156,13 +162,10 @@ export function GodrawEditor({
 	);
 
 	// Set home page
-	const handleSetHomePage = useCallback(
-		async (pageId: string) => {
-			// TODO: Update godraw_project.home_page_id via API
-			console.log("Set home page:", pageId);
-		},
-		[],
-	);
+	const handleSetHomePage = useCallback(async (pageId: string) => {
+		// TODO: Update godraw_project.home_page_id via API
+		console.log("Set home page:", pageId);
+	}, []);
 
 	// Format last saved time
 	const formatLastSaved = (date: Date | null) => {
@@ -266,8 +269,7 @@ export function GodrawEditor({
 								elements: currentPage.elements as ExcalidrawElement[],
 								appState: {
 									...currentPage.app_state,
-									viewBackgroundColor:
-										theme === "dark" ? "#1e1e1e" : "#ffffff",
+									viewBackgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
 								} as Partial<AppState>,
 							}}
 							UIOptions={{

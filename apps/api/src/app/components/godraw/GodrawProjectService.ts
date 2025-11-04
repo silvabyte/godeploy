@@ -74,9 +74,7 @@ export class GodrawProjectService extends BaseService {
 	 * @param godrawProjectId GoDraw project ID
 	 * @returns Result indicating success or error message
 	 */
-	async deleteGodrawProject(
-		godrawProjectId: string,
-	): Promise<Result<boolean>> {
+	async deleteGodrawProject(godrawProjectId: string): Promise<Result<boolean>> {
 		const { error } = await this.supabase
 			.from(this.tableName)
 			.delete()

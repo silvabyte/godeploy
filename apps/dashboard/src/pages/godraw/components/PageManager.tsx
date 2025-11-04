@@ -3,7 +3,6 @@ import {
 	EyeIcon,
 	EyeSlashIcon,
 	HomeIcon,
-	PencilIcon,
 	TrashIcon,
 	XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -152,40 +151,37 @@ export function PageManager({
 										)}
 
 										{/* Delete */}
-										{page.id !== project.home_page_id && (
-											<>
-												{deleteConfirm === page.id ? (
-													<div className="flex gap-1">
-														<button
-															type="button"
-															onClick={() => {
-																onPageDelete(page.id);
-																setDeleteConfirm(null);
-															}}
-															className="rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
-														>
-															Confirm
-														</button>
-														<button
-															type="button"
-															onClick={() => setDeleteConfirm(null)}
-															className="rounded bg-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
-														>
-															Cancel
-														</button>
-													</div>
-												) : (
+										{page.id !== project.home_page_id &&
+											(deleteConfirm === page.id ? (
+												<div className="flex gap-1">
 													<button
 														type="button"
-														onClick={() => setDeleteConfirm(page.id)}
-														className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
-														title="Delete page"
+														onClick={() => {
+															onPageDelete(page.id);
+															setDeleteConfirm(null);
+														}}
+														className="rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
 													>
-														<TrashIcon className="h-4 w-4" />
+														Confirm
 													</button>
-												)}
-											</>
-										)}
+													<button
+														type="button"
+														onClick={() => setDeleteConfirm(null)}
+														className="rounded bg-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+													>
+														Cancel
+													</button>
+												</div>
+											) : (
+												<button
+													type="button"
+													onClick={() => setDeleteConfirm(page.id)}
+													className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+													title="Delete page"
+												>
+													<TrashIcon className="h-4 w-4" />
+												</button>
+											))}
 									</div>
 								</div>
 							))}

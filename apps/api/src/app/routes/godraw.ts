@@ -1,20 +1,26 @@
+import * as fs from "node:fs/promises";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { validateAndTransformProjectName } from "../components/projects/project-utils";
+import { GodrawBuilder } from "../components/godraw/GodrawBuilder";
 import { GodrawPageService } from "../components/godraw/GodrawPageService";
 import { GodrawProjectService } from "../components/godraw/GodrawProjectService";
 import {
 	type CreateGodrawPage,
 	type CreateGodrawProject,
 	type ReorderPages,
+	routeSchemas,
 	type UpdateGodrawPage,
 	type UpdateGodrawProject,
-	routeSchemas,
 } from "../components/godraw/godraw.types";
+import { validateAndTransformProjectName } from "../components/projects/project-utils";
+import { StorageService } from "../components/storage/StorageService";
+import { ProjectDomain } from "../utils/url";
 
 export default async function (fastify: FastifyInstance) {
 	// Initialize services
 	const godrawProjectService = new GodrawProjectService();
 	const godrawPageService = new GodrawPageService();
+	const godrawBuilder = new GodrawBuilder();
+	const storageService = new StorageService();
 
 	// ================================================
 	// GoDraw Project Routes
@@ -295,7 +301,7 @@ export default async function (fastify: FastifyInstance) {
 			const countResult = await godrawPageService.countPages(
 				godrawProjectResult.data.id,
 			);
-			const orderIndex = request.body.order_index ?? (countResult.data ?? 0);
+			const orderIndex = request.body.order_index ?? countResult.data ?? 0;
 
 			// Create page
 			const pageResult = await godrawPageService.createPage({
@@ -462,9 +468,7 @@ export default async function (fastify: FastifyInstance) {
 
 			// Prevent deleting home page
 			if (godrawProjectResult.data.home_page_id === pageId) {
-				return reply
-					.code(400)
-					.send({ error: "Cannot delete the home page" });
+				return reply.code(400).send({ error: "Cannot delete the home page" });
 			}
 
 			// Delete page
@@ -505,6 +509,158 @@ export default async function (fastify: FastifyInstance) {
 			}
 
 			return reply.code(200).send({ success: true });
+		},
+	);
+
+	// ================================================
+	// GoDraw Build & Deploy Routes
+	// ================================================
+
+	/**
+	 * POST /api/projects/:projectId/godraw/build
+	 * Build and deploy GoDraw project as static site
+	 */
+	fastify.post(
+		"/projects/:projectId/godraw/build",
+		{ config: { auth: true } },
+		async (
+			request: FastifyRequest<{
+				Params: { projectId: string };
+			}>,
+			reply: FastifyReply,
+		) => {
+			const { projectId } = request.params;
+			const { tenant_id, user_id } = request.user;
+
+			// Verify project exists and belongs to user's tenant
+			const projectResult = await request.db.projects.getProjectById(projectId);
+			if (projectResult.error || !projectResult.data) {
+				return reply.code(404).send({ error: "Project not found" });
+			}
+
+			if (projectResult.data.tenant_id !== tenant_id) {
+				return reply.code(404).send({ error: "Project not found" });
+			}
+
+			const project = projectResult.data;
+
+			// Verify it's a godraw project
+			if (project.project_type !== "godraw") {
+				return reply.code(400).send({ error: "Not a GoDraw project" });
+			}
+
+			// Build the static site
+			const buildResult = await godrawBuilder.build({
+				projectId,
+				tenantId: tenant_id,
+			});
+
+			if (buildResult.error || !buildResult.data) {
+				return reply.code(500).send({
+					error: "Failed to build site",
+					message: buildResult.error,
+				});
+			}
+
+			const { archivePath, pageCount, buildTime } = buildResult.data;
+
+			// Create deployment record
+			const deployResult = await request.db.deploys.recordDeploy({
+				project_id: projectId,
+				user_id,
+				tenant_id,
+				url: ProjectDomain.from(project).determine(),
+				status: "pending",
+			});
+
+			if (deployResult.error || !deployResult.data) {
+				// Cleanup archive
+				await fs.rm(archivePath, { force: true }).catch(() => {});
+				return reply.code(500).send({
+					error: "Failed to record deployment",
+					message: deployResult.error,
+				});
+			}
+
+			const deploy = deployResult.data;
+
+			// Upload to storage
+			let uploadResult: { data: string | null; error: string | null };
+			try {
+				uploadResult = await storageService.processSpaArchive(
+					archivePath,
+					project,
+				);
+			} catch (e) {
+				const err = e as Error;
+				// Update deployment status to failed
+				if (deploy.id) {
+					await request.db.deploys.updateDeployStatus(deploy.id, "failed");
+				}
+				// Cleanup archive
+				await fs.rm(archivePath, { force: true }).catch(() => {});
+				return reply.code(500).send({
+					error: "Failed to upload files",
+					message: err.message,
+				});
+			}
+
+			if (uploadResult.error) {
+				// Update deployment status to failed
+				if (deploy.id) {
+					await request.db.deploys.updateDeployStatus(deploy.id, "failed");
+				}
+				// Cleanup archive
+				await fs.rm(archivePath, { force: true }).catch(() => {});
+				return reply.code(500).send({
+					error: "Failed to upload files",
+					message: uploadResult.error,
+				});
+			}
+
+			// Update deployment status to success
+			if (!deploy.id) {
+				// Cleanup archive
+				await fs.rm(archivePath, { force: true }).catch(() => {});
+				return reply.code(500).send({
+					error: "Failed to update deployment status",
+					message: "Deploy ID not found",
+				});
+			}
+
+			const updateResult = await request.db.deploys.updateDeployStatus(
+				deploy.id,
+				"success",
+			);
+
+			if (updateResult.error) {
+				// Cleanup archive
+				await fs.rm(archivePath, { force: true }).catch(() => {});
+				return reply.code(500).send({
+					error: "Failed to update deployment status",
+					message: updateResult.error,
+				});
+			}
+
+			// Cleanup archive
+			await fs.rm(archivePath, { force: true }).catch(() => {});
+
+			// Construct URLs
+			const projectDomain = ProjectDomain.from(project);
+
+			return reply.code(201).send({
+				deploy_id: deploy.id,
+				project_id: projectId,
+				status: "success",
+				build_info: {
+					page_count: pageCount,
+					build_time_ms: buildTime,
+				},
+				urls: {
+					site: projectDomain.determine(),
+					subdomain: projectDomain.subdomain.origin,
+				},
+			});
 		},
 	);
 }

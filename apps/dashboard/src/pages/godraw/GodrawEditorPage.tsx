@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { PublishDialog } from "./components/PublishDialog";
 import { GodrawEditor } from "./GodrawEditor";
+import { useBuildGodraw } from "./hooks/useBuildGodraw";
 import { useGodrawProject } from "./hooks/useGodrawProject";
 
 /**
@@ -8,8 +11,31 @@ import { useGodrawProject } from "./hooks/useGodrawProject";
  */
 export function GodrawEditorPage() {
 	const { projectId } = useParams<{ projectId: string }>();
+	const [showPublishDialog, setShowPublishDialog] = useState(false);
 
 	const { data, isLoading, error } = useGodrawProject(projectId!);
+	const buildMutation = useBuildGodraw(projectId!);
+
+	const handlePublish = () => {
+		setShowPublishDialog(true);
+	};
+
+	const handleConfirmPublish = () => {
+		buildMutation.mutate(undefined, {
+			onSuccess: () => {
+				// Dialog will show success state automatically
+			},
+			onError: (err: Error) => {
+				console.error("Build failed:", err);
+				// Dialog will show error state automatically
+			},
+		});
+	};
+
+	const handleCloseDialog = () => {
+		setShowPublishDialog(false);
+		buildMutation.reset();
+	};
 
 	if (isLoading) {
 		return (
@@ -42,15 +68,23 @@ export function GodrawEditorPage() {
 	const { godraw_project, pages } = data;
 
 	return (
-		<GodrawEditor
-			project={godraw_project}
-			pages={pages}
-			projectId={projectId!}
-			theme={godraw_project.theme}
-			onPublish={() => {
-				console.log("Publishing site...");
-				// TODO: Implement build & publish in Phase 3
-			}}
-		/>
+		<>
+			<GodrawEditor
+				project={godraw_project}
+				pages={pages}
+				projectId={projectId!}
+				theme={godraw_project.theme}
+				onPublish={handlePublish}
+			/>
+
+			<PublishDialog
+				isOpen={showPublishDialog}
+				isPublishing={buildMutation.isPending}
+				buildResult={buildMutation.data || null}
+				error={buildMutation.error}
+				onClose={handleCloseDialog}
+				onPublish={handleConfirmPublish}
+			/>
+		</>
 	);
 }

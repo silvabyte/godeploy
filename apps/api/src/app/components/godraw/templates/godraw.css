@@ -1,0 +1,146 @@
+/* GoDraw Site Styles */
+
+:root {
+	--godraw-nav-bg: #ffffff;
+	--godraw-nav-border: #e5e7eb;
+	--godraw-nav-text: #374151;
+	--godraw-nav-hover: #f3f4f6;
+	--godraw-nav-active: #3b82f6;
+	--godraw-canvas-bg: #ffffff;
+	--godraw-link-color: #3b82f6;
+}
+
+[data-theme="dark"] {
+	--godraw-nav-bg: #1f2937;
+	--godraw-nav-border: #374151;
+	--godraw-nav-text: #e5e7eb;
+	--godraw-nav-hover: #374151;
+	--godraw-nav-active: #60a5fa;
+	--godraw-canvas-bg: #111827;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+		Cantarell, sans-serif;
+	line-height: 1.6;
+	color: var(--godraw-nav-text);
+	background: var(--godraw-canvas-bg);
+}
+
+/* Navigation */
+.godraw-nav {
+	background: var(--godraw-nav-bg);
+	border-bottom: 1px solid var(--godraw-nav-border);
+	padding: 1rem 2rem;
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.godraw-nav ul {
+	list-style: none;
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.godraw-nav li {
+	display: inline-block;
+}
+
+.godraw-nav a {
+	display: block;
+	padding: 0.5rem 1rem;
+	text-decoration: none;
+	color: var(--godraw-nav-text);
+	border-radius: 0.375rem;
+	transition: background-color 0.2s;
+	font-weight: 500;
+}
+
+.godraw-nav a:hover {
+	background: var(--godraw-nav-hover);
+}
+
+.godraw-nav a.active {
+	color: var(--godraw-nav-active);
+	background: var(--godraw-nav-hover);
+}
+
+/* Canvas Container */
+.godraw-canvas {
+	max-width: 1400px;
+	margin: 2rem auto;
+	padding: 0 2rem;
+	min-height: calc(100vh - 8rem);
+}
+
+.godraw-canvas svg {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	margin: 0 auto;
+}
+
+/* Interactive Elements */
+[data-godraw-link] {
+	cursor: pointer;
+	transition: opacity 0.2s;
+}
+
+[data-godraw-link]:hover {
+	opacity: 0.8;
+}
+
+/* Loading State */
+.godraw-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 50vh;
+	font-size: 1.25rem;
+	color: #9ca3af;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+	.godraw-nav {
+		padding: 0.75rem 1rem;
+	}
+
+	.godraw-nav ul {
+		gap: 0.25rem;
+	}
+
+	.godraw-nav a {
+		padding: 0.375rem 0.75rem;
+		font-size: 0.875rem;
+	}
+
+	.godraw-canvas {
+		padding: 0 1rem;
+		margin: 1rem auto;
+	}
+}
+
+/* Print Styles */
+@media print {
+	.godraw-nav {
+		display: none;
+	}
+
+	.godraw-canvas {
+		margin: 0;
+		padding: 0;
+	}
+}

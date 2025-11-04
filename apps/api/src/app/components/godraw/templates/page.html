@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{THEME}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="GoDraw">
+  <title>{{PAGE_TITLE}} | {{PROJECT_NAME}}</title>
+  <meta name="description" content="{{PAGE_DESCRIPTION}}">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/godraw.css">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{PAGE_TITLE}} | {{PROJECT_NAME}}">
+  <meta property="og:description" content="{{PAGE_DESCRIPTION}}">
+  <meta property="og:url" content="{{PAGE_URL}}">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{PAGE_TITLE}} | {{PROJECT_NAME}}">
+  <meta name="twitter:description" content="{{PAGE_DESCRIPTION}}">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="godraw-nav">
+    <ul>
+      {{NAVIGATION}}
+    </ul>
+  </nav>
+
+  <!-- Canvas Content -->
+  <main class="godraw-canvas">
+    {{CANVAS_CONTENT}}
+  </main>
+
+  <!-- Runtime JavaScript -->
+  <script src="/assets/godraw.js"></script>
+</body>
+</html>
