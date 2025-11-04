@@ -18,6 +18,7 @@ import { DeploymentsPage } from "../pages/deployments/DeploymentsPage";
 import { deploymentsLoader } from "../pages/deployments/loaders";
 import { domainsAction } from "../pages/domains/domains.action";
 import { domainsLoader } from "../pages/domains/domains.loader";
+import { GodrawEditorPage } from "../pages/godraw/GodrawEditorPage";
 import { ProjectDetailsPage } from "../pages/projects/details/ProjectDetailsPage";
 import { projectDetailsLoader } from "../pages/projects/details/projectDetails.loader";
 import {
@@ -88,6 +89,10 @@ export const createRoutes = (services: Services): RouteObject => {
 							}
 							throw new Error(`Method not allowed: ${args.request.method}`);
 						},
+					},
+					{
+						path: "projects/:projectId/godraw/editor",
+						element: <GodrawEditorPage />,
 					},
 					{
 						path: "domains",

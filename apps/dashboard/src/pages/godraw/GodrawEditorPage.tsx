@@ -16,7 +16,9 @@ export function GodrawEditorPage() {
 			<div className="flex h-screen items-center justify-center">
 				<div className="text-center">
 					<div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-					<p className="text-gray-600">Loading GoDraw editor...</p>
+					<p className="text-gray-600 dark:text-gray-400">
+						Loading GoDraw editor...
+					</p>
 				</div>
 			</div>
 		);
@@ -29,7 +31,7 @@ export function GodrawEditorPage() {
 					<h2 className="mb-2 text-xl font-semibold text-red-600">
 						Failed to load GoDraw project
 					</h2>
-					<p className="text-gray-600">
+					<p className="text-gray-600 dark:text-gray-400">
 						{error instanceof Error ? error.message : "Unknown error"}
 					</p>
 				</div>
@@ -38,16 +40,16 @@ export function GodrawEditorPage() {
 	}
 
 	const { godraw_project, pages } = data;
-	const homePage = pages.find((p) => p.id === godraw_project.home_page_id);
 
 	return (
 		<GodrawEditor
+			project={godraw_project}
+			pages={pages}
 			projectId={projectId!}
-			pageId={homePage?.id}
 			theme={godraw_project.theme}
-			onSave={(data) => {
-				console.log("Saving page data:", data);
-				// TODO: Implement API call to save page
+			onPublish={() => {
+				console.log("Publishing site...");
+				// TODO: Implement build & publish in Phase 3
 			}}
 		/>
 	);
