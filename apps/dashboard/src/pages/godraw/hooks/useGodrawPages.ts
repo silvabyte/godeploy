@@ -1,6 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../../lib/api";
-import type { GodrawPage } from "./useGodrawProject";
 
 interface CreatePageData {
 	name: string;
@@ -17,22 +16,6 @@ interface UpdatePageData {
 	app_state?: Record<string, unknown>;
 	files?: Record<string, unknown>;
 	is_published?: boolean;
-}
-
-/**
- * Hook to fetch pages for a project
- */
-export function useGodrawPages(projectId: string, includeUnpublished = true) {
-	return useQuery<{ pages: GodrawPage[] }>({
-		queryKey: ["godraw", "pages", projectId, includeUnpublished],
-		queryFn: async () => {
-			const response = await api.get(
-				`/projects/${projectId}/godraw/pages?includeUnpublished=${includeUnpublished}`,
-			);
-			return response.data;
-		},
-		enabled: !!projectId,
-	});
 }
 
 /**

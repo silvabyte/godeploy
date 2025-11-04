@@ -283,10 +283,3 @@ export type GodrawPage = z.infer<typeof godrawPageSchema>;
 export type CreateGodrawPage = z.infer<typeof createGodrawPageSchema>;
 export type UpdateGodrawPage = z.infer<typeof updateGodrawPageSchema>;
 export type ReorderPages = z.infer<typeof reorderPagesSchema>;
-
-export type CreateGodrawProjectResponse = z.infer<
-	typeof createGodrawProjectResponseSchema
->;
-export type GodrawProjectWithPages = z.infer<
-	typeof godrawProjectWithPagesSchema
->;
