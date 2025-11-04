@@ -14,6 +14,7 @@ const projectSchema = z.object({
 		.string({ description: "Custom domain for the given project" })
 		.nullable()
 		.optional(), // if this is prov
+	project_type: z.enum(["spa", "godraw"]).default("spa"),
 	url: z
 		.string({
 			description:

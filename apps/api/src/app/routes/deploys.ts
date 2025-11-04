@@ -163,6 +163,7 @@ export default async function (fastify: FastifyInstance) {
 				subdomain,
 				domain: null, //we do not set the custom domain for projects created via the deploy endpoint
 				description: null,
+				project_type: "spa",
 			});
 
 			if (createResult.error || !createResult.data) {

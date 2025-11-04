@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { AuthService } from "../auth/AuthService";
 import { DeployService } from "../deploys/DeployService";
+import { GodrawPageService } from "../godraw/GodrawPageService";
+import { GodrawProjectService } from "../godraw/GodrawProjectService";
 import { MetricsPageService } from "../metrics/MetricsPageService";
 import { ProjectService } from "../projects/ProjectService";
 import { SubscriptionService } from "../subscriptions/SubscriptionService";
@@ -15,6 +17,8 @@ export class DatabaseService {
 	readonly subscriptions: SubscriptionService;
 	readonly metricsPages: MetricsPageService;
 	readonly auth: AuthService;
+	readonly godrawProjects: GodrawProjectService;
+	readonly godrawPages: GodrawPageService;
 	readonly supabase: SupabaseClient;
 
 	constructor(supabase: SupabaseClient) {
@@ -24,5 +28,7 @@ export class DatabaseService {
 		this.subscriptions = new SubscriptionService();
 		this.metricsPages = new MetricsPageService();
 		this.auth = new AuthService(supabase);
+		this.godrawProjects = new GodrawProjectService();
+		this.godrawPages = new GodrawPageService();
 	}
 }

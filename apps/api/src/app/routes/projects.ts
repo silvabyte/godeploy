@@ -105,6 +105,7 @@ export default async function (fastify: FastifyInstance) {
 				name,
 				subdomain,
 				description: request.body.description ?? null,
+				project_type: "spa",
 			});
 
 			if (projectResult.error || !projectResult.data) {

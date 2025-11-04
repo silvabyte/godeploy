@@ -21,6 +21,7 @@
 		"knip": "bunx knip"
 	},
 	"dependencies": {
+		"@excalidraw/excalidraw": "^0.18.0",
 		"@headlessui/react": "^2.2.0",
 		"@heroicons/react": "^2.2.0",
 		"@hyperdx/browser": "^0.21.2",

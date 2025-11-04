@@ -13,6 +13,7 @@ import cacheRoutes from "../routes/cache.js";
 import deploysRoutes from "../routes/deploys.js";
 import domainsRoutes from "../routes/domains.js";
 import envRoutes from "../routes/env.js";
+import godrawRoutes from "../routes/godraw.js";
 import healthRoutes from "../routes/health.js";
 import metricsPagesRoutes from "../routes/metrics.pages.js";
 import projectsRoutes from "../routes/projects.js";
@@ -52,6 +53,7 @@ export async function registerPluginsAndRoutes(
 	await fastify.register(metricsPagesRoutes, opts);
 	await fastify.register(publicMetricsRoutes, opts);
 	await fastify.register(subscriptionsRoutes, opts);
+	await fastify.register(godrawRoutes, opts);
 
 	// Register new stub routes
 	await fastify.register(envRoutes, opts);

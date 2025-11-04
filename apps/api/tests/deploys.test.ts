@@ -54,6 +54,7 @@ function makeProject(overrides: Partial<Project> = {}): Project {
 		subdomain: "default-project",
 		description: null,
 		domain: null,
+		project_type: "spa",
 		created_at: timestamp,
 		updated_at: timestamp,
 		...overrides,
