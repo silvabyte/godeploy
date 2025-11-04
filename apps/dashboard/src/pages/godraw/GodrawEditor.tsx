@@ -20,6 +20,7 @@ import {
 	useCreatePage,
 	useDeletePage,
 	useReorderPages,
+	useUpdateAnyPage,
 	useUpdatePage,
 } from "./hooks/useGodrawPages";
 import type { GodrawPage, GodrawProject } from "./hooks/useGodrawProject";
@@ -55,6 +56,7 @@ export function GodrawEditor({
 
 	// API mutations
 	const updatePageMutation = useUpdatePage(projectId, currentPage?.id || "");
+	const updateAnyPageMutation = useUpdateAnyPage(projectId);
 	const createPageMutation = useCreatePage(projectId);
 	const deletePageMutation = useDeletePage(projectId);
 	const reorderPagesMutation = useReorderPages(projectId);
@@ -147,10 +149,9 @@ export function GodrawEditor({
 			const page = pages.find((p) => p.id === pageId);
 			if (!page) return;
 
-			const updateMutation = useUpdatePage(projectId, pageId);
-			await updateMutation.mutateAsync(data);
+			await updateAnyPageMutation.mutateAsync({ pageId, data });
 		},
-		[pages, projectId],
+		[pages, updateAnyPageMutation],
 	);
 
 	// Reorder pages

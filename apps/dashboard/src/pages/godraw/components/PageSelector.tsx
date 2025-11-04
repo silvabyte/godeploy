@@ -37,9 +37,11 @@ export function PageSelector({
 			{isOpen && (
 				<>
 					{/* Backdrop */}
-					<div
+					<button
+						type="button"
 						className="fixed inset-0 z-10"
 						onClick={() => setIsOpen(false)}
+						aria-label="Close page selector"
 					/>
 
 					{/* Menu */}

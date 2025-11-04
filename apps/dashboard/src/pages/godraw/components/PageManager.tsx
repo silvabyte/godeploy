@@ -79,10 +79,11 @@ export function PageManager({
 							No pages yet
 						</div>
 					) : (
-						<div className="space-y-2">
+						<ul className="space-y-2">
 							{pages.map((page) => (
-								<div
+								<li
 									key={page.id}
+									aria-label={`Page: ${page.name}`}
 									draggable
 									onDragStart={() => handleDragStart(page.id)}
 									onDragOver={(e) => handleDragOver(e, page.id)}
@@ -183,9 +184,9 @@ export function PageManager({
 												</button>
 											))}
 									</div>
-								</div>
+								</li>
 							))}
-						</div>
+						</ul>
 					)}
 				</div>
 

@@ -1,5 +1,5 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 interface NewPageDialogProps {
 	onClose: () => void;
@@ -12,6 +12,8 @@ export function NewPageDialog({
 	onCreate,
 	existingSlugs,
 }: NewPageDialogProps) {
+	const nameId = useId();
+	const slugId = useId();
 	const [name, setName] = useState("");
 	const [slug, setSlug] = useState("");
 	const [error, setError] = useState("");
@@ -84,13 +86,13 @@ export function NewPageDialog({
 						{/* Page name */}
 						<div>
 							<label
-								htmlFor="page-name"
+								htmlFor={nameId}
 								className="block text-sm font-medium text-gray-700 dark:text-gray-300"
 							>
 								Page Name
 							</label>
 							<input
-								id="page-name"
+								id={nameId}
 								type="text"
 								value={name}
 								onChange={(e) => handleNameChange(e.target.value)}
@@ -102,13 +104,13 @@ export function NewPageDialog({
 						{/* Slug */}
 						<div>
 							<label
-								htmlFor="page-slug"
+								htmlFor={slugId}
 								className="block text-sm font-medium text-gray-700 dark:text-gray-300"
 							>
 								URL Slug
 							</label>
 							<input
-								id="page-slug"
+								id={slugId}
 								type="text"
 								value={slug}
 								onChange={(e) => handleSlugChange(e.target.value)}

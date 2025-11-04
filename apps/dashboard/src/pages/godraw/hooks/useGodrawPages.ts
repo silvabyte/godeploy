@@ -88,6 +88,38 @@ export function useUpdatePage(projectId: string, pageId: string) {
 }
 
 /**
+ * Hook to update any page (generic)
+ */
+export function useUpdateAnyPage(projectId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({
+			pageId,
+			data,
+		}: {
+			pageId: string;
+			data: UpdatePageData;
+		}) => {
+			const response = await api.patch(
+				`/projects/${projectId}/godraw/pages/${pageId}`,
+				data,
+			);
+			return response.data;
+		},
+		onSuccess: () => {
+			// Invalidate queries
+			queryClient.invalidateQueries({
+				queryKey: ["godraw", "pages", projectId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["godraw", "project", projectId],
+			});
+		},
+	});
+}
+
+/**
  * Hook to delete a page
  */
 export function useDeletePage(projectId: string) {

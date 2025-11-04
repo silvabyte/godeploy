@@ -18,6 +18,20 @@ interface BuildResult {
 	buildTime: number;
 }
 
+interface ExcalidrawElementData {
+	type?: string;
+	x?: number;
+	y?: number;
+	width?: number;
+	height?: number;
+	strokeColor?: string;
+	backgroundColor?: string;
+	text?: string;
+	customData?: {
+		link?: string;
+	};
+}
+
 /**
  * Service for building static sites from GoDraw projects
  */
@@ -147,7 +161,7 @@ export class GodrawBuilder {
 		// In a full implementation, we'd use @excalidraw/excalidraw's exportToSvg
 		// But that requires browser environment or complex server-side rendering
 
-		const elements = page.elements as any[];
+		const elements = page.elements as ExcalidrawElementData[];
 
 		if (elements.length === 0) {
 			return '<div class="godraw-loading">Empty canvas - draw something in the editor!</div>';
@@ -191,7 +205,11 @@ export class GodrawBuilder {
 	/**
 	 * Convert Excalidraw element to SVG (simplified)
 	 */
-	private elementToSVG(element: any, offsetX: number, offsetY: number): string {
+	private elementToSVG(
+		element: ExcalidrawElementData,
+		offsetX: number,
+		offsetY: number,
+	): string {
 		const x = (element.x || 0) - offsetX;
 		const y = (element.y || 0) - offsetY;
 		const width = element.width || 100;
