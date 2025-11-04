@@ -15,6 +15,7 @@ interface ProjectItemProps {
 export function ProjectItem({ project }: ProjectItemProps) {
 	const url = ProjectDomain.from(project).determine();
 	const navigate = useNavigate();
+	const isGodraw = project.project_type === "godraw";
 
 	return (
 		<li className="group relative flex items-center space-x-4 px-6 py-6 transition-colors sm:px-8 lg:px-12">
@@ -29,6 +30,11 @@ export function ProjectItem({ project }: ProjectItemProps) {
 							{project.name}
 						</Link>
 					</Text>
+					{isGodraw && (
+						<Badge status="beta" className="flex-none capitalize font-light">
+							{t("projects.item.type.godraw")}
+						</Badge>
+					)}
 				</div>
 				<div className="mt-2 flex items-center gap-x-2.5 text-xs font-light">
 					<time dateTime={project.created_at || ""} className="text-slate-500">
@@ -72,6 +78,22 @@ export function ProjectItem({ project }: ProjectItemProps) {
 						transition
 						className="absolute right-0 z-10 mt-2 w-48 origin-top-right border border-slate-100 bg-white py-1 focus:outline-none data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
 					>
+						{isGodraw && (
+							<MenuItem>
+								{({ close }) => (
+									<button
+										type="button"
+										className="block w-full px-4 py-2 text-left text-sm font-light text-green-600 hover:text-green-700 transition"
+										onClick={() => {
+											navigate(`/projects/${project.id}/godraw/editor`);
+											close();
+										}}
+									>
+										{t("projects.item.actions.openEditor")}
+									</button>
+								)}
+							</MenuItem>
+						)}
 						<MenuItem>
 							{({ close }) => (
 								<button

@@ -1,11 +1,13 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { t } from "@matsilva/xtranslate";
+import { useState } from "react";
 import { useNavigate, useNavigation } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { Heading } from "../../components/typography/Heading";
 import { FeatureFlags, FLAGS } from "../../featureflags/ff";
 import { pushQueryParam } from "../../utils/navigate";
+import { NewGodrawProjectDialog } from "./NewGodrawProjectDialog";
 import { ProjectItem } from "./ProjectItem";
 import { ProjectSkeletonItem } from "./ProjectSkeletonItem";
 import type { Project } from "./project.types";
@@ -13,8 +15,14 @@ import type { Project } from "./project.types";
 export function ProjectList({ projects }: { projects: Project[] }) {
 	const navigate = useNavigate();
 	const nav = useNavigation();
+	const [showNewGodrawDialog, setShowNewGodrawDialog] = useState(false);
 
 	return (
+		<>
+			<NewGodrawProjectDialog
+				isOpen={showNewGodrawDialog}
+				onClose={() => setShowNewGodrawDialog(false)}
+			/>
 		<main className="lg:pr-96">
 			<header className="flex items-center justify-between border-b border-slate-100 px-6 py-6 sm:px-8 sm:py-8 lg:px-12">
 				<Heading level={1} className="text-lg font-light text-slate-900">
@@ -90,6 +98,13 @@ export function ProjectList({ projects }: { projects: Project[] }) {
 							{t("projects.newProject")}
 						</Button>
 					)}
+					<Button
+						variant="primary"
+						color="green"
+						onClick={() => setShowNewGodrawDialog(true)}
+					>
+						{t("projects.newGodrawProject")}
+					</Button>
 				</div>
 			</header>
 
@@ -110,5 +125,6 @@ export function ProjectList({ projects }: { projects: Project[] }) {
 				))}
 			</ul>
 		</main>
+		</>
 	);
 }

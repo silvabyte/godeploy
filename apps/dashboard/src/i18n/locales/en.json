@@ -131,6 +131,7 @@
 	"projects": {
 		"title": "Projects",
 		"newProject": "+ New Project",
+		"newGodrawProject": "+ Draw & Deploy",
 		"noProjects": "No projects found",
 		"sort": {
 			"label": "Sort by",
@@ -145,16 +146,41 @@
 			"status": {
 				"active": "Active"
 			},
+			"type": {
+				"godraw": "GoDraw"
+			},
 			"actions": {
 				"settings": "Settings",
 				"viewDetails": "View Details",
-				"delete": "Delete Project"
+				"delete": "Delete Project",
+				"openEditor": "Open Editor"
 			},
 			"date": {
 				"today": "Today",
 				"yesterday": "Yesterday",
 				"daysAgo": "{{count}} days ago",
 				"format": "MMM d, yyyy h:mm a"
+			}
+		},
+		"godrawDialog": {
+			"name": "Project Name",
+			"namePlaceholder": "My Awesome Site",
+			"description": "Description (optional)",
+			"descriptionPlaceholder": "A brief description of your project",
+			"theme": "Theme",
+			"themeLight": "Light",
+			"themeDark": "Dark",
+			"create": "Create Project",
+			"creating": "Creating...",
+			"error": "Failed to create project. Please try again."
+		},
+		"empty": {
+			"godraw": {
+				"title": "Draw & Deploy",
+				"description": "Draw anything, deploy everywhere. Your canvas becomes a live experience."
+			},
+			"cli": {
+				"title": "Or deploy with CLI"
 			}
 		}
 	},

@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
@@ -57,6 +58,16 @@ const loadApp = async () => {
 		// Create router with the auth service
 		const router = createRouter(services);
 
+		// Create React Query client
+		const queryClient = new QueryClient({
+			defaultOptions: {
+				queries: {
+					staleTime: 1000 * 60 * 5, // 5 minutes
+					retry: 1,
+				},
+			},
+		});
+
 		// Render the application with service provider
 		const rootElement = document.getElementById("root");
 		if (!rootElement) {
@@ -64,9 +75,11 @@ const loadApp = async () => {
 			return;
 		}
 		ReactDOM.createRoot(rootElement).render(
-			<ServiceProvider services={services}>
-				<RouterProvider router={router} />
-			</ServiceProvider>,
+			<QueryClientProvider client={queryClient}>
+				<ServiceProvider services={services}>
+					<RouterProvider router={router} />
+				</ServiceProvider>
+			</QueryClientProvider>,
 		);
 	} catch (error) {
 		debug.log("[Main] Error initializing application");

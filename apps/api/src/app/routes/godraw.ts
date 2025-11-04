@@ -31,7 +31,7 @@ export default async function (fastify: FastifyInstance) {
 	 * Create a new GoDraw project
 	 */
 	fastify.post(
-		"/projects/godraw",
+		"/api/projects/godraw",
 		{ ...routeSchemas.createGodrawProject, config: { auth: true } },
 		async (
 			request: FastifyRequest<{
@@ -154,7 +154,7 @@ export default async function (fastify: FastifyInstance) {
 	 * Get GoDraw project with all pages
 	 */
 	fastify.get(
-		"/projects/:projectId/godraw",
+		"/api/projects/:projectId/godraw",
 		{ ...routeSchemas.getGodrawProject, config: { auth: true } },
 		async (
 			request: FastifyRequest<{
@@ -207,7 +207,7 @@ export default async function (fastify: FastifyInstance) {
 	 * Update GoDraw project settings
 	 */
 	fastify.patch(
-		"/projects/:projectId/godraw",
+		"/api/projects/:projectId/godraw",
 		{ ...routeSchemas.updateGodrawProject, config: { auth: true } },
 		async (
 			request: FastifyRequest<{
@@ -262,7 +262,7 @@ export default async function (fastify: FastifyInstance) {
 	 * Create a new page
 	 */
 	fastify.post(
-		"/projects/:projectId/godraw/pages",
+		"/api/projects/:projectId/godraw/pages",
 		{ ...routeSchemas.createPage, config: { auth: true } },
 		async (
 			request: FastifyRequest<{
@@ -332,7 +332,7 @@ export default async function (fastify: FastifyInstance) {
 	 * List all pages
 	 */
 	fastify.get(
-		"/projects/:projectId/godraw/pages",
+		"/api/projects/:projectId/godraw/pages",
 		{ ...routeSchemas.listPages, config: { auth: true } },
 		async (
 			request: FastifyRequest<{
@@ -373,7 +373,7 @@ export default async function (fastify: FastifyInstance) {
 	 * Get a single page
 	 */
 	fastify.get(
-		"/projects/:projectId/godraw/pages/:pageId",
+		"/api/projects/:projectId/godraw/pages/:pageId",
 		{ ...routeSchemas.getPage, config: { auth: true } },
 		async (
 			request: FastifyRequest<{
@@ -397,7 +397,7 @@ export default async function (fastify: FastifyInstance) {
 	 * Update a page
 	 */
 	fastify.patch(
-		"/projects/:projectId/godraw/pages/:pageId",
+		"/api/projects/:projectId/godraw/pages/:pageId",
 		{ ...routeSchemas.updatePage, config: { auth: true } },
 		async (
 			request: FastifyRequest<{
@@ -449,7 +449,7 @@ export default async function (fastify: FastifyInstance) {
 	 * Delete a page
 	 */
 	fastify.delete(
-		"/projects/:projectId/godraw/pages/:pageId",
+		"/api/projects/:projectId/godraw/pages/:pageId",
 		{ ...routeSchemas.deletePage, config: { auth: true } },
 		async (
 			request: FastifyRequest<{
@@ -489,7 +489,7 @@ export default async function (fastify: FastifyInstance) {
 	 * Reorder pages
 	 */
 	fastify.patch(
-		"/projects/:projectId/godraw/pages/reorder",
+		"/api/projects/:projectId/godraw/pages/reorder",
 		{ ...routeSchemas.reorderPages, config: { auth: true } },
 		async (
 			request: FastifyRequest<{
@@ -521,7 +521,7 @@ export default async function (fastify: FastifyInstance) {
 	 * Build and deploy GoDraw project as static site
 	 */
 	fastify.post(
-		"/projects/:projectId/godraw/build",
+		"/api/projects/:projectId/godraw/build",
 		{ config: { auth: true } },
 		async (
 			request: FastifyRequest<{
