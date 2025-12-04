@@ -17,6 +17,7 @@ import (
 	"github.com/silvabyte/godeploy/internal/auth"
 	"github.com/silvabyte/godeploy/internal/cache"
 	"github.com/silvabyte/godeploy/internal/config"
+	"github.com/silvabyte/godeploy/internal/theme"
 	"github.com/silvabyte/godeploy/internal/version"
 	"github.com/yarlson/pin"
 	"golang.org/x/term"
@@ -29,35 +30,35 @@ var CLI struct {
 	VersionFlag bool   `name:"version" short:"v" help:"Display the version of godeploy"`
 
 	// Commands
-	Init        InitCmd        `cmd:"init" help:"Initialize a new godeploy.config.json file"`
-	Auth        AuthCmd        `cmd:"auth" help:"Authentication commands"`
-	Deploy      DeployCmd      `cmd:"deploy" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
-	Version     VersionCmd     `cmd:"version" help:"Display the version of godeploy"`
-	Projects    ProjectsCmd    `cmd:"projects" help:"List all deployed projects" aliases:"list"`
+	Init        InitCmd          `cmd:"init" help:"Initialize a new godeploy.config.json file"`
+	Auth        AuthCmd          `cmd:"auth" help:"Authentication commands"`
+	Deploy      DeployCmd        `cmd:"deploy" help:"Deploy your SPA to the GoDeploy service (requires authentication)"`
+	Version     VersionCmd       `cmd:"version" help:"Display the version of godeploy"`
+	Projects    ProjectsCmd      `cmd:"projects" help:"List all deployed projects" aliases:"list"`
 	Status      StatusProjectCmd `cmd:"status" help:"Check deployment status for a project"`
-	Logs        LogsCmd        `cmd:"logs" help:"View deployment logs"`
-	Deployments DeploymentsCmd `cmd:"deployments" help:"View deployment history for a project"`
-	Whoami      WhoamiCmd      `cmd:"whoami" help:"Display current user information"`
-	Rollback    RollbackCmd    `cmd:"rollback" help:"Rollback project to a previous deployment"`
-	Delete      DeleteCmd      `cmd:"delete" help:"Delete a deployed project"`
-	Open        OpenCmd        `cmd:"open" help:"Open project URL in browser"`
-	Validate    ValidateCmd    `cmd:"validate" help:"Validate configuration file"`
-	Link        LinkCmd        `cmd:"link" help:"Link local directory to remote project"`
-	Preview     PreviewCmd     `cmd:"preview" help:"Create a preview deployment"`
-	Diff        DiffCmd        `cmd:"diff" help:"Show differences between local and deployed version"`
-	Env         EnvCmd         `cmd:"env" help:"Manage environment variables"`
-	CLIConfig   CLIConfigCmd   `cmd:"cli-config" help:"Manage CLI configuration"`
-	Domains     DomainsCmd     `cmd:"domains" help:"Manage custom domains"`
-	Aliases     AliasesCmd     `cmd:"aliases" help:"Manage URL aliases"`
-	Metrics     MetricsCmd     `cmd:"metrics" help:"View project metrics"`
-	Analytics   AnalyticsCmd   `cmd:"analytics" help:"Open analytics dashboard"`
-	Health      HealthCmd      `cmd:"health" help:"Check project health"`
-	Teams       TeamsCmd       `cmd:"teams" help:"Manage teams"`
-	Tokens      TokensCmd      `cmd:"tokens" help:"Manage API tokens"`
-	Promote     PromoteCmd     `cmd:"promote" help:"Promote deployment between projects"`
-	Compare     CompareCmd     `cmd:"compare" help:"Compare two deployments"`
-	Cache       CacheCmd       `cmd:"cache" help:"Manage CDN cache"`
-	Builds      BuildsCmd      `cmd:"builds" help:"Manage build configuration"`
+	Logs        LogsCmd          `cmd:"logs" help:"View deployment logs"`
+	Deployments DeploymentsCmd   `cmd:"deployments" help:"View deployment history for a project"`
+	Whoami      WhoamiCmd        `cmd:"whoami" help:"Display current user information"`
+	Rollback    RollbackCmd      `cmd:"rollback" help:"Rollback project to a previous deployment"`
+	Delete      DeleteCmd        `cmd:"delete" help:"Delete a deployed project"`
+	Open        OpenCmd          `cmd:"open" help:"Open project URL in browser"`
+	Validate    ValidateCmd      `cmd:"validate" help:"Validate configuration file"`
+	Link        LinkCmd          `cmd:"link" help:"Link local directory to remote project"`
+	Preview     PreviewCmd       `cmd:"preview" help:"Create a preview deployment"`
+	Diff        DiffCmd          `cmd:"diff" help:"Show differences between local and deployed version"`
+	Env         EnvCmd           `cmd:"env" help:"Manage environment variables"`
+	CLIConfig   CLIConfigCmd     `cmd:"cli-config" help:"Manage CLI configuration"`
+	Domains     DomainsCmd       `cmd:"domains" help:"Manage custom domains"`
+	Aliases     AliasesCmd       `cmd:"aliases" help:"Manage URL aliases"`
+	Metrics     MetricsCmd       `cmd:"metrics" help:"View project metrics"`
+	Analytics   AnalyticsCmd     `cmd:"analytics" help:"Open analytics dashboard"`
+	Health      HealthCmd        `cmd:"health" help:"Check project health"`
+	Teams       TeamsCmd         `cmd:"teams" help:"Manage teams"`
+	Tokens      TokensCmd        `cmd:"tokens" help:"Manage API tokens"`
+	Promote     PromoteCmd       `cmd:"promote" help:"Promote deployment between projects"`
+	Compare     CompareCmd       `cmd:"compare" help:"Compare two deployments"`
+	Cache       CacheCmd         `cmd:"cache" help:"Manage CDN cache"`
+	Builds      BuildsCmd        `cmd:"builds" help:"Manage build configuration"`
 }
 
 // InitCmd represents the init command
@@ -174,8 +175,8 @@ func (i *InitCmd) Run() error {
 
 	createCancel()
 	createSpinner.Stop("Configuration created")
-	fmt.Printf("✅ Created config file: %s\n", configPath)
-	fmt.Println("You can now edit this file to configure your SPAs.")
+	fmt.Println(theme.SuccessMsg(fmt.Sprintf("Created config file: %s", configPath)))
+	fmt.Println(theme.MutedMsg("You can now edit this file to configure your SPAs."))
 	return nil
 }
 
@@ -251,11 +252,11 @@ func (l *LoginCmd) Run() error {
 
 		// Check for specific error messages
 		if strings.Contains(err.Error(), "Invalid credentials") || strings.Contains(err.Error(), "Invalid email or password") {
-			fmt.Println("❌ Invalid email or password. Please check your credentials and try again.")
+			fmt.Println(theme.ErrorMsg("Invalid email or password. Please check your credentials and try again."))
 		} else if strings.Contains(err.Error(), "User not found") {
-			fmt.Println("❌ User not found. Please check your email address.")
+			fmt.Println(theme.ErrorMsg("User not found. Please check your email address."))
 		} else {
-			fmt.Printf("❌ Authentication failed: %v\n", err)
+			fmt.Println(theme.ErrorMsg(fmt.Sprintf("Authentication failed: %v", err)))
 		}
 		return err
 	}
@@ -286,9 +287,9 @@ func (l *LoginCmd) Run() error {
 	saveCancel()
 	saveSpinner.Stop("Token saved")
 
-	fmt.Println("✅ Authentication successful! You are now logged in.")
+	fmt.Println(theme.SuccessMsg("Authentication successful! You are now logged in."))
 	if signInResp.User.Email != "" {
-		fmt.Printf("Logged in as: %s\n", signInResp.User.Email)
+		fmt.Println(theme.MutedMsg(fmt.Sprintf("Logged in as: %s", signInResp.User.Email)))
 	}
 
 	return nil
@@ -372,13 +373,13 @@ func (s *SignUpCmd) Run() error {
 
 		// Check for specific error messages
 		if strings.Contains(err.Error(), "already exists") || strings.Contains(err.Error(), "User already exists") {
-			fmt.Println("❌ An account with this email already exists. Use 'godeploy auth login' to sign in.")
+			fmt.Println(theme.ErrorMsg("An account with this email already exists. Use 'godeploy auth login' to sign in."))
 		} else if strings.Contains(err.Error(), "Invalid email") {
-			fmt.Println("❌ Invalid email address. Please provide a valid email.")
+			fmt.Println(theme.ErrorMsg("Invalid email address. Please provide a valid email."))
 		} else if strings.Contains(err.Error(), "Password must be at least") {
-			fmt.Println("❌ Password does not meet requirements. It must be at least 8 characters long.")
+			fmt.Println(theme.ErrorMsg("Password does not meet requirements. It must be at least 8 characters long."))
 		} else {
-			fmt.Printf("❌ Registration failed: %v\n", err)
+			fmt.Println(theme.ErrorMsg(fmt.Sprintf("Registration failed: %v", err)))
 		}
 		return err
 	}
@@ -409,9 +410,9 @@ func (s *SignUpCmd) Run() error {
 	saveCancel()
 	saveSpinner.Stop("Token saved")
 
-	fmt.Println("✅ Account created successfully! You are now logged in.")
+	fmt.Println(theme.SuccessMsg("Account created successfully! You are now logged in."))
 	if signUpResp.User.Email != "" {
-		fmt.Printf("Logged in as: %s\n", signUpResp.User.Email)
+		fmt.Println(theme.MutedMsg(fmt.Sprintf("Logged in as: %s", signUpResp.User.Email)))
 	}
 
 	return nil
@@ -452,9 +453,9 @@ func (l *LogoutCmd) Run() error {
 	// Get saved email for message
 	savedEmail, _ := auth.GetUserEmail()
 	if savedEmail != "" {
-		fmt.Printf("✅ You have been successfully logged out. Your email (%s) is saved for future logins.\n", savedEmail)
+		fmt.Println(theme.SuccessMsg(fmt.Sprintf("You have been successfully logged out. Your email (%s) is saved for future logins.", savedEmail)))
 	} else {
-		fmt.Println("✅ You have been successfully logged out.")
+		fmt.Println(theme.SuccessMsg("You have been successfully logged out."))
 	}
 
 	return nil
@@ -472,19 +473,19 @@ func (s *StatusCmd) Run() error {
 
 	if err != nil || token == "" {
 		// Not authenticated or token refresh failed
-		fmt.Println("❌ You are not authenticated with GoDeploy.")
+		fmt.Println(theme.ErrorMsg("You are not authenticated with GoDeploy."))
 		if savedEmail != "" {
-			fmt.Printf("Run 'godeploy auth login' to authenticate with saved email: %s\n", savedEmail)
+			fmt.Println(theme.MutedMsg(fmt.Sprintf("Run 'godeploy auth login' to authenticate with saved email: %s", savedEmail)))
 		} else {
-			fmt.Println("Run 'godeploy auth login' to authenticate.")
+			fmt.Println(theme.MutedMsg("Run 'godeploy auth login' to authenticate."))
 		}
 		return nil
 	}
 
 	// Token is valid (automatically refreshed if it was expiring)
-	fmt.Println("✅ You are authenticated with GoDeploy.")
+	fmt.Println(theme.SuccessMsg("You are authenticated with GoDeploy."))
 	if savedEmail != "" {
-		fmt.Printf("Logged in as: %s\n", savedEmail)
+		fmt.Println(theme.MutedMsg(fmt.Sprintf("Logged in as: %s", savedEmail)))
 	}
 
 	return nil
@@ -527,197 +528,70 @@ func formatBytes(bytes int64) string {
 
 // formatZipStats creates a nicely formatted output for zip statistics
 func formatZipStats(stats *archive.ZipStats) string {
-	// Define styles
-	titleStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("#00D4AA")).
-		Background(lipgloss.Color("#1A1A1A")).
-		Padding(0, 1).
-		Margin(1, 0)
+	// Build the content using theme helpers
+	ratioStyle := theme.CompressionRatioStyle(stats.CompressionRatio)
 
-	keyStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("#FFE55C")).
-		Width(16).
-		Align(lipgloss.Right)
-
-	valueStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#FFFFFF"))
-
-	ratioColor := "#FF6B6B" // Red for poor compression
-	if stats.CompressionRatio < 80 {
-		ratioColor = "#FFD93D" // Yellow for okay compression
-	}
-	if stats.CompressionRatio < 60 {
-		ratioColor = "#6BCF7F" // Green for good compression
-	}
-
-	ratioStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color(ratioColor))
-
-	// Build the content
 	content := lipgloss.JoinVertical(lipgloss.Left,
+		theme.KeyValue("Files", fmt.Sprintf("%d", stats.FileCount)),
+		theme.KeyValue("Original Size", formatBytes(stats.TotalSize)),
+		theme.KeyValue("Compressed", formatBytes(stats.CompressedSize)),
 		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Files:"),
-			" ",
-			valueStyle.Render(fmt.Sprintf("%d", stats.FileCount)),
-		),
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Original Size:"),
-			" ",
-			valueStyle.Render(formatBytes(stats.TotalSize)),
-		),
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Compressed:"),
-			" ",
-			valueStyle.Render(formatBytes(stats.CompressedSize)),
-		),
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Ratio:"),
+			theme.KeyStyle.Render("Ratio:"),
 			" ",
 			ratioStyle.Render(fmt.Sprintf("%.1f%%", stats.CompressionRatio)),
 		),
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Duration:"),
-			" ",
-			valueStyle.Render(stats.Duration.String()),
-		),
+		theme.KeyValue("Duration", stats.Duration.String()),
 	)
 
-	// Create a border around the content
-	borderStyle := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("#444444")).
-		Padding(1, 2).
-		Margin(1, 0)
+	// Use theme title and box styles
+	titleStyle := theme.TitleStyle.Margin(1, 0)
+	boxStyle := theme.BoxStyle.Margin(1, 0)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
-		titleStyle.Render("📦 Archive Details"),
-		borderStyle.Render(content),
+		titleStyle.Render("Archive Details"),
+		boxStyle.Render(content),
 	)
 }
 
 // formatDeploymentSuccess creates a nicely formatted success message
 func formatDeploymentSuccess(projectName, url string, zipStats *archive.ZipStats) string {
-	// Define styles
-	titleStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("#FFFFFF")).
-		Background(lipgloss.Color("#00AA55")).
-		Padding(0, 1).
-		Margin(1, 0)
-
-	keyStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("#00D4AA")).
-		Width(14).
-		Align(lipgloss.Right)
-
-	valueStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#FFFFFF"))
-
-	urlStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("#4DABF7")).
-		Underline(true)
-
-	// Build the content
+	// Build the content using theme helpers
 	content := lipgloss.JoinVertical(lipgloss.Left,
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Project:"),
-			" ",
-			valueStyle.Render(projectName),
-		),
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Files:"),
-			" ",
-			valueStyle.Render(fmt.Sprintf("%d", zipStats.FileCount)),
-		),
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Size:"),
-			" ",
-			valueStyle.Render(formatBytes(zipStats.CompressedSize)),
-		),
+		theme.KeyValueSuccess("Project", projectName),
+		theme.KeyValueSuccess("Files", fmt.Sprintf("%d", zipStats.FileCount)),
+		theme.KeyValueSuccess("Size", formatBytes(zipStats.CompressedSize)),
 		"",
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("URL:"),
-			" ",
-			urlStyle.Render(url),
-		),
+		theme.KeyValueURL("URL", url),
 	)
 
-	// Create a border around the content
-	borderStyle := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("#00AA55")).
-		Padding(1, 2).
-		Margin(1, 0)
+	// Use theme title and box styles
+	titleStyle := theme.TitleSuccessStyle.Margin(1, 0)
+	boxStyle := theme.BoxSuccessStyle.Margin(1, 0)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
-		titleStyle.Render("✅ Deployment Successful"),
-		borderStyle.Render(content),
+		titleStyle.Render(" "+theme.SuccessIcon+" Deployment Successful "),
+		boxStyle.Render(content),
 	)
 }
 
 // formatDeploymentError creates a nicely formatted error message
 func formatDeploymentError(projectName string, err error, zipStats *archive.ZipStats) string {
-	// Define styles
-	titleStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("#FFFFFF")).
-		Background(lipgloss.Color("#FF5555")).
-		Padding(0, 1).
-		Margin(1, 0)
-
-	keyStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("#FF6B6B")).
-		Width(14).
-		Align(lipgloss.Right)
-
-	valueStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#FFFFFF"))
-
-	errorStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#FFB3B3")).
-		Italic(true)
-
-	// Build the content
+	// Build the content using theme helpers
 	content := lipgloss.JoinVertical(lipgloss.Left,
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Project:"),
-			" ",
-			valueStyle.Render(projectName),
-		),
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Files:"),
-			" ",
-			valueStyle.Render(fmt.Sprintf("%d", zipStats.FileCount)),
-		),
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Size:"),
-			" ",
-			valueStyle.Render(formatBytes(zipStats.CompressedSize)),
-		),
+		theme.KeyValueError("Project", projectName),
+		theme.KeyValueError("Files", fmt.Sprintf("%d", zipStats.FileCount)),
+		theme.KeyValueError("Size", formatBytes(zipStats.CompressedSize)),
 		"",
-		lipgloss.JoinHorizontal(lipgloss.Left,
-			keyStyle.Render("Error:"),
-			" ",
-			errorStyle.Render(err.Error()),
-		),
+		theme.KeyValueError("Error", err.Error()),
 	)
 
-	// Create a border around the content
-	borderStyle := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("#FF5555")).
-		Padding(1, 2).
-		Margin(1, 0)
+	// Use theme title and box styles
+	titleStyle := theme.TitleErrorStyle.Margin(1, 0)
+	boxStyle := theme.BoxErrorStyle.Margin(1, 0)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
-		titleStyle.Render("❌ Deployment Failed"),
-		borderStyle.Render(content),
+		titleStyle.Render(" "+theme.ErrorIcon+" Deployment Failed "),
+		boxStyle.Render(content),
 	)
 }
 
@@ -936,8 +810,7 @@ type ProjectsCmd struct {
 }
 
 func (p *ProjectsCmd) Run() error {
-	fmt.Println("🚧 Not implemented yet: projects list")
-	fmt.Println("This will list all your deployed projects with their URLs and status")
+	fmt.Println(theme.NotImplementedWithDesc("projects", "This will list all your deployed projects with their URLs and status"))
 	return nil
 }
 
@@ -947,8 +820,10 @@ type StatusProjectCmd struct {
 }
 
 func (s *StatusProjectCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: status for project '%s'\n", s.Project)
-	fmt.Println("This will show deployment state, last deployment info, and current URL")
+	fmt.Println(theme.NotImplementedWithDesc(
+		fmt.Sprintf("status %s", s.Project),
+		"This will show deployment state, last deployment info, and current URL",
+	))
 	return nil
 }
 
@@ -961,10 +836,11 @@ type LogsCmd struct {
 }
 
 func (l *LogsCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: logs for project '%s'\n", l.Project)
+	desc := "This will display deployment logs for the project"
 	if l.Follow {
-		fmt.Println("Follow mode will stream logs in real-time")
+		desc = "This will stream logs in real-time"
 	}
+	fmt.Println(theme.NotImplementedWithDesc(fmt.Sprintf("logs %s", l.Project), desc))
 	return nil
 }
 
@@ -976,8 +852,10 @@ type DeploymentsCmd struct {
 }
 
 func (d *DeploymentsCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: deployment history for '%s'\n", d.Project)
-	fmt.Println("This will show past deployments with timestamps, commit info, and status")
+	fmt.Println(theme.NotImplementedWithDesc(
+		fmt.Sprintf("deployments %s", d.Project),
+		"This will show past deployments with timestamps, commit info, and status",
+	))
 	return nil
 }
 
@@ -987,8 +865,7 @@ type WhoamiCmd struct {
 }
 
 func (w *WhoamiCmd) Run() error {
-	fmt.Println("🚧 Not implemented yet: whoami")
-	fmt.Println("This will show your email, tenant ID, and subscription status")
+	fmt.Println(theme.NotImplementedWithDesc("whoami", "This will show your email, tenant ID, and subscription status"))
 	return nil
 }
 
@@ -1002,12 +879,11 @@ type RollbackCmd struct {
 }
 
 func (r *RollbackCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: rollback for project '%s'\n", r.Project)
+	desc := "This will rollback to the last successful deployment"
 	if r.DeploymentID != "" {
-		fmt.Printf("Will rollback to deployment: %s\n", r.DeploymentID)
-	} else {
-		fmt.Println("Will rollback to last successful deployment")
+		desc = fmt.Sprintf("This will rollback to deployment: %s", r.DeploymentID)
 	}
+	fmt.Println(theme.NotImplementedWithDesc(fmt.Sprintf("rollback %s", r.Project), desc))
 	return nil
 }
 
@@ -1018,8 +894,10 @@ type DeleteCmd struct {
 }
 
 func (d *DeleteCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: delete project '%s'\n", d.Project)
-	fmt.Println("This will remove the project from the platform with confirmation")
+	fmt.Println(theme.NotImplementedWithDesc(
+		fmt.Sprintf("delete %s", d.Project),
+		"This will remove the project from the platform with confirmation",
+	))
 	return nil
 }
 
@@ -1030,12 +908,11 @@ type OpenCmd struct {
 }
 
 func (o *OpenCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: open project '%s'\n", o.Project)
+	desc := "This will open the project URL in your browser"
 	if o.Dashboard {
-		fmt.Println("Will open dashboard page")
-	} else {
-		fmt.Println("Will open project URL in browser")
+		desc = "This will open the dashboard page in your browser"
 	}
+	fmt.Println(theme.NotImplementedWithDesc(fmt.Sprintf("open %s", o.Project), desc))
 	return nil
 }
 
@@ -1045,8 +922,10 @@ type ValidateCmd struct {
 }
 
 func (v *ValidateCmd) Run() error {
-	fmt.Println("🚧 Not implemented yet: validate config")
-	fmt.Println("This will check config syntax, verify source directories, and validate file sizes")
+	fmt.Println(theme.NotImplementedWithDesc(
+		"validate",
+		"This will check config syntax, verify source directories, and validate file sizes",
+	))
 	return nil
 }
 
@@ -1058,8 +937,10 @@ type LinkCmd struct {
 }
 
 func (l *LinkCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: link to project '%s'\n", l.Project)
-	fmt.Println("This will associate this directory with the remote project")
+	fmt.Println(theme.NotImplementedWithDesc(
+		fmt.Sprintf("link %s", l.Project),
+		"This will associate this directory with the remote project",
+	))
 	return nil
 }
 
@@ -1070,8 +951,7 @@ type PreviewCmd struct {
 }
 
 func (p *PreviewCmd) Run() error {
-	fmt.Println("🚧 Not implemented yet: preview deployment")
-	fmt.Println("This will create a temporary deployment with auto-cleanup")
+	fmt.Println(theme.NotImplementedWithDesc("preview", "This will create a temporary deployment with auto-cleanup"))
 	return nil
 }
 
@@ -1081,8 +961,10 @@ type DiffCmd struct {
 }
 
 func (d *DiffCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: diff for project '%s'\n", d.Project)
-	fmt.Println("This will compare local build with deployed version")
+	fmt.Println(theme.NotImplementedWithDesc(
+		fmt.Sprintf("diff %s", d.Project),
+		"This will compare local build with deployed version",
+	))
 	return nil
 }
 
@@ -1101,7 +983,7 @@ type EnvListCmd struct {
 }
 
 func (e *EnvListCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: env list for '%s'\n", e.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("env list %s", e.Project)))
 	return nil
 }
 
@@ -1112,7 +994,7 @@ type EnvSetCmd struct {
 }
 
 func (e *EnvSetCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: env set %s=%s for '%s'\n", e.Key, e.Value, e.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("env set %s=%s for %s", e.Key, e.Value, e.Project)))
 	return nil
 }
 
@@ -1122,7 +1004,7 @@ type EnvUnsetCmd struct {
 }
 
 func (e *EnvUnsetCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: env unset %s for '%s'\n", e.Key, e.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("env unset %s for %s", e.Key, e.Project)))
 	return nil
 }
 
@@ -1132,7 +1014,7 @@ type EnvPullCmd struct {
 }
 
 func (e *EnvPullCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: env pull for '%s' to %s\n", e.Project, e.Output)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("env pull %s --output %s", e.Project, e.Output)))
 	return nil
 }
 
@@ -1149,7 +1031,7 @@ type CLIConfigGetCmd struct {
 }
 
 func (c *CLIConfigGetCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: cli-config get %s\n", c.Key)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("cli-config get %s", c.Key)))
 	return nil
 }
 
@@ -1159,14 +1041,14 @@ type CLIConfigSetCmd struct {
 }
 
 func (c *CLIConfigSetCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: cli-config set %s=%s\n", c.Key, c.Value)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("cli-config set %s=%s", c.Key, c.Value)))
 	return nil
 }
 
 type CLIConfigListCmd struct{}
 
 func (c *CLIConfigListCmd) Run() error {
-	fmt.Println("🚧 Not implemented yet: cli-config list")
+	fmt.Println(theme.NotImplementedMsg("cli-config list"))
 	return nil
 }
 
@@ -1175,7 +1057,7 @@ type CLIConfigAPIUrlCmd struct {
 }
 
 func (c *CLIConfigAPIUrlCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: cli-config api-url %s\n", c.URL)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("cli-config api-url %s", c.URL)))
 	return nil
 }
 
@@ -1194,7 +1076,7 @@ type DomainsListCmd struct {
 }
 
 func (d *DomainsListCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: domains list for '%s'\n", d.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("domains list %s", d.Project)))
 	return nil
 }
 
@@ -1204,7 +1086,7 @@ type DomainsAddCmd struct {
 }
 
 func (d *DomainsAddCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: domains add %s to '%s'\n", d.Domain, d.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("domains add %s %s", d.Project, d.Domain)))
 	return nil
 }
 
@@ -1214,7 +1096,7 @@ type DomainsRemoveCmd struct {
 }
 
 func (d *DomainsRemoveCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: domains remove %s from '%s'\n", d.Domain, d.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("domains remove %s %s", d.Project, d.Domain)))
 	return nil
 }
 
@@ -1223,7 +1105,7 @@ type DomainsVerifyCmd struct {
 }
 
 func (d *DomainsVerifyCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: domains verify %s\n", d.Domain)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("domains verify %s", d.Domain)))
 	return nil
 }
 
@@ -1239,7 +1121,7 @@ type AliasesListCmd struct {
 }
 
 func (a *AliasesListCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: aliases list for '%s'\n", a.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("aliases list %s", a.Project)))
 	return nil
 }
 
@@ -1249,7 +1131,7 @@ type AliasesCreateCmd struct {
 }
 
 func (a *AliasesCreateCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: aliases create %s for '%s'\n", a.Alias, a.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("aliases create %s %s", a.Project, a.Alias)))
 	return nil
 }
 
@@ -1259,7 +1141,7 @@ type AliasesRemoveCmd struct {
 }
 
 func (a *AliasesRemoveCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: aliases remove %s from '%s'\n", a.Alias, a.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("aliases remove %s %s", a.Project, a.Alias)))
 	return nil
 }
 
@@ -1273,7 +1155,7 @@ type MetricsCmd struct {
 }
 
 func (m *MetricsCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: metrics for '%s' (period: %s)\n", m.Project, m.Period)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("metrics %s --period %s", m.Project, m.Period)))
 	return nil
 }
 
@@ -1283,8 +1165,10 @@ type AnalyticsCmd struct {
 }
 
 func (a *AnalyticsCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: analytics for '%s'\n", a.Project)
-	fmt.Println("This will open the analytics dashboard in your browser")
+	fmt.Println(theme.NotImplementedWithDesc(
+		fmt.Sprintf("analytics %s", a.Project),
+		"This will open the analytics dashboard in your browser",
+	))
 	return nil
 }
 
@@ -1295,8 +1179,10 @@ type HealthCmd struct {
 }
 
 func (h *HealthCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: health check for '%s'\n", h.Project)
-	fmt.Println("This will ping deployment, check CDN, and verify SSL certificate")
+	fmt.Println(theme.NotImplementedWithDesc(
+		fmt.Sprintf("health %s", h.Project),
+		"This will ping deployment, check CDN, and verify SSL certificate",
+	))
 	return nil
 }
 
@@ -1313,7 +1199,7 @@ type TeamsCmd struct {
 type TeamsListCmd struct{}
 
 func (t *TeamsListCmd) Run() error {
-	fmt.Println("🚧 Not implemented yet: teams list")
+	fmt.Println(theme.NotImplementedMsg("teams list"))
 	return nil
 }
 
@@ -1322,7 +1208,7 @@ type TeamsSwitchCmd struct {
 }
 
 func (t *TeamsSwitchCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: switch to team '%s'\n", t.Team)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("teams switch %s", t.Team)))
 	return nil
 }
 
@@ -1331,7 +1217,7 @@ type TeamsCreateCmd struct {
 }
 
 func (t *TeamsCreateCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: create team '%s'\n", t.Name)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("teams create %s", t.Name)))
 	return nil
 }
 
@@ -1340,7 +1226,7 @@ type TeamsInviteCmd struct {
 }
 
 func (t *TeamsInviteCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: invite %s to team\n", t.Email)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("teams invite %s", t.Email)))
 	return nil
 }
 
@@ -1354,7 +1240,7 @@ type TokensCmd struct {
 type TokensListCmd struct{}
 
 func (t *TokensListCmd) Run() error {
-	fmt.Println("🚧 Not implemented yet: tokens list")
+	fmt.Println(theme.NotImplementedMsg("tokens list"))
 	return nil
 }
 
@@ -1364,7 +1250,7 @@ type TokensCreateCmd struct {
 }
 
 func (t *TokensCreateCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: create token (expires: %s)\n", t.Expires)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("tokens create --expires %s", t.Expires)))
 	return nil
 }
 
@@ -1373,7 +1259,7 @@ type TokensRevokeCmd struct {
 }
 
 func (t *TokensRevokeCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: revoke token %s\n", t.ID)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("tokens revoke %s", t.ID)))
 	return nil
 }
 
@@ -1387,7 +1273,7 @@ type PromoteCmd struct {
 }
 
 func (p *PromoteCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: promote from '%s' to '%s'\n", p.Source, p.Target)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("promote %s %s", p.Source, p.Target)))
 	return nil
 }
 
@@ -1398,7 +1284,7 @@ type CompareCmd struct {
 }
 
 func (c *CompareCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: compare %s vs %s\n", c.DeploymentA, c.DeploymentB)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("compare %s %s", c.DeploymentA, c.DeploymentB)))
 	return nil
 }
 
@@ -1414,7 +1300,7 @@ type CacheClearCmd struct {
 }
 
 func (c *CacheClearCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: cache clear for '%s'\n", c.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("cache clear %s", c.Project)))
 	return nil
 }
 
@@ -1424,7 +1310,7 @@ type CachePurgeCmd struct {
 }
 
 func (c *CachePurgeCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: cache purge %s for '%s'\n", c.Path, c.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("cache purge %s %s", c.Project, c.Path)))
 	return nil
 }
 
@@ -1433,7 +1319,7 @@ type CacheStatsCmd struct {
 }
 
 func (c *CacheStatsCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: cache stats for '%s'\n", c.Project)
+	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("cache stats %s", c.Project)))
 	return nil
 }
 
@@ -1449,9 +1335,9 @@ type BuildsRunCmd struct {
 
 func (b *BuildsRunCmd) Run() error {
 	if b.BuildCmd != "" {
-		fmt.Printf("🚧 Not implemented yet: builds run with command '%s'\n", b.BuildCmd)
+		fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("builds run --build-cmd %s", b.BuildCmd)))
 	} else {
-		fmt.Println("🚧 Not implemented yet: builds run (auto-detect)")
+		fmt.Println(theme.NotImplementedWithDesc("builds run", "This will auto-detect and run your build command"))
 	}
 	return nil
 }
@@ -1461,7 +1347,11 @@ type BuildsConfigCmd struct {
 }
 
 func (b *BuildsConfigCmd) Run() error {
-	fmt.Printf("🚧 Not implemented yet: builds config (command: %s)\n", b.Command)
+	if b.Command != "" {
+		fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("builds config --command %s", b.Command)))
+	} else {
+		fmt.Println(theme.NotImplementedMsg("builds config"))
+	}
 	return nil
 }
 
