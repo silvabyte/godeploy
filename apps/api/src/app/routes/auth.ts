@@ -445,8 +445,6 @@ export default async function (fastify: FastifyInstance) {
 		},
 	});
 
-	// ===== STUB ENDPOINTS - Priority 1 =====
-
 	// Get current user information (whoami)
 	fastify.get("/api/auth/whoami", {
 		config: { auth: true },

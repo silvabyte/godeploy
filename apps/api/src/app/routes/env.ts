@@ -1,8 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 export default async function (fastify: FastifyInstance) {
-	// ===== STUB ENDPOINTS - Priority 4: Environment Variables =====
-
 	// List environment variables for a project
 	fastify.get("/api/projects/:projectId/env", {
 		config: { auth: true },

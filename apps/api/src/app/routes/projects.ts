@@ -298,8 +298,6 @@ export default async function (fastify: FastifyInstance) {
 		},
 	});
 
-	// ===== STUB ENDPOINTS - Priority 1 =====
-
 	// Get project status
 	fastify.get("/api/projects/:projectId/status", {
 		config: { auth: true },
@@ -342,8 +340,6 @@ export default async function (fastify: FastifyInstance) {
 		},
 	});
 
-	// ===== STUB ENDPOINTS - Priority 2 =====
-
 	// Rollback project to previous deployment
 	fastify.post("/api/projects/:projectId/rollback", {
 		config: { auth: true },
@@ -385,8 +381,6 @@ export default async function (fastify: FastifyInstance) {
 			});
 		},
 	});
-
-	// ===== STUB ENDPOINTS - Priority 5 =====
 
 	// List project aliases
 	fastify.get("/api/projects/:projectId/aliases", {
@@ -432,8 +426,6 @@ export default async function (fastify: FastifyInstance) {
 		},
 	});
 
-	// ===== STUB ENDPOINTS - Priority 6 =====
-
 	// Get project metrics
 	fastify.get("/api/projects/:projectId/metrics", {
 		config: { auth: true },
@@ -461,8 +453,6 @@ export default async function (fastify: FastifyInstance) {
 			});
 		},
 	});
-
-	// ===== STUB ENDPOINTS - Priority 8 =====
 
 	// Promote deployment
 	fastify.post("/api/projects/:sourceId/promote/:targetId", {

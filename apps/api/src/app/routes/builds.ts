@@ -1,8 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 export default async function (fastify: FastifyInstance) {
-	// ===== STUB ENDPOINTS - Priority 8: Build Configuration =====
-
 	// Get build configuration for a project
 	fastify.get("/api/projects/:projectId/builds/config", {
 		config: { auth: true },

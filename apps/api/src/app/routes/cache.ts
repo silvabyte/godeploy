@@ -1,8 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 export default async function (fastify: FastifyInstance) {
-	// ===== STUB ENDPOINTS - Priority 8: Cache Management =====
-
 	// Clear entire CDN cache for a project
 	fastify.post("/api/projects/:projectId/cache/clear", {
 		config: { auth: true },

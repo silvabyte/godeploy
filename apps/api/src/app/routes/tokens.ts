@@ -1,8 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 export default async function (fastify: FastifyInstance) {
-	// ===== STUB ENDPOINTS - Priority 7: API Tokens =====
-
 	// List all API tokens for user
 	fastify.get("/api/tokens", {
 		config: { auth: true },

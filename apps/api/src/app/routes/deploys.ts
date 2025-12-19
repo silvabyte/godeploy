@@ -324,8 +324,6 @@ export default async function (fastify: FastifyInstance) {
 		},
 	});
 
-	// ===== STUB ENDPOINTS - Priority 3 =====
-
 	// Preview deployment
 	fastify.post("/api/deploys/preview", {
 		config: { auth: true },
@@ -336,8 +334,6 @@ export default async function (fastify: FastifyInstance) {
 			});
 		},
 	});
-
-	// ===== STUB ENDPOINTS - Priority 8 =====
 
 	// Compare two deployments
 	fastify.get("/api/deploys/compare", {

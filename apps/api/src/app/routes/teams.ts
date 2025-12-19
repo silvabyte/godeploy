@@ -1,8 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 export default async function (fastify: FastifyInstance) {
-	// ===== STUB ENDPOINTS - Priority 7: Teams & Collaboration =====
-
 	// List all teams for user
 	fastify.get("/api/teams", {
 		config: { auth: true },
