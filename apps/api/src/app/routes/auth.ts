@@ -450,7 +450,7 @@ export default async function (fastify: FastifyInstance) {
 	// Get current user information (whoami)
 	fastify.get("/api/auth/whoami", {
 		config: { auth: true },
-		handler: async (request: FastifyRequest, reply: FastifyReply) => {
+		handler: async (_request: FastifyRequest, reply: FastifyReply) => {
 			return reply.code(501).send({
 				error: "Not implemented yet",
 				message: "Whoami endpoint coming soon",

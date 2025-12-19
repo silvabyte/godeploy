@@ -7,7 +7,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.post("/api/projects/:projectId/cache/clear", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -21,7 +21,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.post("/api/projects/:projectId/cache/purge", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -35,7 +35,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/cache/stats", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({

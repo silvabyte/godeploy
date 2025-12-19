@@ -7,7 +7,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/builds/config", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -21,7 +21,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.post("/api/projects/:projectId/builds/config", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -35,7 +35,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.post("/api/projects/:projectId/builds/run", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -49,7 +49,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/builds/history", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -63,7 +63,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/builds/:buildId/logs", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{
+			_request: FastifyRequest<{
 				Params: { projectId: string; buildId: string };
 			}>,
 			reply: FastifyReply,
