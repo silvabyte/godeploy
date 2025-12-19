@@ -24,9 +24,42 @@ GoDeploy is a SPA deployment platform delivered as a monorepo. Users deploy stat
          ▼                ▼                ▼
 ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐
 │  Supabase   │  │  DO Spaces  │  │  DO App Platform│
-│  PostgreSQL │  │  (S3)       │  │  (CDN/Hosting)  │
-│  + Auth     │  │  Assets     │  │  Static Sites   │
-└─────────────┘  └─────────────┘  └─────────────────┘
+│  PostgreSQL │  │  (S3)       │  │  (Hosting)      │
+│  + Auth     │  │  Assets     │  │                 │
+└─────────────┘  └──────┬──────┘  └─────────────────┘
+                        │
+                        ▼
+              ┌─────────────────┐
+              │  Nginx Proxy    │◄──── User requests to
+              │  (Edge Router)  │      *.godeploy.app
+              └─────────────────┘
+```
+
+## Request Flow for Deployed SPAs
+
+```
+User Browser
+     │
+     │  https://my-app--tenant.spa.godeploy.app
+     ▼
+┌─────────────────────────────────────────┐
+│         Nginx Proxy Server              │
+│  (godeploy-nginx-server on DO App)      │
+│                                         │
+│  1. Parse subdomain/custom domain       │
+│  2. Route to correct CDN path           │
+│  3. SPA fallback (index.html for 404s)  │
+│  4. Cache responses                     │
+└────────────────┬────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│      DigitalOcean Spaces CDN            │
+│  godeploy-spa-assets.nyc3.cdn.do.com    │
+│                                         │
+│  /spa-projects/{tenant}/{project}/      │
+│  /spa-projects/{custom-domain}/         │
+└─────────────────────────────────────────┘
 ```
 
 ## Components
@@ -88,6 +121,36 @@ Next.js static site for public-facing content:
 - Homepage, pricing, philosophy
 - Terms of service, privacy policy
 
+### Nginx Proxy Server (`godeploy-nginx-server`)
+
+> **Note:** This is a separate repository at `github.com/silvabyte/godeploy-nginx-server`
+
+Nginx-based edge proxy that routes user requests to deployed SPAs:
+
+- **Subdomain routing** - Routes `project--tenant.spa.godeploy.app` to correct CDN path
+- **Custom domain routing** - Routes verified custom domains to their assets
+- **Marketing site** - Serves `godeploy.app` and `www.godeploy.app`
+- **SPA fallback** - Returns `index.html` for client-side routing (404 → index.html)
+- **Caching** - Caches CDN responses at the edge
+
+#### Server Blocks
+
+| Block          | Domain Pattern                         | CDN Path                            |
+| -------------- | -------------------------------------- | ----------------------------------- |
+| Subdomains     | `{project}--{tenant}.spa.godeploy.app` | `/spa-projects/{tenant}/{project}/` |
+| Marketing      | `godeploy.app`, `www.godeploy.app`     | `/spa-projects/godeploy.app/`       |
+| Custom Domains | Any verified domain                    | `/spa-projects/{domain}/`           |
+
+#### SPA Fallback Logic
+
+```
+1. Try exact path: /about → /spa-projects/.../about
+2. Try .html extension: /about → /spa-projects/.../about.html
+3. Fallback to index: /about → /spa-projects/.../index.html
+```
+
+This enables client-side routing frameworks (React Router, Vue Router, etc.) to work correctly.
+
 ## Data Flow
 
 ### Deploy Flow
@@ -100,12 +163,14 @@ Next.js static site for public-facing content:
 2. API: Receive upload
    └─► Validate JWT token
    └─► Store archive in DO Spaces
-   └─► Extract and process files
-   └─► Configure CDN routing
+   └─► Extract files to /spa-projects/{tenant}/{project}/
    └─► Return deploy URL
 
-3. CDN: Serve static files
-   └─► https://project-name.godeploy.app
+3. User visits https://my-app--tenant.spa.godeploy.app
+   └─► Request hits Nginx proxy
+   └─► Nginx routes to DO Spaces CDN
+   └─► CDN serves static files
+   └─► SPA fallback handles client-side routes
 ```
 
 ### Authentication Flow
@@ -149,11 +214,11 @@ Isolation is enforced via:
 
 ### DigitalOcean Services
 
-| Service      | Purpose                                        |
-| ------------ | ---------------------------------------------- |
-| App Platform | Hosts API, dashboard, auth, marketing          |
-| Spaces       | S3-compatible object storage for deploy assets |
-| CDN          | Edge caching for deployed SPAs                 |
+| Service      | Purpose                                            |
+| ------------ | -------------------------------------------------- |
+| App Platform | Hosts API, dashboard, auth, marketing, nginx proxy |
+| Spaces       | S3-compatible object storage for deploy assets     |
+| Spaces CDN   | Edge caching for static assets                     |
 
 ### Supabase
 

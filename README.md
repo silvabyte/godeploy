@@ -96,6 +96,12 @@ libs/
 supabase/       # Database migrations
 ```
 
+### Related Repositories
+
+| Repository                                                                  | Description                                            |
+| --------------------------------------------------------------------------- | ------------------------------------------------------ |
+| [godeploy-nginx-server](https://github.com/silvabyte/godeploy-nginx-server) | Nginx edge proxy for routing requests to deployed SPAs |
+
 ## Development
 
 ```bash
