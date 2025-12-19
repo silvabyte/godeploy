@@ -13,6 +13,7 @@ import {
 	subscriptionLoader,
 } from "../components/settings/SubscriptionPage";
 import { FeatureFlags, FLAGS } from "../featureflags/ff";
+// Note: ENABLE_SUBSCRIPTIONS flag has been lifted - subscription route is always available
 import { DomainsPage } from "../pages/DomainsPage";
 import { DeploymentsPage } from "../pages/deployments/DeploymentsPage";
 import { deploymentsLoader } from "../pages/deployments/loaders";
@@ -103,18 +104,14 @@ export const createRoutes = (services: Services): RouteObject => {
 						path: "settings",
 						element: <SettingsPage />,
 					},
-					...(FeatureFlags.getInstance().isEnabled(FLAGS.ENABLE_SUBSCRIPTIONS)
-						? [
-								{
-									path: "subscription",
-									element: <SubscriptionPage />,
-									loader: async (args: LoaderFunctionArgs) =>
-										subscriptionLoader(args, services),
-									action: async (args: ActionFunctionArgs) =>
-										subscriptionAction(args, services),
-								},
-							]
-						: []),
+					{
+						path: "subscription",
+						element: <SubscriptionPage />,
+						loader: async (args: LoaderFunctionArgs) =>
+							subscriptionLoader(args, services),
+						action: async (args: ActionFunctionArgs) =>
+							subscriptionAction(args, services),
+					},
 					...(FeatureFlags.getInstance().isEnabled(FLAGS.ENABLE_OFFER)
 						? [
 								{

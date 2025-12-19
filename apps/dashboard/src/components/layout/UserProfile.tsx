@@ -2,7 +2,6 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { t } from "@matsilva/xtranslate";
 import { Link, useLoaderData } from "react-router-dom";
-import { FeatureFlags, FLAGS } from "../../featureflags/ff";
 import { redirectToAuth } from "../../router/redirect";
 import type { AppLoaderData } from "../../services/loader.types";
 import { useServices } from "../../services/ServiceProvider";
@@ -58,19 +57,15 @@ export function UserProfile() {
 									<Badge status="planned" />
 								</Link>
 							</MenuItem>
-							{FeatureFlags.getInstance().isEnabled(
-								FLAGS.ENABLE_SUBSCRIPTIONS,
-							) && (
-								<MenuItem>
-									<Link
-										to="/subscription"
-										className={`flex items-center justify-between px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900`}
-									>
-										<span>{t("subscription.title")}</span>
-										<Badge status="beta" />
-									</Link>
-								</MenuItem>
-							)}
+							<MenuItem>
+								<Link
+									to="/subscription"
+									className={`flex items-center justify-between px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900`}
+								>
+									<span>{t("subscription.title")}</span>
+									<Badge status="beta" />
+								</Link>
+							</MenuItem>
 							{/* <MenuItem>
             <Link
               to="/support"
