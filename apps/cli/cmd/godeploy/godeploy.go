@@ -801,8 +801,6 @@ func (d *DeployCmd) Run() error {
 	return nil
 }
 
-// ===== Priority 1: Core Project Management =====
-
 // ProjectsCmd lists all deployed projects
 type ProjectsCmd struct {
 	Filter string `help:"Filter projects (enabled/disabled/all)" default:"all"`
@@ -869,8 +867,6 @@ func (w *WhoamiCmd) Run() error {
 	return nil
 }
 
-// ===== Priority 2: Deployment Operations =====
-
 // RollbackCmd rolls back to a previous deployment
 type RollbackCmd struct {
 	Project      string `arg:"" help:"Project name" required:"true"`
@@ -929,8 +925,6 @@ func (v *ValidateCmd) Run() error {
 	return nil
 }
 
-// ===== Priority 3: Developer Experience =====
-
 // LinkCmd links local directory to remote project
 type LinkCmd struct {
 	Project string `arg:"" help:"Project name" required:"true"`
@@ -967,8 +961,6 @@ func (d *DiffCmd) Run() error {
 	))
 	return nil
 }
-
-// ===== Priority 4: Environment & Configuration =====
 
 // EnvCmd manages environment variables
 type EnvCmd struct {
@@ -1061,8 +1053,6 @@ func (c *CLIConfigAPIUrlCmd) Run() error {
 	return nil
 }
 
-// ===== Priority 5: Domain & URL Management =====
-
 // DomainsCmd manages custom domains
 type DomainsCmd struct {
 	List   DomainsListCmd   `cmd:"list" help:"List domains for a project"`
@@ -1145,8 +1135,6 @@ func (a *AliasesRemoveCmd) Run() error {
 	return nil
 }
 
-// ===== Priority 6: Analytics & Monitoring =====
-
 // MetricsCmd views project metrics
 type MetricsCmd struct {
 	Project string `arg:"" help:"Project name" required:"true"`
@@ -1185,8 +1173,6 @@ func (h *HealthCmd) Run() error {
 	))
 	return nil
 }
-
-// ===== Priority 7: Team & Collaboration =====
 
 // TeamsCmd manages teams
 type TeamsCmd struct {
@@ -1262,8 +1248,6 @@ func (t *TokensRevokeCmd) Run() error {
 	fmt.Println(theme.NotImplementedMsg(fmt.Sprintf("tokens revoke %s", t.ID)))
 	return nil
 }
-
-// ===== Priority 8: Advanced Features =====
 
 // PromoteCmd promotes deployment between projects
 type PromoteCmd struct {
