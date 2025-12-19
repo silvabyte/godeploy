@@ -304,7 +304,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/status", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -318,7 +318,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/deployments", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -332,7 +332,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/logs", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -348,7 +348,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.post("/api/projects/:projectId/rollback", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -362,7 +362,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.delete("/api/projects/:projectId", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -376,7 +376,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/diff", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -392,7 +392,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/aliases", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -406,7 +406,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.post("/api/projects/:projectId/aliases", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -420,7 +420,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.delete("/api/projects/:projectId/aliases/:alias", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{
+			_request: FastifyRequest<{
 				Params: { projectId: string; alias: string };
 			}>,
 			reply: FastifyReply,
@@ -438,7 +438,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/metrics", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -452,7 +452,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/projects/:projectId/health", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { projectId: string } }>,
+			_request: FastifyRequest<{ Params: { projectId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -468,7 +468,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.post("/api/projects/:sourceId/promote/:targetId", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{
+			_request: FastifyRequest<{
 				Params: { sourceId: string; targetId: string };
 			}>,
 			reply: FastifyReply,

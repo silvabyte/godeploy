@@ -100,7 +100,7 @@ export function TrialConfirmationDialog({
 											<Form method="post" className="mt-8">
 												<input type="hidden" name="tierId" value={tier.id} />
 												<button
-													type="button"
+													type="submit"
 													className="block w-full rounded-full bg-green-500 px-4 py-2.5 text-center font-mono text-sm font-medium text-white shadow-sm hover:bg-green-600 active:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
 												>
 													{isFree ? "Get Started" : "Start 14-Day Free Trial"}

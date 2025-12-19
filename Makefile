@@ -114,7 +114,7 @@ all.check: ## Check workspace with biome
 
 all.check.fix: ## Check and fix workspace with biome
 	$(call print_header,Checking and fixing workspace)
-	@$(BUNX) biome check --write .
+	@$(BUNX) biome check --write --unsafe .
 	$(call print_success,Workspace fixes applied)
 
 all.knip: ## Run knip on entire workspace

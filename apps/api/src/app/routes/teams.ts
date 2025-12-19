@@ -6,7 +6,7 @@ export default async function (fastify: FastifyInstance) {
 	// List all teams for user
 	fastify.get("/api/teams", {
 		config: { auth: true },
-		handler: async (request: FastifyRequest, reply: FastifyReply) => {
+		handler: async (_request: FastifyRequest, reply: FastifyReply) => {
 			return reply.code(501).send({
 				error: "Not implemented yet",
 				message: "List teams endpoint coming soon",
@@ -17,7 +17,7 @@ export default async function (fastify: FastifyInstance) {
 	// Create a new team
 	fastify.post("/api/teams", {
 		config: { auth: true },
-		handler: async (request: FastifyRequest, reply: FastifyReply) => {
+		handler: async (_request: FastifyRequest, reply: FastifyReply) => {
 			return reply.code(501).send({
 				error: "Not implemented yet",
 				message: "Create team endpoint coming soon",
@@ -29,7 +29,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/teams/:teamId", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { teamId: string } }>,
+			_request: FastifyRequest<{ Params: { teamId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -43,7 +43,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.patch("/api/teams/:teamId", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { teamId: string } }>,
+			_request: FastifyRequest<{ Params: { teamId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -57,7 +57,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.delete("/api/teams/:teamId", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { teamId: string } }>,
+			_request: FastifyRequest<{ Params: { teamId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -71,7 +71,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.get("/api/teams/:teamId/members", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { teamId: string } }>,
+			_request: FastifyRequest<{ Params: { teamId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -85,7 +85,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.post("/api/teams/:teamId/members", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { teamId: string } }>,
+			_request: FastifyRequest<{ Params: { teamId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
@@ -99,7 +99,7 @@ export default async function (fastify: FastifyInstance) {
 	fastify.delete("/api/teams/:teamId/members/:userId", {
 		config: { auth: true },
 		handler: async (
-			request: FastifyRequest<{ Params: { teamId: string; userId: string } }>,
+			_request: FastifyRequest<{ Params: { teamId: string; userId: string } }>,
 			reply: FastifyReply,
 		) => {
 			return reply.code(501).send({
