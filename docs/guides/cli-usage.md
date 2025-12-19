@@ -14,7 +14,7 @@ This installs the latest version to `~/.local/bin/godeploy`.
 
 ### Manual Installation
 
-Download the appropriate binary from the [releases page](https://github.com/silvabyte/godeploy-api/releases):
+Download the appropriate binary from the [releases page](https://github.com/silvabyte/godeploy/releases):
 
 | Platform | Architecture  | File                            |
 | -------- | ------------- | ------------------------------- |

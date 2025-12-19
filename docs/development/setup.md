@@ -30,7 +30,7 @@ sudo apt install golang-go
 
 ```bash
 # Clone the repository
-git clone https://github.com/silvabyte/godeploy-api.git
+git clone https://github.com/silvabyte/godeploy.git
 cd godeploy-api
 
 # Install dependencies
@@ -139,6 +139,10 @@ make api.dev
 ### Dashboard
 
 ```bash
+# Via Makefile (from repo root)
+make dashboard.dev
+
+# Or manually
 cd apps/dashboard
 bun dev
 ```
@@ -146,6 +150,10 @@ bun dev
 ### Auth App
 
 ```bash
+# Via Makefile (from repo root)
+make auth.dev
+
+# Or manually
 cd apps/auth
 bun dev
 ```
@@ -153,6 +161,10 @@ bun dev
 ### Marketing Site
 
 ```bash
+# Via Makefile (from repo root)
+make marketing.dev
+
+# Or manually
 cd apps/marketing
 bun dev
 ```
@@ -160,13 +172,11 @@ bun dev
 ### CLI
 
 ```bash
-cd apps/cli
-
-# Build
+# Build (from repo root)
 make cli.build
 
 # Run locally
-./out/godeploy --help
+./apps/cli/out/godeploy --help
 ```
 
 ## Testing
