@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/adrg/xdg"
+	"github.com/silvabyte/godeploy/internal/paths"
 )
 
 // Config represents the authentication configuration stored on disk
@@ -21,9 +21,9 @@ type Config struct {
 type ConfigDirFunc func() (string, error)
 
 // GetConfigDir returns the directory where the config file should be stored
-// using XDG Base Directory specification
+// using XDG Base Directory specification via the paths package
 var GetConfigDir ConfigDirFunc = func() (string, error) {
-	return filepath.Join(xdg.ConfigHome, "godeploy"), nil
+	return paths.GetConfigDir(), nil
 }
 
 // GetLegacyConfigDir returns the legacy (pre-XDG) config directory path

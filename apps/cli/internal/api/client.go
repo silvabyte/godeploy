@@ -20,6 +20,9 @@ const (
 
 	// DefaultTimeout is the default timeout for API requests
 	DefaultTimeout = 30 * time.Second
+	// DefaultAuthTimeout is the timeout for auth operations (login, refresh)
+	// Shorter timeout for better UX when backend is unreachable
+	DefaultAuthTimeout = 10 * time.Second
 	// DefaultDeployTimeout is the default timeout for deploy requests
 	DefaultDeployTimeout = 10 * time.Minute
 )
@@ -344,8 +347,9 @@ func (c *Client) SignIn(email, password string) (*SignInResponse, error) {
 	// Set the headers
 	req.Header.Set("Content-Type", "application/json")
 
-	// Send the request
-	resp, err := c.HTTPClient.Do(req)
+	// Use shorter timeout for auth operations
+	authClient := &http.Client{Timeout: DefaultAuthTimeout}
+	resp, err := authClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -482,8 +486,9 @@ func (c *Client) RefreshToken(refreshToken string) (*RefreshResponse, error) {
 	// Set the headers
 	req.Header.Set("Content-Type", "application/json")
 
-	// Send the request
-	resp, err := c.HTTPClient.Do(req)
+	// Use shorter timeout for auth operations
+	authClient := &http.Client{Timeout: DefaultAuthTimeout}
+	resp, err := authClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
