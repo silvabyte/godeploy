@@ -1,9 +1,12 @@
 import dns from "node:dns";
-import { promisify } from "node:util";
 import { z } from "zod";
 import type { Result } from "../types/result.types";
 
-const resolveCname = promisify(dns.resolveCname);
+// Use public DNS servers to avoid stale caches on hosting providers
+const resolver = new dns.promises.Resolver();
+resolver.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+
+const resolveCname = (domain: string) => resolver.resolveCname(domain);
 
 // Zod schemas for validation
 const domainSchema = z
