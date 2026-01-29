@@ -6,15 +6,15 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/adrg/xdg"
+	"github.com/silvabyte/godeploy/internal/paths"
 )
 
 // GetDeploymentCacheDir returns the directory for deployment caches
-// using XDG Base Directory specification
+// using XDG Base Directory specification via the paths package
 func GetDeploymentCacheDir(projectName string) (string, error) {
 	// Create a timestamped directory for this deployment
 	timestamp := time.Now().Format("20060102-150405")
-	cacheDir := filepath.Join(xdg.CacheHome, "godeploy", "deploys", fmt.Sprintf("%s-%s", timestamp, projectName))
+	cacheDir := filepath.Join(paths.DeployCacheDir(), fmt.Sprintf("%s-%s", timestamp, projectName))
 
 	// Create the directory
 	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
@@ -26,7 +26,7 @@ func GetDeploymentCacheDir(projectName string) (string, error) {
 
 // CleanupOldCaches removes deployment cache directories older than the specified duration
 func CleanupOldCaches(olderThan time.Duration) error {
-	deploysDir := filepath.Join(xdg.CacheHome, "godeploy", "deploys")
+	deploysDir := paths.DeployCacheDir()
 
 	// If the deploys directory doesn't exist, nothing to clean up
 	if _, err := os.Stat(deploysDir); os.IsNotExist(err) {

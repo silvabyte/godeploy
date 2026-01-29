@@ -17,6 +17,7 @@ import (
 	"github.com/silvabyte/godeploy/internal/auth"
 	"github.com/silvabyte/godeploy/internal/cache"
 	"github.com/silvabyte/godeploy/internal/config"
+	"github.com/silvabyte/godeploy/internal/logging"
 	"github.com/silvabyte/godeploy/internal/theme"
 	"github.com/silvabyte/godeploy/internal/version"
 	"github.com/yarlson/pin"
@@ -182,52 +183,76 @@ func (i *InitCmd) Run() error {
 
 // Run executes the login command
 func (l *LoginCmd) Run() error {
-	// Check if already authenticated with a simple token check using TokenManager
+	logging.Info().Msg("login command started")
+
+	// Check if already authenticated with a LOCAL token check only
+	// We don't want to make network calls here - if token is expired, let user login again
+	logging.Debug().Msg("checking existing authentication (local only)")
 	apiClient := api.NewClient()
 	tokenManager := createTokenManager(apiClient)
-	if token, err := tokenManager.EnsureValidToken(); err == nil && token != "" {
-		fmt.Println("You are already authenticated. To log out, run 'godeploy auth logout'.")
-		return nil
+
+	// First check if we have a token locally
+	token, _ := auth.GetAuthToken()
+	if token != "" {
+		// Check if token is NOT expired (without network call)
+		expired, err := tokenManager.IsTokenExpired(token, 0)
+		if err == nil && !expired {
+			logging.Info().Msg("user already authenticated with valid token")
+			fmt.Println("You are already authenticated. To log out, run 'godeploy auth logout'.")
+			return nil
+		}
+		logging.Debug().Bool("expired", expired).Msg("existing token is expired or invalid, proceeding with login")
 	}
 
 	// Get email from argument or stored config
 	email := l.Email
 	if email == "" {
 		// Try to get email from saved config
+		logging.Debug().Msg("checking for saved email")
 		savedEmail, err := auth.GetUserEmail()
 		if err != nil {
+			logging.Err(err, "failed to retrieve saved email")
 			return fmt.Errorf("error retrieving saved email: %w", err)
 		}
 
 		if savedEmail != "" {
 			email = savedEmail
+			logging.Debug().Str("email", email).Msg("using saved email")
 			fmt.Printf("Using saved email: %s\n", email)
 		} else {
 			// Prompt for email if not provided
+			logging.Debug().Msg("prompting for email")
 			fmt.Print("Email: ")
 			reader := bufio.NewReader(os.Stdin)
 			emailInput, err := reader.ReadString('\n')
 			if err != nil {
+				logging.Err(err, "failed to read email input")
 				return fmt.Errorf("failed to read email: %w", err)
 			}
 			email = strings.TrimSpace(emailInput)
 			if email == "" {
+				logging.Warn().Msg("empty email provided")
 				return fmt.Errorf("email is required for authentication")
 			}
 		}
 	}
 
+	logging.Info().Str("email", email).Msg("login attempt started")
+
 	// Get password from argument or prompt
 	password := l.Password
 	if password == "" {
+		logging.Debug().Msg("prompting for password")
 		fmt.Print("Password: ")
 		passwordBytes, err := term.ReadPassword(int(syscall.Stdin))
 		if err != nil {
+			logging.Err(err, "failed to read password input")
 			return fmt.Errorf("failed to read password: %w", err)
 		}
 		fmt.Println() // Add newline after password input
 		password = string(passwordBytes)
 		if password == "" {
+			logging.Warn().Msg("empty password provided")
 			return fmt.Errorf("password is required for authentication")
 		}
 	}
@@ -243,12 +268,14 @@ func (l *LoginCmd) Run() error {
 	authCancel := authSpinner.Start(ctx)
 
 	// Authenticate with email and password (reuse apiClient from above)
+	logging.Debug().Str("email", email).Msg("calling SignIn API")
 	signInResp, err := apiClient.SignIn(email, password)
 
 	authCancel()
 
 	if err != nil {
 		authSpinner.Fail("Authentication failed")
+		logging.Error().Err(err).Str("email", email).Msg("authentication failed")
 
 		// Check for specific error messages
 		if strings.Contains(err.Error(), "Invalid credentials") || strings.Contains(err.Error(), "Invalid email or password") {
@@ -262,6 +289,7 @@ func (l *LoginCmd) Run() error {
 	}
 
 	authSpinner.Stop("Authentication successful")
+	logging.Info().Str("email", email).Msg("authentication successful")
 
 	// Create a spinner for saving the token
 	saveSpinner := pin.New("Saving authentication token...",
@@ -271,21 +299,26 @@ func (l *LoginCmd) Run() error {
 	saveCancel := saveSpinner.Start(ctx)
 
 	// Save both tokens
+	logging.Debug().Msg("saving tokens")
 	if err := auth.SetTokens(signInResp.Token, signInResp.RefreshToken); err != nil {
 		saveCancel()
 		saveSpinner.Fail("Failed to save tokens")
+		logging.Err(err, "failed to save tokens")
 		return fmt.Errorf("failed to save authentication tokens: %w", err)
 	}
 
 	// Save email for future authentication
+	logging.Debug().Msg("saving email")
 	if err := auth.SetUserEmail(email); err != nil {
 		saveCancel()
 		saveSpinner.Fail("Failed to save email")
+		logging.Err(err, "failed to save email")
 		return fmt.Errorf("failed to save email: %w", err)
 	}
 
 	saveCancel()
 	saveSpinner.Stop("Token saved")
+	logging.Info().Str("email", email).Msg("login completed successfully")
 
 	fmt.Println(theme.SuccessMsg("Authentication successful! You are now logged in."))
 	if signInResp.User.Email != "" {
@@ -463,15 +496,42 @@ func (l *LogoutCmd) Run() error {
 
 // Run executes the status command
 func (s *StatusCmd) Run() error {
+	logging.Info().Msg("auth status command started")
+
 	// Get saved email if available
 	savedEmail, _ := auth.GetUserEmail()
 
+	// First do a quick local check - if no token exists, no need to try refresh
+	token, _ := auth.GetAuthToken()
+	if token == "" {
+		logging.Debug().Msg("no token found locally")
+		fmt.Println(theme.ErrorMsg("You are not authenticated with GoDeploy."))
+		if savedEmail != "" {
+			fmt.Println(theme.MutedMsg(fmt.Sprintf("Run 'godeploy auth login' to authenticate with saved email: %s", savedEmail)))
+		} else {
+			fmt.Println(theme.MutedMsg("Run 'godeploy auth login' to authenticate."))
+		}
+		return nil
+	}
+
 	// Check authentication using TokenManager (which handles refresh automatically)
+	// Show a spinner since this may make network calls
+	ctx := context.Background()
+	statusSpinner := pin.New("Checking authentication status...",
+		pin.WithSpinnerColor(pin.ColorMagenta),
+		pin.WithTextColor(pin.ColorMagenta),
+	)
+	statusCancel := statusSpinner.Start(ctx)
+
 	apiClient := api.NewClient()
 	tokenManager := createTokenManager(apiClient)
 	token, err := tokenManager.EnsureValidToken()
 
+	statusCancel()
+
 	if err != nil || token == "" {
+		statusSpinner.Fail("Authentication check failed")
+		logging.Debug().Err(err).Msg("token validation failed")
 		// Not authenticated or token refresh failed
 		fmt.Println(theme.ErrorMsg("You are not authenticated with GoDeploy."))
 		if savedEmail != "" {
@@ -481,6 +541,8 @@ func (s *StatusCmd) Run() error {
 		}
 		return nil
 	}
+
+	statusSpinner.Stop("Authenticated")
 
 	// Token is valid (automatically refreshed if it was expiring)
 	fmt.Println(theme.SuccessMsg("You are authenticated with GoDeploy."))
