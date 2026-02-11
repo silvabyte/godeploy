@@ -10,9 +10,6 @@ import { ProjectDomain } from "../../utils/url";
 import type { Project } from "../projects/projects.types";
 import { extractZip } from "./Zip";
 
-//TODO: ensure we use streams for all file operations to avoid inevitable nodejs memory issues
-// couple the above with plimit library to limit the number of concurrent file operations our server does at a time to avoid overloading the server
-
 interface Result<T> {
 	data: T | null;
 	error: string | null;

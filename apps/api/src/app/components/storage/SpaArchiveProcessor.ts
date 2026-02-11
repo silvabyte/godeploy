@@ -1,10 +1,10 @@
-import { createWriteStream } from "node:fs";
+import { createReadStream, createWriteStream } from "node:fs";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 import { pipeline } from "node:stream/promises";
 import { to } from "await-to-js";
-import unzipper from "unzipper";
+import { Unzip, UnzipInflate, UnzipPassThrough } from "fflate";
 
 interface Result<T> {
 	data: T | null;
@@ -52,28 +52,63 @@ export async function saveStreamToTemp(
 export async function validateSpaArchive(
 	archivePath: string,
 ): Promise<Result<boolean>> {
-	try {
-		// Inspect the zip without extracting to avoid disk and memory overhead
-		const zip = await unzipper.Open.file(archivePath);
-		// Consider non-directory entries as files
-		const hasFiles = zip.files.some(
-			(f) => !f.path.endsWith("/") && f.type === "File",
-		);
+	return new Promise<Result<boolean>>((resolve) => {
+		let settled = false;
 
-		if (!hasFiles) {
-			return {
+		function settle(result: Result<boolean>) {
+			if (settled) return;
+			settled = true;
+			rs.destroy();
+			resolve(result);
+		}
+
+		const uz = new Unzip();
+		uz.register(UnzipPassThrough);
+		uz.register(UnzipInflate);
+
+		uz.onfile = (file) => {
+			file.ondata = () => {};
+			file.start();
+
+			if (!file.name.endsWith("/")) {
+				settle({ data: true, error: null });
+			}
+		};
+
+		const rs = createReadStream(archivePath, { highWaterMark: 65536 });
+
+		rs.on("error", (err) => {
+			settle({
+				data: null,
+				error: err instanceof Error ? err.message : String(err),
+			});
+		});
+
+		rs.on("data", (chunk: Buffer) => {
+			if (settled) return;
+			try {
+				uz.push(
+					new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength),
+					false,
+				);
+			} catch {
+				settle({ data: null, error: "Invalid or corrupt archive file" });
+			}
+		});
+
+		rs.on("end", () => {
+			if (settled) return;
+			try {
+				uz.push(new Uint8Array(0), true);
+			} catch {
+				settle({ data: null, error: "Invalid or corrupt archive file" });
+				return;
+			}
+			settle({
 				data: false,
 				error:
 					"Archive is empty. Please ensure your static files are included.",
-			};
-		}
-
-		return { data: true, error: null };
-	} catch (error) {
-		return {
-			data: null,
-			error:
-				error instanceof Error ? error.message : "Unknown validation error",
-		};
-	}
+			});
+		});
+	});
 }
